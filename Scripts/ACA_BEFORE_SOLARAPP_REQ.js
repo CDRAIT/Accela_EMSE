@@ -8,6 +8,7 @@
 | Action# : N/A
 |
 | Notes   : TDunn  08/27/2024 Created by
+|         : TDunn  03/18/2025 updated Solar App ID validation method.
 |
 /------------------------------------------------------------------------------------------------------*/
 /*------------------------------------------------------------------------------------------------------/
@@ -231,6 +232,8 @@ try
 	var solarAnswer = AInfo["Solar App"];
 	var panelUpgrade = AInfo["Panel Upgrage"];
 	var mainAmps = AInfo["Main Panel Amperage"];
+	var solarID = AInfo["Solar App ID"];
+	var solarSTring = String(solarID);
 
 	if(solarAnswer == "No" || solarAnswer == "N" || solarAnswer == "NO") 
 	{
@@ -244,8 +247,12 @@ try
 		varShowMessage = true;
 		varComText = "You have entered a value for Main Panel Amperage in excess of the allowed maximum of 400A for SolarApp Plus submittals.Please correct this entry before trying to proceed.";
 	}
-	aa.print("varCancel: " + varCancel);
-	aa.print("varComText: " + varComText);
+	if(solarSTring.match(/^SA20[0-9]{1,}-[0-9]+-[0-9]+-[0-9]+-[A-Za-z]$/g)==null)
+	{
+		varCancel = true;
+		varComText = "Invalid Approval Code. You must have a valid approval code from SolarApp+ to use this application.";
+		varShowMessage = true;
+    }	
 
 	if (varCancel) 
 	{
@@ -257,7 +264,7 @@ try
 } catch (err) 
 {
 	logDebug(err);
-	aa.sendMail("noreply@placer.ca.gov","tdunn@truepointsolutions.com", "", "Testing CTRCA SolarApp Error message ", err.message);	
+	aa.sendMail(defaultFrom,"tdunn@truepointsolutions.com", "", "Testing CTRCA SolarApp Error message ", err.message);	
 }
 
 /*------------------------------------------------------------------------------------------------------/
