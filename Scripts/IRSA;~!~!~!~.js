@@ -18,9 +18,10 @@
 |         : TDunn 08/28/2023 added additionial logic for new error message emails for bad parcel utility data
 |         : TDunn 11/16/2023 added code to ensure parcel attributes are instantiated for use by the utility release script block
 |         : TDunn 12/06/2024 updated generateReport calls to use new name 'generateReportPCO'
+|         : Abe   04/08/2025 added IT Req# 2340 - Auto-result WF when Final Passed on SolarApp+
 | 
 /-----------------------------------------------------------------------------------------------------------------*/
-if (matches(currentUserID,"JMCKENZI","TDUNN","EAFTAHI")) 
+if (matches(currentUserID,"JMCKENZI","TDUNN","EAFTAHI", "SVC_AGENT")) 
 {
 	showDebug = 1;
 }
@@ -148,7 +149,11 @@ if(matches(vEventName,"InspectionResultSubmitAfter","V360InspectionResultSubmitA
 		logDebug("Running Inspection result rules for Building");
 		if (inspResult == "Final Pass") {
 			closeTask("Inspections","Construction Complete","Building Granted a Final Pass"," ","BLD_20181201_MAIN");
-			//aa.sendMail("noreply@placer.ca.gov", "eaftahi@placer.ca.gov", "", "IRSA:TRACT Homes - IT Request # 2083 ", debug);
+			//aa.sendMail(defaultFrom, "eaftahi@placer.ca.gov", "", "IRSA:TRACT Homes - IT Request # 2083 ", debug);
+
+                //Abe 04/08/2025: IT Req# 2340
+                if(appTypeArray[3]== "Solar App")
+                        closeTask("Inspection","Construction Complete","Permit Granted a Final Pass"," ","B_SOLARAPP");
 
 		}
 
@@ -273,7 +278,7 @@ function sendElecUtilRelease()
 	//converted from ES_SEND_ELEC_UTIL_RELEASE - 02/15/2023 Tdunn, TPS
 	var params = aa.util.newHashtable();
 	var reportParams = aa.util.newHashMap();
-	var emailSendFrom = "placercounty_noreply@accela.com";
+	var emailSendFrom = defaultFrom;
 	var emailStaff = null;
 	var emailStaffCC = null;
 	var report = null;
@@ -332,7 +337,7 @@ function sendGasUtilRelease()
 	
 	var params = aa.util.newHashtable();
 	var reportParams = aa.util.newHashMap();
-	var emailSendFrom = "placercounty_noreply@accela.com";
+	var emailSendFrom = defaultFrom;
 	var emailStaff = null;
 	var emailStaffCC = null;
 	var report = null;
@@ -396,7 +401,7 @@ function sendTRPARelease()
 	var reportParams = aa.util.newHashMap();
 	addParameter(reportParams,"AltID",capIDString);
 	report = generateReportPCO("TRPA Release Letter",reportParams,"TRPA");
-	emailSendFrom = "placercounty_noreply@accela.com";
+	emailSendFrom = defaultFrom;
 	cap = aa.cap.getCap(capId).getOutput();
 	alias = cap.capModel.getAppTypeAlias();
 	logDebug("Alias: " + alias);
@@ -490,5 +495,4 @@ function lookup(stdChoice,stdValue)
 		logDebug("lookup(" + stdChoice + "," + stdValue + ") does not exist");
 		}
 	return strControl;
-
 }
