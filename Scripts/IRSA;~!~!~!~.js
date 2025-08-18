@@ -273,7 +273,7 @@ function sendElecUtilRelease()
 	//converted from ES_SEND_ELEC_UTIL_RELEASE - 02/15/2023 Tdunn, TPS
 	var params = aa.util.newHashtable();
 	var reportParams = aa.util.newHashMap();
-	var emailSendFrom = "noreply@placer.ca.gov";
+	var emailSendFrom = "placercounty_noreply@accela.com";
 	var emailStaff = null;
 	var emailStaffCC = null;
 	var report = null;
@@ -332,7 +332,7 @@ function sendGasUtilRelease()
 	
 	var params = aa.util.newHashtable();
 	var reportParams = aa.util.newHashMap();
-	var emailSendFrom = "noreply@placer.ca.gov";
+	var emailSendFrom = "placercounty_noreply@accela.com";
 	var emailStaff = null;
 	var emailStaffCC = null;
 	var report = null;
@@ -396,7 +396,7 @@ function sendTRPARelease()
 	var reportParams = aa.util.newHashMap();
 	addParameter(reportParams,"AltID",capIDString);
 	report = generateReportPCO("TRPA Release Letter",reportParams,"TRPA");
-	emailSendFrom = "noreply@placer.ca.gov";
+	emailSendFrom = "placercounty_noreply@accela.com";
 	cap = aa.cap.getCap(capId).getOutput();
 	alias = cap.capModel.getAppTypeAlias();
 	logDebug("Alias: " + alias);
@@ -490,4 +490,5 @@ function lookup(stdChoice,stdValue)
 		logDebug("lookup(" + stdChoice + "," + stdValue + ") does not exist");
 		}
 	return strControl;
+
 }
