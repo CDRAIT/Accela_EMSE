@@ -496,4 +496,3 @@ function lookup(stdChoice,stdValue)
 		}
 	return strControl;
 }
-logDebug("here... TEST")
