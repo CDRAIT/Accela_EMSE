@@ -85,8 +85,8 @@ if(publicUser) {
 }
 
 
-// var sendResult = aa.sendMail("noreply@placer.ca.gov","cdrait@placer.ca.gov", "", "Testing Building DUB script ", debug);	
-// sendResult = aa.sendMail("noreply@placer.ca.gov","tdunn@truepointsolutions.com", "", "Testing Building DUB script ", debug);
+// var sendResult = aa.sendMail(defaultFrom,"cdrait@placer.ca.gov", "", "Testing Building DUB script ", debug);	
+// sendResult = aa.sendMail(defaultFrom,"tdunn@truepointsolutions.com", "", "Testing Building DUB script ", debug);
 // External functions used by script
 //=============================================================================
 function replaceSpecialChar(docModel) {

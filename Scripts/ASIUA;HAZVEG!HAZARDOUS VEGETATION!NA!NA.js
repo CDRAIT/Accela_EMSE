@@ -10,10 +10,8 @@
 |
 | Notes	  : TDunn 11/11/2020 Created script
 |         : Abe   06/01/2023 Added "Complaint Received" auto-complete regarding ASI value
+|         : Abe   03/31/2025 commented the above item (06/01/2023) regarding IT Req# 1986
 |           
-|		
-|        
-|
 /------------------------------------------------------------------------------------------------------*/
 
 
@@ -44,14 +42,14 @@ if(typeof(TIMETRACKING == "object")) {
 	}
 	removeASITable("TIMETRACKING");
     addASITable("TIMETRACKING",myTable);
-	editAppSpecific("Charges to Date",costTotal);
+	editAppSpecific("Charges to Date", costTotal);
 }
 
 
 //Abe>> 06/01/2023: Auto-complete per ASI field
 
-if(AInfo["Received via"] == "Officer")
-    if(isTaskActive("Complaint Received")){
-        branchTask("Complaint Received", "Reviewed - Accepted", "Closed by script - Case initiated by officer", "Officer Initiated");
-        assignTask("Inspection", "EMAXWELL");
-    }
+// if(AInfo["Received via"] == "Officer")
+//     if(isTaskActive("Complaint Received")){
+//         branchTask("Complaint Received", "Reviewed - Accepted", "Closed by script - Case initiated by officer", "Officer Initiated");
+//         assignTask("Inspection", "EMAXWELL");
+//     }

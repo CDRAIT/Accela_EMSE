@@ -19,11 +19,14 @@
 |         : TDunn 11/06/2023 added SolarApp+ fee rules
 |         : TDunn 11/14/2023 added additional logic to include SolarApp+ as an 'exception' for adding and collecting fees online.
 |         : EAftahi 12/07/2023 IT Request # 1865 - added "Addressing" Ad Hoc task 
-|	  : EAftahi 11/18/2023 IT Request # 1590 - Tracking ADUs - changed the code based on new ASI fields		
+|	      : EAftahi 11/18/2023 IT Request # 1590 - Tracking ADUs - changed the code based on new ASI fields		
 |         : EAftahi 03/07/2024 IT Request # 1978 - do not Auto Invoice 'Solar Roof Mount' fees
-|	  : EAftahi 04/29/2024 IT Request # 1998 - ADU Ad-Hoc Task - adds Ad-Hoc task for ADU/JADU permits(ADU Review & Addressing)
+|	      : EAftahi 04/29/2024 IT Request # 1998 - ADU Ad-Hoc Task - adds Ad-Hoc task for ADU/JADU permits(ADU Review & Addressing)
 |         : eaftahi 01/16/2025 IT Request # 2221 - Fee Deferral - SB937
-
+|         : eaftahi 04/09/2025 IT Request # 2035 - updated ADU fees
+|         : eaftahi 08/07/2025 IT Request # 2493 - 
+ 
+|
 |
 /==========================================================================================================*/
 if(currentUserID == "TDUNN" || currentUserID == "EAFTAHI") 
@@ -142,7 +145,7 @@ if(!publicUser || doLimited || doSolarApp)
 					thisQty = thisQty.toFixed(4);
 					logDebug("Quantity = " + thisQty);
 				}
-				if(thisScope =="Accessory Dwelling Unit" && matches(feeName,"0750","0754","0756")) {
+				if(thisScope =="Accessory Dwelling Unit" && matches(feeName,"0751","0754","0752")) {
 					sqftADU = getAppSpecific("ADU SqFt");
 					if(sqftADU < 750) {
 						addFeeFlag = false;
@@ -232,9 +235,19 @@ if(!publicUser || doLimited || doSolarApp)
 	if(getAppSpecific("HVAC-Mechanical") == "CHECKED") {
 		updateFee("0712","B_RES","FINAL",1,"N");
 	}
-	if(publicUser && AInfo["Scope of Work ACA"] == "Mechanical" && AInfo["MECHANICAL - Number of Systems"] > 1) {
-		updateFee("0712","B_RES","FINAL",getAppSpecific("MECHANICAL - Number of Systems"),"Y");
+
+	//IT Req# 2493
+
+	// if(publicUser && AInfo["Scope of Work ACA"] == "Mechanical" && AInfo["MECHANICAL - Number of Systems"] > 1) {    //# of Packages
+	// 	updateFee("0712","B_RES","FINAL",getAppSpecific("MECHANICAL - Number of Systems"),"Y");
+	// }	
+	if(publicUser && AInfo["Scope of Work ACA"] == "Mechanical") {
+		if(getAppSpecific("MECHANICAL - System Type") == "Package Unit"  && AInfo["MECHANICAL - Number of Systems"] > 1)     //# of Packages
+			updateFee("0712","B_RES","FINAL",getAppSpecific("MECHANICAL - Number of Systems"),"Y");
+		if(getAppSpecific("MECHANICAL - System Type") == "Split System"  && AInfo["MECHANICAL - Number of Splits"] > 1)     //# of Splits
+			updateFee("0712","B_RES","FINAL",getAppSpecific("MECHANICAL - Number of Splits"),"Y");
 	}
+	// end of IT Req# 2493
 
 	
 	if(publicUser && AInfo["Scope of Work ACA"] == "Solar Roof Mount" && matches(AInfo["SOLAR - Panel Changeout"],"Y","Yes")) {
@@ -294,10 +307,10 @@ if (!publicUser)
 
 if(publicUser && appTypeArray[3] == "Solar App")
 {
-	//sendResult = aa.sendMail("noreply@placer.ca.gov","tdunn@truepointsolutions.com", "", "Testing Limited submittal in prod", debug);
+	//sendResult = aa.sendMail(defaultFrom,"tdunn@truepointsolutions.com", "", "Testing Limited submittal in prod", debug);
 }
 
-//sendResult = aa.sendMail("noreply@placer.ca.gov","eaftahi@placer.ca.gov", "", "ASA;Building!Residential!~!~ in prod", debug);
+//sendResult = aa.sendMail(defaultFrom,"eaftahi@placer.ca.gov", "", "ASA;Building!Residential!~!~ in prod", debug);
 
 
 // PVLDAIR,PVLDAIW,PVLDAIRW,PVLDAIJT,PVLDAIS,PVLDAISD,PVLDAIOS,PVLDAIROW,PVLDAIEM,PVLDAIRVSP,PVLDAIADM,PVLDASS,PVLDAST,PVLDASADM,PVLDANP,PVLDANPIL,PVLDANPADM,PVLDACP,PVLDACPADM,PVLDASAC,PVLDASACADM,PVRIEGO99-AR,PVROSETMPR-AR,PVTIER2R-AR,PVAGWATER

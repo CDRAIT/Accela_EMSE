@@ -10,6 +10,7 @@
 | Requires: EMSE 3.0 and Standard Choice: "EMSE_EXECUTE_OPTIONS": "SCRIPT" to be Active.
 |
 | Notes   : TDunn 04/28/2020 created production version
+|         : Abe   04/09/2025 IT Request# 1911 - EV Charging Station 
 |         
 |
 /=============================================================================================*/
@@ -43,3 +44,16 @@ logDebug("Running ASA:Building for SP Fees and std condition");
 			}
 		}
 	}
+
+//IT Request# 1911 - EV Charging Station
+if (!publicUser)
+    if (matches(appTypeArray[1], "Residential", "Commercial") && appTypeArray[2] == "Limited")
+        if (getAppSpecific("Scope of Work") == "Electric Vehicle Charging Station (EVCS)") {
+            if (getAppSpecific("EVCS Units Qty") == "1-25 units")
+                editAppSpecific("EVCS Processing Deadline", dateAdd(fileDate, 5, " "));
+
+            if (getAppSpecific("EVCS Units Qty") == "26+ units")
+                editAppSpecific("EVCS Processing Deadline", dateAdd(fileDate, 10, " "));
+        }
+
+//End of IT Request# 1911 - EV Charging Station 

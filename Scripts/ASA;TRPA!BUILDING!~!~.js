@@ -16,6 +16,7 @@
 |         : Abe   02/20/2024 modified the ADU/JADU Fees' logic based on the new ASI fields																					
 |         : Abe   04/29/2024 IT Request# 1865 & 1998 - Adds ad-hoc "ADU Review" & "Addressing" to ADU/JADU Apps
 |         : Abe   01/16/2025 IT Req# 2221 Fee deferral - SB937 
+|         : Abe   04/09/2025 IT Request# 20235 - updated ADU Fees
 |
 /=============================================================================================*/
 if(currentUserID == "TDUNN" || currentUserID == "EAFTAHI") {
@@ -77,7 +78,7 @@ if(!publicUser) {
 					thisQty = thisQty.toFixed(4);
 					logDebug("Quantity = " + thisQty);
 				}
-				if(thisScope =="Accessory Dwelling Unit" && matches(feeName,"0750","0754","0756")) {
+				if(thisScope =="Accessory Dwelling Unit" && matches(feeName,"0751","0754","0752")) {
 					sqftADU = getAppSpecific("ADU SqFt");
 					if(sqftADU < 750) {
 						addFeeFlag = false;

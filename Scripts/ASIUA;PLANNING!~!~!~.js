@@ -20,6 +20,8 @@ if(matches(currentUserID,"EAFTAHI")) {showDebug = 1;}
 
 //conversion from stdChoice ASIUA:PLN
 var vShortNotes = "";
+var assignedToFullName = null;
+
 if (typeof (PROJECT) == "object")
     for (thisRow in PROJECT) {
         var vEntitlement = null;
@@ -43,8 +45,8 @@ addParameter(emailParameters, "$$capName$$", capName);
 addParameter(emailParameters, "$$assigneeName$$", assignedToFullName); 
 
 if(appTypeArray[1] != "Pre-Application" && matches(AInfo["ECSNotificationSent"], 'No', '', 'Undefined') && AInfo["Major or Minor Project"]== "Major"){
-    sendNotification("noreply@placer.ca.gov", "","", "ECS_NOTICE_UPDATE_TO_MAJOR_PROJECT", emailParameters, null);
+    sendNotification(defaultFrom, "","", "ECS_NOTICE_UPDATE_TO_MAJOR_PROJECT", emailParameters, null);
     editAppSpecific("ECSNotificationSent", "Yes"); 
-    aa.sendMail("noreply@placer.ca.gov", "eaftahi@placer.ca.gov", "", "DEBUG: "+ "ASIUA:PLANNING/*/*/*)", debug);
+    aa.sendMail(defaultFrom, "eaftahi@placer.ca.gov", "", "DEBUG: "+ "ASIUA:PLANNING/*/*/*)", debug);
 } 
 //End of IT Request # 2057

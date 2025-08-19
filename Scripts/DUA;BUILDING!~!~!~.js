@@ -306,5 +306,3 @@ function emailInspDocUploadNotification(docGroups,docCategories) {
 | addParentID = set to "Y" or "N" to control if parent altId of current record is included in the notification. 
 | staffDefault = the email address of the staff member to include in the vToEmail if no staff is assigned to the record. Use userID if toStaffEmail set to 'T'
 /------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
-
-

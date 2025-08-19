@@ -37,4 +37,4 @@ if(publicUser)
 		}
 	}
 }
-aa.sendMail("noreply@placer.ca.gov", "tdunn@truepointsolutions.com", "", "DEBUG: "+ "SolarApp Revision at ASA", debug);
+aa.sendMail(defaultFrom, "tdunn@truepointsolutions.com", "", "DEBUG: "+ "SolarApp Revision at ASA", debug);
