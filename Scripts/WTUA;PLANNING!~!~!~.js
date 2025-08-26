@@ -27,7 +27,7 @@ if(matches(appTypeArray[1],"Administrative","MBLA","Pre Development","Project","
 	// Actions for Payment Requested
 	if(wfTask == "Permit Initiation" && wfStatus == "Payment Requested") 
 	{
-		editAppSpecific("Last Payment Requested Date",dateAdd(null,0));
+		editAppSpecific("Last Payment Requested Date",dateAdd(null,0));		
 	}
 	// Actions for manual advancement from Payment Requested to Fees Paid
 	if(wfTask == "Permit Initiation" && wfStatus == "Fees Paid")
