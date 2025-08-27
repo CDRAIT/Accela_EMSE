@@ -15,7 +15,7 @@
 |
 /=============================================================================================*/
 logDebug("Running CTRCA:ESD");
-
+logDebug("Test");
 var varAutoInvoiceFees = "N"
 
 var notificationTemplate = "STAFF_NEW_ONLINE_PERMIT_SUBMITTED_ESD";
@@ -68,4 +68,5 @@ if (publicUser) {
         sendNotification(emailSendFrom, toEmailStaff, emailStaffCC, notificationTemplate, params, report);
     }
     //aa.sendMail("noreply@placer.ca.gov", "eaftahi@placer.ca.gov", "", "PLACERCO CTRCA", debug);
+
 }
