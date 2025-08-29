@@ -18,9 +18,10 @@
 |         : TDunn 08/28/2023 added additionial logic for new error message emails for bad parcel utility data
 |         : TDunn 11/16/2023 added code to ensure parcel attributes are instantiated for use by the utility release script block
 |         : TDunn 12/06/2024 updated generateReport calls to use new name 'generateReportPCO'
-| 
+|         : Abe   04/08/2025 added IT Req# 2340 - Auto-result WF when Final Passed on SolarApp+
+|         : Abe   08/26/2025 added IT Req# 2504 - New Fee Code and Inspection Type (515 ESS)
 /-----------------------------------------------------------------------------------------------------------------*/
-if (matches(currentUserID,"JMCKENZI","TDUNN","EAFTAHI")) 
+if (matches(currentUserID,"JMCKENZI","TDUNN","EAFTAHI", "SVC_AGENT")) 
 {
 	showDebug = 1;
 }
@@ -75,46 +76,52 @@ if(matches(vEventName,"InspectionResultModifyAfter"))
 			sendElecUtilRelease();
 		}
 
+		//Start: IT Req# 2504
+		if (inspType == "515 ESS" && (inspResult == "FINALPASS" || inspResult == "Final Pass" || inspResult == "PASS" || inspResult == "Pass"))
+		{
+			sendElecUtilRelease();
+		}
+		//End of IT Req# 2504	
+
 		if (inspResult != "") 
 		{
 			emailInspectionResultParameters()
 		}
 	}
-	if(appTypeArray[0] == "TRPA")
-	{
-		if(appTypeArray[1] == "Building")
-		{
-			if (lookup("Group Inspection Lookup",inspType) != null) 
-			{
-				varInspList = lookup("Group Inspection Lookup",inspType);
+	if (appTypeArray[0] == "TRPA") {
+		if (appTypeArray[1] == "Building") {
+			if (lookup("Group Inspection Lookup", inspType) != null) {
+				varInspList = lookup("Group Inspection Lookup", inspType);
 				varInspType = new Array();
 				varInspType = varInspList.split(",");
 			}
 
-			if (getInspector(inspType) != null)
-			{
+			if (getInspector(inspType) != null) {
 				groupInspName = getInspector(inspType);
 				comment("Inspection Type = " + inspType + ". Inspector ID = " + getInspector(inspType));
 			}
 
-			if (lookup("Group Inspection Lookup",inspType) != null) 
-			{
-				for(thisCode in varInspType) resultInspection(varInspType[thisCode],inspResult,dateAdd(null,0),"Group Resulted");
+			if (lookup("Group Inspection Lookup", inspType) != null) {
+				for (thisCode in varInspType) resultInspection(varInspType[thisCode], inspResult, dateAdd(null, 0), "Group Resulted");
 			}
 
-			if ((inspType == "518 Gas Service") && (inspResult == "FINALPASS" || inspResult == "Final Pass" || inspResult == "PASS" || inspResult == "Pass")) 
-			{
+			if ((inspType == "518 Gas Service") && (inspResult == "FINALPASS" || inspResult == "Final Pass" || inspResult == "PASS" || inspResult == "Pass")) {
 				sendGasUtilRelease();
 			}
 
-			if (((inspType == "513 Solar Panel-Final" && AInfo['ParcelAttribute.ELECTRIC UTILITY'] == "SMUD") || (inspType == "501 Temp Power Pole" || inspType == "502 Perm Power Pole" ||  inspType == "503 Electrical Service" ||  inspType == "504 AG Electrical Service" ||  inspType == "507 Electrical Service Change")) && (inspResult == "FINALPASS" || inspResult == "Final Pass" || inspResult == "PASS" || inspResult == "Pass")) 
-			{
+			if (((inspType == "513 Solar Panel-Final" && AInfo['ParcelAttribute.ELECTRIC UTILITY'] == "SMUD") || (inspType == "501 Temp Power Pole" || inspType == "502 Perm Power Pole" || inspType == "503 Electrical Service" || inspType == "504 AG Electrical Service" || inspType == "507 Electrical Service Change")) && (inspResult == "FINALPASS" || inspResult == "Final Pass" || inspResult == "PASS" || inspResult == "Pass")) {
 				sendElecUtilRelease();
 			}
+			//Start: IT Req# 2504
+			if ((inspType == "515 ESS") && (inspResult == "FINALPASS" || inspResult == "Final Pass" || inspResult == "PASS" || inspResult == "Pass")) {
+				sendElecUtilRelease();
+			}
+			//End: IT Req# 2504
 
-		if (inspType == "914 TRPA Final" && (inspResult == "FINALPASS" || inspResult == "Final Pass" || inspResult == "PASS" || inspResult == "Pass") && (appMatch("TRPA/Building/Multi-Family/Project") || appMatch("TRPA/Building/Multi-Family/TRPA Review at TRPA") || appMatch("TRPA/Building/Residential/Project") || appMatch("TRPA/Building/Residential/TRPA Review at TRPA") || appMatch("TRPA/Building/TRPA MOU Project/*"))) {
-			sendTRPARelease();
-		}
+
+			if (inspType == "914 TRPA Final" && (inspResult == "FINALPASS" || inspResult == "Final Pass" || inspResult == "PASS" || inspResult == "Pass") && (appMatch("TRPA/Building/Multi-Family/Project") || appMatch("TRPA/Building/Multi-Family/TRPA Review at TRPA") || appMatch("TRPA/Building/Residential/Project") || appMatch("TRPA/Building/Residential/TRPA Review at TRPA") || appMatch("TRPA/Building/TRPA MOU Project/*"))) {
+				sendTRPARelease();
+			}
 
 			if (inspResult != "") {
 				emailInspectionResultParameters();
@@ -147,8 +154,12 @@ if(matches(vEventName,"InspectionResultSubmitAfter","V360InspectionResultSubmitA
 	{
 		logDebug("Running Inspection result rules for Building");
 		if (inspResult == "Final Pass") {
-			closeTask("Inspections","Construction Complete","Building Granted a Final Pass"," ","BLD_20181201_MAIN");
-			//aa.sendMail("noreply@placer.ca.gov", "eaftahi@placer.ca.gov", "", "IRSA:TRACT Homes - IT Request # 2083 ", debug);
+			closeTask("Inspections", "Construction Complete", "Building Granted a Final Pass", " ", "BLD_20181201_MAIN");
+			//aa.sendMail(defaultFrom, "eaftahi@placer.ca.gov", "", "IRSA:TRACT Homes - IT Request # 2083 ", debug);
+
+			//Abe 04/08/2025: IT Req# 2340
+			if (appTypeArray[3] == "Solar App")
+				closeTask("Inspection", "Construction Complete", "Permit Granted a Final Pass", " ", "B_SOLARAPP");
 
 		}
 
@@ -193,6 +204,12 @@ if(matches(vEventName,"InspectionResultSubmitAfter","V360InspectionResultSubmitA
 		{
 			sendElecUtilRelease();
 		}
+		//Start: IT Req# 2504
+		if (inspType == "515 ESS" && (inspResult == "FINALPASS" || inspResult == "Final Pass" || inspResult == "PASS" || inspResult == "Pass"))
+		{
+			sendElecUtilRelease();
+		}
+		//End of IT Req# 2504
 	}
 	// Controls for IRSA TRPA/Building
 	if(appTypeArray[0] == "TRPA")
@@ -257,6 +274,14 @@ if(matches(vEventName,"InspectionResultSubmitAfter","V360InspectionResultSubmitA
 				sendElecUtilRelease();
 			}
 
+			//Start: IT Req# 2504
+			if ((inspType == "515 ESS" ) && (inspResult == "FINALPASS" || inspResult == "Final Pass" || inspResult == "PASS" || inspResult == "Pass")) 
+			{
+				sendElecUtilRelease();
+			}
+			//End: IT Req# 2504
+ 
+
 			if (inspResult != "") 
 			{
 				emailInspectionResultParameters();
@@ -273,7 +298,7 @@ function sendElecUtilRelease()
 	//converted from ES_SEND_ELEC_UTIL_RELEASE - 02/15/2023 Tdunn, TPS
 	var params = aa.util.newHashtable();
 	var reportParams = aa.util.newHashMap();
-	var emailSendFrom = "noreply@placer.ca.gov";
+	var emailSendFrom = defaultFrom;
 	var emailStaff = null;
 	var emailStaffCC = null;
 	var report = null;
@@ -332,7 +357,7 @@ function sendGasUtilRelease()
 	
 	var params = aa.util.newHashtable();
 	var reportParams = aa.util.newHashMap();
-	var emailSendFrom = "noreply@placer.ca.gov";
+	var emailSendFrom = defaultFrom;
 	var emailStaff = null;
 	var emailStaffCC = null;
 	var report = null;
@@ -396,7 +421,7 @@ function sendTRPARelease()
 	var reportParams = aa.util.newHashMap();
 	addParameter(reportParams,"AltID",capIDString);
 	report = generateReportPCO("TRPA Release Letter",reportParams,"TRPA");
-	emailSendFrom = "noreply@placer.ca.gov";
+	emailSendFrom = defaultFrom;
 	cap = aa.cap.getCap(capId).getOutput();
 	alias = cap.capModel.getAppTypeAlias();
 	logDebug("Alias: " + alias);
