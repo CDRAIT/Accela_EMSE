@@ -14,12 +14,24 @@
 |           TDunn 06/02/2022 updated 'To' and Cc email addresses for staff
 |           TDunn 06/19/2023 added update to Submittal task on document upload.
 |           TDunn 09/18/2023 updated backupToEmail for Solar App to SolarApp@placer.ca.gov
+|           TDunn 01/26/2024 added rules for wf process BLD_20230501_MAIN
+|           TDunn 05/30/2024 updated actions for resubmittal when at Distribution
+|           TDunn 09/04/2024 added actions for Revisions on document upload
+|           TDunn 10/25/2024 added appStatus updates on documents uploaded and corrected API user.
+|           TDunn 11/14/2024 updated Submittal Review and Distribution due date rules
+|           TDunn 01/28/2025 updated task and rec status update on resubmit to just 'Received'.
+|           TDunn 01/31/2025 updated capStatus to Resubmittal Received.
+|           TDunn 03/04/2025 added logic to test for if from Pre-screen for DUA resubmittal via ACA
+|           TDunn 03/25/2025 added rules for PC Master wf Process for documents uploaded
+|           TDunn 08/29/2025 copied to Non-prod1
+|           TDunn 08/30/2025 deployed to Github
 |
 /------------------------------------------------------------------------------------------------------*/
 
-if(matches(currentUserID,"JMCKENZIE","KHOBDAY","TDUNN")) {showDebug = 1;}
-
+if(matches(currentUserID,"JMCKENZIE","KHOBDAY","TDUNN","MHELVICK","JMCKENZI","ADMIN")) {showDebug = 3;}
+publicUserEDR = false;
 logDebug("Inside DUA:Building/*/*/* script");
+if(currentUserID == "DIGEPLAN") loadCustomScript("DUA:DIGEPLAN");
 
 // loadCustomScript("DUA_EXECUTE_DIGEPLAN_SCRIPTS_PLN"); /* Example from Menlo Park, may NOT need for this agency */
 // Global variables for document management
@@ -31,8 +43,9 @@ var todayDate = dateAdd(null,0);
 
 // Generate notices to staff
 //if(publicUser) {
-if(publicUser && capIDString.indexOf("TMP") == -1) 
-{																				   
+if((publicUser || publicUserEDR == true) && capIDString.indexOf("TMP") == -1) 
+{
+	logDebug("Inside publicUser if statement block");
 	var assignedToStaff = "";
 	var report = null;
 	var reportName = "Report Name";
@@ -50,9 +63,10 @@ if(publicUser && capIDString.indexOf("TMP") == -1)
 	if(appTypeArray[3] == "Solar App")
 	{
 		backupToEmail = "SolarApp@placer.ca.gov";
-	}								   
+	}
 
-	if(matches(capStatus,"Corrections Required","Issued")) {
+	if(matches(capStatus,"Corrections Required","Issued")) 
+	{
 		if(isTaskActive("Plan Check","BLD_20181201_REVISIONS")) {
 			foundStaff = true;
 			assignedToStaff = getTaskAssignUser("Plan Check","BLD_20181201_REVISIONS");
@@ -105,7 +119,188 @@ if(publicUser && capIDString.indexOf("TMP") == -1)
 
 		}
 	}
+	// New block for resubmittals on wf process BLD_20230501_MAIN
+	//-------------------------------------------------------------
+	var preTriageListArray = new Array();
+	preTriageList = lookup("PLAN REVIEW - REQUIRED REVIEWS", "BTRIAGE"); // get Triage tasks
+	preTriageListArray = preTriageList.split(",");
+	for(tl in preTriageListArray)
+	{
+		logDebug("task in array: " + preTriageListArray[tl]);
+	}
 	
+	if(matches(capStatus,"Corrections Required","Submittal Incomplete","Responses Received"))
+	{
+		logDebug("Inside first if for matches capStatus");
+		if(isTaskActive("Submittal Review","BLD_20230501_MAIN"))
+		{
+			logDebug("Inside matches active task");
+			if(isTaskStatus("Submittal Review","Pending Resubmittal","BLD_20230501_MAIN"))
+			{
+				logDebug("Inside matches task status");
+				editTaskDueDate("Submittal Review",dateAdd(null,1,"Y"),"BLD_20230501_MAIN");
+				updateTask("Submittal Review","Received","Document uploaded following a Submittal Incomplete status. Updated by script","");
+				updateAppStatus("Received","Document uploaded following a Submittal Incomplete status. Updated by script");				
+			}
+		}
+		if(isTaskActive("Distribution","BLD_20230501_MAIN"))
+		{
+			if(isTaskStatus("Distribution","Pending Resubmittal","BLD_20230501_MAIN"))
+			{
+				recFromTriage = false;
+				for(xx in preTriageListArray)
+				{
+					failTask = "";
+					thisReview = preTriageListArray[xx];
+					logDebug("Triage required test, current task: " + thisReview);
+					if(isTaskStatus(thisReview,"Corrections Required"))
+					{
+						failTask = failTask + thisReview + ";";
+						recFromTriage = true;
+						logDebug("Task with corrections: " + thisReview);
+					}
+				}
+				editTaskDueDate("Distribution",dateAdd(null,1,"Y"),"BLD_20230501_MAIN");
+				updateAppStatus("Resubmittal Received","Document uploaded following a Corrections Required/Responses Received status. Updated by script");				
+				if(recFromTriage)
+				{
+					updateTask("Distribution","Resubmittal Received","Resubmittal from Pre-screen received. Updated by script","Resubmittal from Pre-screen");
+				}
+				else {
+					var resubNum = getAppSpecific("Resubmittal Number");
+					logDebug("Resub Number is " + resubNum);
+					if(matches(getAppSpecific("Resubmittal Number"),null,"",undefined,0))
+					{
+						resubNum = 1;
+					}
+					updateTask("Distribution","Resubmittal Received","Submittal " + formatResubNum(resubNum) + " received. Updated by script","Submittal " + formatResubNum(resubNum));
+				}				
+			}
+		}
+	}
+	//--- End block for BLD_20230501_MAIN -------------------------
+	
+	// New block for resubmittals on wf process BLD_20231116_REV
+	//-------------------------------------------------------------
+	logDebug("Should be running rules for Revisions")
+	if(matches(capStatus,"Corrections Required","Submittal Incomplete","Responses Received"))
+	{
+		logDebug("Inside matches capStatus section");
+		if(isTaskActive("Submittal Review","BLD_20231116_REV"))
+		{
+			logDebug("Inside matches active task");			
+			if(isTaskStatus("Submittal Review","Pending Resubmittal","BLD_20231116_REV"))
+			{
+				logDebug("Inside matches task status");
+				editTaskDueDate("Submittal Review",dateAdd(null,1,"Y"),"BLD_20231116_REV");
+				updateTask("Submittal Review","Received","Document uploaded following a Submittal Incomplete status. Updated by script","");
+				updateAppStatus("Received","Document uploaded following a Submittal Incomplete status. Updated by script");
+			}
+		}
+		if(isTaskActive("Distribution","BLD_20231116_REV"))
+		{
+			if(isTaskStatus("Distribution","Pending Resubmittal","BLD_20231116_REV"))
+			{
+				recFromTriage = false;
+				for(xx in preTriageListArray)
+				{
+					failTask = "";
+					thisReview = preTriageListArray[xx];
+					logDebug("Triage required test, current task: " + thisReview);
+					if(isTaskStatus(thisReview,"Corrections Required"))
+					{
+						failTask = failTask + thisReview + ";";
+						recFromTriage = true;
+						logDebug("Task with corrections: " + thisReview);
+					}
+				}
+				editTaskDueDate("Distribution",dateAdd(null,1,"Y"),"BLD_20230501_MAIN");
+				updateAppStatus("Resubmittal Received","Document uploaded following a Corrections Required/Responses Received status. Updated by script");				
+				if(recFromTriage)
+				{
+					updateTask("Distribution","Resubmittal Received","Resubmittal from Pre-screen received. Updated by script","Resubmittal from Pre-screen");
+				}
+				else {
+					var resubNum = getAppSpecific("Resubmittal Number");
+					logDebug("Resub Number is " + resubNum);
+					if(matches(getAppSpecific("Resubmittal Number"),null,"",undefined,0))
+					{
+						resubNum = 1;
+					}					
+					updateTask("Distribution","Resubmittal Received","Submittal " + formatResubNum(resubNum) + " received. Updated by script","Submittal " + formatResubNum(resubNum));
+				}		
+			}
+		}
+	}
+	
+	//--- End block for BLD_20231116_REV -------------------------
+
+	// New block for resubmittals on wf process BLD_DEFERRED_20240710
+	//-------------------------------------------------------------
+	logDebug("Should be running rules for Deferred")
+	if(matches(capStatus,"Corrections Required","Submittal Incomplete","Responses Received"))
+	{
+		logDebug("Inside matches capStatus section");
+		if(isTaskActive("Submittal Review","BLD_DEFERRED_20240710"))
+		{
+			logDebug("Inside matches active task");			
+			if(matches(capStatus,"Submittal Incomplete"))
+			{
+				logDebug("Inside matches task status");
+				editTaskDueDate("Submittal Review",dateAdd(null,1,"Y"),"BLD_DEFERRED_20240710");
+				updateTask("Submittal Review","Received","Document uploaded following a Submittal Incomplete status. Updated by script","");
+				updateAppStatus("Received","Document uploaded following a Submittal Incomplete status. Updated by script");
+			}
+			if(matches(capStatus,"Corrections Required") && isTaskStatus("Building Plan Check","Corrections Required","BLD_DEFERRED_20240710"))
+			{			
+				var resubNum = getAppSpecific("Resubmittal Number");
+				logDebug("Resub Number is " + resubNum);
+				editTaskDueDate("Submittal Review",dateAdd(null,1,"Y"),"BLD_DEFERRED_20240710");
+				updateTask("Distribution","Resubmittal Received","Submittal " + formatResubNum(resubNum) + " received. Updated by script","Submittal " + formatResubNum(resubNum));
+				updateAppStatus("Resubmittal Received","Document uploaded following a Corrections Required/Responses Received status. Updated by script");	
+			}
+		}
+	}
+	
+	//--- End block for BLD_DEFERRED_20240710 -------------------------
+	
+	// New block for resubmittals on wf process BLD_PLNCHK_20241222
+	//-------------------------------------------------------------	
+	logDebug("Should be running rules for Master")
+	if(matches(capStatus,"Corrections Required","Submittal Incomplete","Responses Received"))
+	{
+		logDebug("Inside matches capStatus section");
+		if(isTaskActive("Submittal Review","BLD_PLNCHK_20241222"))
+		{
+			logDebug("Inside matches active task");			
+			if(isTaskStatus("Submittal Review","Pending Resubmittal","BLD_PLNCHK_20241222"))
+			{
+				logDebug("Inside matches task status");
+				editTaskDueDate("Submittal Review",dateAdd(null,1,"Y"),"BLD_PLNCHK_20241222");
+				updateTask("Submittal Review","Received","Document uploaded following a Submittal Incomplete status. Updated by script","");
+				updateAppStatus("Received","Document uploaded following a Submittal Incomplete status. Updated by script");
+			}
+		}
+		if(isTaskActive("Distribution","BLD_PLNCHK_20241222"))
+		{
+			if(isTaskStatus("Distribution","Pending Resubmittal","BLD_PLNCHK_20241222"))
+			{
+
+				editTaskDueDate("Distribution",dateAdd(null,1,"Y"),"BLD_20230501_MAIN");
+				updateAppStatus("Resubmittal Received","Document uploaded following a Corrections Required/Responses Received status. Updated by script");				
+				var resubNum = getAppSpecific("Resubmittal Number");
+				logDebug("Resub Number is " + resubNum);
+				if(matches(getAppSpecific("Resubmittal Number"),null,"",undefined,0))
+				{
+					resubNum = 1;
+				}					
+				updateTask("Distribution","Resubmittal Received","Submittal " + formatResubNum(resubNum) + " received. Updated by script","Submittal " + formatResubNum(resubNum));
+			}
+		}
+	}	
+
+	//--- End block for BLD_PLNCHK_20241222	--------------------------/
+
 	if(capStatus == "Received") {
 		if(AInfo["Project Office"]== "Auburn") {
 			addParameter(emailParameters,"$$officeParam$$","Auburn");
@@ -113,7 +308,7 @@ if(publicUser && capIDString.indexOf("TMP") == -1)
 			vCcEmail = "BLDPlanCheck@placer.ca.gov";
 
 		}
-		if(AInfo["Project Office"] == "Tahoe") {
+		if(AInfo["Project Office"] == "Tahoe") {Re
 			addParameter(emailParameters,"$$officeParam$$","Tahoe");
 			vToEmail = "OnlineBLDPermitsTahoe@placer.ca.gov";
 			vCcEmail = "";
@@ -126,14 +321,11 @@ if(publicUser && capIDString.indexOf("TMP") == -1)
 	logDebug("Params: " + emailParameters + "; to email:" + vToEmail + "; copy to email:" + vCcEmail);
 	
 	sendNotification(vFromEmail,vToEmail,vCcEmail,emailTemplate,emailParameters,fileNames);
-	if(capStatus == "Submittal Incomplete" && isTaskActive("Submittal Review","BLD_20230501_MAIN"))
-	{
-		updateTask("Submittal Review","Submittal Received","Document uploaded following a Submittal Incomplete status. Updated by script","");
-	}
+
 }
 
-// var sendResult = aa.sendMail("noreply@placer.ca.gov","cdrait@placer.ca.gov", "", "Testing Building DUA script ", debug);	
-//sendResult = aa.sendMail("noreply@placer.ca.gov","tdunn@truepointsolutions.com", "", "Testing Building DUA script ", debug);	
+
+
 
 /* Template for limiting criteria for generating an upload notification */
 //if (publicUser && capIDString.indexOf("TMP") == -1) {
@@ -204,35 +396,39 @@ docDescription
 =========================================
 */
 
+email("mckenzie@truepointsolutions.com","noreply@placer.ca.gov","DUA PLACERCO TEST" + capIDString,debug);
+sendResult = aa.sendMail("noreply@placer.ca.gov","tdunn@truepointsolutions.com", "", "Testing Building DUA script " + capIDString, debug);
+
 // External functions
 //=============================
-function getTaskAssignUser(wfstr) {
-               // optional process name.
-               var useProcess = false;
-               var processName = "";
-               if (arguments.length == 2) {
-                              processName = arguments[1]; // subprocess
-                              useProcess = true;
-               }
-               var workflowResult = aa.workflow.getTasks(capId);
-               if (workflowResult.getSuccess()) {
-                              wfObj = workflowResult.getOutput();
-               } else {
-                              logMessage("**ERROR: Failed to get workflow object: " + s_capResult.getErrorMessage()); 
-                              return false; 
-               }
-               for (i in wfObj) {
-                              var fTask = wfObj[i];
-                              if ((fTask.getTaskDescription().toUpperCase().equals(wfstr.toUpperCase()) || wfstr == "*")  && (!useProcess || fTask.getProcessCode().equals(processName))) {
-                                             var taskAssignUser = aa.person.getUser(fTask.getAssignedStaff().getFirstName(),fTask.getAssignedStaff().getMiddleName(),fTask.getAssignedStaff().getLastName()).getOutput();
-                                             if (taskAssignUser != null) {
-                                                            // re-grabbing for userid.
-                                                            wfUserObj = aa.person.getUser(fTask.getAssignedStaff().getFirstName(),fTask.getAssignedStaff().getMiddleName(),fTask.getAssignedStaff().getLastName()).getOutput();
-                                                            return wfUserObj.getUserID();
-                                             }
-                              }
-               }
-               return false;
+function getTaskAssignUser(wfstr) 
+{
+	// optional process name.
+	var useProcess = false;
+	var processName = "";
+	if (arguments.length == 2) {
+			processName = arguments[1]; // subprocess
+			useProcess = true;
+	}
+	var workflowResult = aa.workflow.getTasks(capId);
+	if (workflowResult.getSuccess()) {
+		wfObj = workflowResult.getOutput();
+	} else {
+		 logMessage("**ERROR: Failed to get workflow object: " + s_capResult.getErrorMessage()); 
+		 return false; 
+	}
+	for(i in wfObj) {
+		var fTask = wfObj[i];
+		if((fTask.getTaskDescription().toUpperCase().equals(wfstr.toUpperCase()) || wfstr == "*")  && (!useProcess || fTask.getProcessCode().equals(processName))) {
+			var taskAssignUser = aa.person.getUser(fTask.getAssignedStaff().getFirstName(),fTask.getAssignedStaff().getMiddleName(),fTask.getAssignedStaff().getLastName()).getOutput();
+			if (taskAssignUser != null) {
+				// re-grabbing for userid.
+				wfUserObj = aa.person.getUser(fTask.getAssignedStaff().getFirstName(),fTask.getAssignedStaff().getMiddleName(),fTask.getAssignedStaff().getLastName()).getOutput();
+				return wfUserObj.getUserID();
+			}
+		}
+	}
+	return false;
 }
 
 
