@@ -22,7 +22,11 @@
 |         : TDunn 09/19/2024 Removed update to Plan check expiration date.
 |         : TDunn 10/01/2024 Remarked out 'addAllFees' function due to fee assessment errors
 |         : TDunn 10/10/2024 changed all 'addFee' to updateFee unless associated with a 'removeAllFees' call.
-|         : Abe   01/16/2025 IT Request# 2221 - SB937 - Fee Deferral
+|         : TDunn 10/10/2024 added master flag and 'Tract' flag to control reassessing fees.
+|         : TDunn 01/08/2025 remarked out adhoc task additions for ADU and Addressing
+|         : TDunn 04/09/2025 added 'notTract' flag to new Master record type to skip assessing fees.
+|         : TDunn 08/29/2025 copied to Non-prod1
+|         : TDunn 08/31/2025 deployed to GitHub
 |
 |
 /==========================================================================================================*/
@@ -38,21 +42,10 @@ var varAutoInvoiceFees = "N";
 // }
 
 
-//IT Request# 2221 - SB937 - Fee Deferral
-if(appTypeArray[2] == "Full Review" && (matches(appTypeArray[3], "Other", "Residential<3000", "Residential>3000", "Tract < 3000", "Tract > 3000")))
-    if(matches(getAppSpecific("Type of Work"), "Addition", "Manufactured Home","New", "Farmworker Housing") && getAppSpecific("YesToFeeDeferral") == "CHECKED")
-        if(!(appHasCondition("Building - Prevent Final / Completion","Applied","SB-937 Mitigation Fee Act","Notice") || appHasCondition("Building - Prevent Final / Completion","Cleared","SB-937 Mitigation Fee Act","Notice")) )
-            addStdCondition("Building - Prevent Final / Completion", "SB-937 Mitigation Fee Act");
-//End of IT Request# 2221
-
-
-
-if(cap.isCreatedByACA() && appMatch("Building/Residential/Limited/*") && !matches(getAppSpecific("Scope of Work"), "Solar Roof Mount")) {
-	varAutoInvoiceFees = "Y";
-}
-
 var spTypeFlag = true;
 var doLimited = false;
+var notTract = true;
+var updateOn = true;
 var varLookupTable = "Residential Scope of Work";
 // Assess Fees
 if(appTypeArray[2] == "Limited") {varLookupTable = "OTC Scope of Work";}
@@ -67,6 +60,7 @@ if(appTypeArray[2] == "Limited" && publicUser) {
 }
 if(appTypeArray[3] == "Tract < 3000") {
 	varLookupTable = "ResidentialTract < 3000";
+	notTract = false;
 	if(!matches(AInfo["Type of Work"],"New","Manufactured Home")) {
 		spTypeFlag = false;
 	}
@@ -74,18 +68,33 @@ if(appTypeArray[3] == "Tract < 3000") {
 
 if(appTypeArray[3] == "Tract > 3000") {
 	varLookupTable = "ResidentialTract > 3000";
+	notTract = false;	
 	if(!matches(AInfo["Type of Work"],"New","Manufactured Home")) {
 		spTypeFlag = false;
 	}	
 }
 if(appTypeArray[3] == "Master < 3000") {varLookupTable = "Residential Master<3000";}
 if(appTypeArray[3] == "Master > 3000") {varLookupTable = "Residential Master>3000";}
-if(appTypeArray[3] == "Tract-Third Party Rev > 3000") {varLookupTable = "Third Party Review";}
-if(appTypeArray[3] == "Tract-Third Party Rev < 3000") {varLookupTable = "Third Party Review";}
+if(appTypeArray[2] == "Master")
+{
+	varLookupTable = "SDL:PCMasterPlanScope";
+	notTract = false;
+}
+if(appTypeArray[3] == "Tract-Third Party Rev > 3000") 
+{
+	varLookupTable = "Third Party Review";
+	notTract = false;
+}
+if(appTypeArray[3] == "Tract-Third Party Rev < 3000") 
+{
+	varLookupTable = "Third Party Review";
+	notTract = false;
+}
 logDebug("Fee lookup table is " + varLookupTable);
 
 
-if(!publicUser || doLimited) {
+if((notTract || doLimited) && updateOn) 
+{
 	var varSpecialFees = "";
 	var specFeeCodes = new Array(); 	
 	var fsFlag ="";
@@ -268,14 +277,14 @@ for (i in wfTask) {
 		if(tempTask.getTaskDescription().toUpperCase().equals("ADU Review".toUpperCase()))
 			hasAduReview = true;
 }
-if (thisADU == "Yes" || thisJADU == "Yes")  {
-	if(!(hasAddressing))
-		addAdHocTask("ADHOC", "Addressing", "", "LDEROBER");
-	if(!(hasAduReview) && AInfo["Project Office"] == "Auburn")
-		addAdHocTask("ADHOC", "ADU Review", "", "PHOFFMAN");
-	else if(!(hasAduReview) && AInfo["Project Office"] == "Tahoe")
-		addAdHocTask("ADHOC", "ADU Review", "", "TLYKINS");
-}
+// if (thisADU == "Yes" || thisJADU == "Yes")  {
+	// if(!(hasAddressing))
+		// addAdHocTask("ADHOC", "Addressing", "", "LDEROBER");
+	// if(!(hasAduReview) && AInfo["Project Office"] == "Auburn")
+		// addAdHocTask("ADHOC", "ADU Review", "", "PHOFFMAN");
+	// else if(!(hasAduReview) && AInfo["Project Office"] == "Tahoe")
+		// addAdHocTask("ADHOC", "ADU Review", "", "TLYKINS");
+// }
 //End Of IT Request# 1998 & 1865 
 
 //sendResult = aa.sendMail("noreply@placer.ca.gov","tdunn@truepointsolutions.com", "", "Testing Limited submittal in prod", debug);
