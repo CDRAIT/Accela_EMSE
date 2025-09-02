@@ -29,6 +29,7 @@
 |         : TDunn   08/28/2025 added Abe IT request # 2493
 |         : TDunn   08/29/2025 copied to Non-prod1
 |         : TDunn   08/29/2025 deployed to GitHub
+|         : Abe     09/02/2025 IT Request # 2504 - Added Fee code 0515 to the SolarApp Fee Calculations
 |
 /================================================================================================================================*/
 if (currentUserID == "TDUNN" || currentUserID == "EAFTAHI") {
@@ -261,7 +262,12 @@ try
 			}
 			if (matches(AInfo["Panel Upgrade"], "Y", "Yes") && AInfo["Project Type"] == "PV Solar and Storage") {
 				updateFee("0711", "B_RES", "FINAL", 2, varAutoInvoiceFees);
+			}			
+			//Start: Abe - IT Request # 2504 
+			if (AInfo["Project Type"] == "PV Solar and Storage") {
+				updateFee("0515", "B_RES", "FINAL", 1, varAutoInvoiceFees);
 			}
+			//End: Abe - IT Request # 2504 
 			//updateFee("TECH","ACCOUNTING","FINAL",1,varAutoInvoiceFees);
 		}
 
