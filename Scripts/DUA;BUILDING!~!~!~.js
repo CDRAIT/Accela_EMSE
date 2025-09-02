@@ -31,7 +31,7 @@
 if(matches(currentUserID,"JMCKENZIE","KHOBDAY","TDUNN","MHELVICK","JMCKENZI","ADMIN")) {showDebug = 3;}
 publicUserEDR = false;
 logDebug("Inside DUA:Building/*/*/* script");
-if(currentUserID == "DIGEPLAN") loadCustomScript("DUA:DIGEPLAN");
+if(doDigEplan && currentUserID == "SVC_AGENT") loadCustomScript("DUA:DIGEPLAN");
 
 // loadCustomScript("DUA_EXECUTE_DIGEPLAN_SCRIPTS_PLN"); /* Example from Menlo Park, may NOT need for this agency */
 // Global variables for document management

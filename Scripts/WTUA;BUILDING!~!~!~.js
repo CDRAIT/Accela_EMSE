@@ -100,7 +100,7 @@ if(matches(currentUserID,"TDUNN","EAFTAHI","MHELVIC"))
 }
 logDebug("Running WTUA:Building ... ");
 
-loadCustomScript("WTUA:DIGEPLAN");
+if(doDigEplan) loadCustomScript("WTUA:DIGEPLAN");
 
 // Prereq: Application Attachment policy changed to not having download permission for ACA CAP Creator
 if(wfTask == "Process for Issuance" && wfStatus == "Issued"){

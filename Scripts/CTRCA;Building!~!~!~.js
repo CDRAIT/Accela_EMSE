@@ -28,7 +28,7 @@ logDebug("Running CTRCA:Building/");
 
 //For 'Revision' or 'Deferred' Type records, if the altId is changing at submittal, then the CTRCA DigEplan code needs to be in CTRCA for the specific record type.
 //See CTRCA:BUILDING/RESIDENTIAL/REVISION/NA for example
-if(!appMatch("Building/*/*/SolarApp Revision") && !appMatch("Building/Residential/Master/Revision") && !appMatch("Building/Revision/*/*") && !appMatch("Building/Deferred Submittal/*/*")) loadCustomScript("CTRCA:DIGEPLAN");
+if(doDigEplan && !appMatch("Building/*/*/SolarApp Revision") && !appMatch("Building/Residential/Master/Revision") && !appMatch("Building/Revision/*/*") && !appMatch("Building/Deferred Submittal/*/*")) loadCustomScript("CTRCA:DIGEPLAN");
 email("mckenzie@truepointsolutions.com","noreplyTEST@placer.ca.gov","PLACERCO TEST CTRCA " + capIDString,debug);
 
 // Copy original description field into record comment when app is submitted by customer for data integrity
