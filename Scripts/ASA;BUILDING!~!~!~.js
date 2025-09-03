@@ -25,6 +25,7 @@
 |         : TDunn 03/17/2025 added new submittal notification for staff record creation
 |         : TDunn 08/29/2025 added Abe IT request #1911
 |         : TDunn 08/29/2025 deployed to non-prod1 via GitHub
+|         : Abe   09/03/2025 IT Request #2059 - Auto Create SPMUD Flag
 |
 /=============================================================================================*/
 if(matches(currentUserID,"TDUNN","JMCKENZI", "EAFTAHI")) { showDebug = 1;}
@@ -450,6 +451,11 @@ if (!publicUser)
 
 //End of IT Request# 1911 - EV Charging Station
 
+//IT Request#2059 - Auto Create SPMUD Flag
+if(AInfo["ParcelAttribute.UTILITY"].startsWith("SOUTH PLACER MUD"))
+	if((appTypeArray[1]== "Commercial" && appTypeArray[2]=="Full Review")|| (appTypeArray[1]== "Residential" && appTypeArray[2]== "Full Review" && matches(appTypeArray[3],'Other','Residential<3000','Residential>3000','Tract < 3000','Tract > 3000')))
+		addStdCondition('Env. Engineering - Prevent Issuance / Approval', 'Project in SPMUD Jurisdiction');
+//End of IT Request#2059 - Auto Create SPMUD Flag 
 
 
 aa.sendMail("noreply@placer.ca.gov","tdunn@truepointsolutions.com", "", "Testing ASA:Building: debug ", debug);
