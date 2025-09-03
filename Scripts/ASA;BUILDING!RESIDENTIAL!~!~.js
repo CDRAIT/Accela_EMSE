@@ -23,7 +23,6 @@
 |         : EAftahi 03/07/2024 IT Request # 1978 - do not Auto Invoice 'Solar Roof Mount' fees
 |	      : EAftahi 04/29/2024 IT Request # 1998 - ADU Ad-Hoc Task - adds Ad-Hoc task for ADU/JADU permits(ADU Review & Addressing)
 |         : TDunn   08/14/2024 during restore process kept production version and added new editDueDate rule for new workflow.
-|         : Abe     10/17/2024 IT Request # 2059 Auto Create Flag for SPMUD (Utility Geocode)
 |         : TDunn   03/22/2025 Disabled dolimited flag for limited scope records to eliminate add fees at ACA for testing.
 |         : TDunn   08/28/2025 Added Abe IT request #2221 code to 'test' script version
 |         : TDunn   08/28/2025 added Abe IT request # 2493
