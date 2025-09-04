@@ -1497,7 +1497,7 @@ if(matches(appTypeArray[1],"Revision") && wfProcess == "BLD_20231116_REV")
 	// Rules for updating TSI Distribution and task activation fields when review task is Approved -------------
 	if(matches(wfTask,"Stormwater and Floodplain Review") && wfStatus == "Approved")
 	{
-		editTaskSpecific("ESD_BUILDING","Stormwater and Floodplain","N");
+		editTaskSpecific("B_ESD","Stormwater and Floodplain","N");
 		editTaskSpecific("Distribution","Stormwater and Floodplain Review","N");		
 	}
 	
