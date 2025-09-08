@@ -452,9 +452,10 @@ if (!publicUser)
 //End of IT Request# 1911 - EV Charging Station
 
 //IT Request#2059 - Auto Create SPMUD Flag
-if(AInfo["ParcelAttribute.UTILITY"].startsWith("SOUTH PLACER MUD"))
-	if((appTypeArray[1]== "Commercial" && appTypeArray[2]=="Full Review")|| (appTypeArray[1]== "Residential" && appTypeArray[2]== "Full Review" && matches(appTypeArray[3],'Other','Residential<3000','Residential>3000','Tract < 3000','Tract > 3000')))
-		addStdCondition('Env. Engineering - Prevent Issuance / Approval', 'Project in SPMUD Jurisdiction');
+if (AInfo["ParcelAttribute.UTILITY"] != null && AInfo["ParcelAttribute.UTILITY"] != "")
+	if (AInfo["ParcelAttribute.UTILITY"].startsWith("SOUTH PLACER MUD"))
+		if ((appTypeArray[1] == "Commercial" && appTypeArray[2] == "Full Review") || (appTypeArray[1] == "Residential" && appTypeArray[2] == "Full Review" && matches(appTypeArray[3], 'Other', 'Residential<3000', 'Residential>3000', 'Tract < 3000', 'Tract > 3000')))
+			addStdCondition('Env. Engineering - Prevent Issuance / Approval', 'Project in SPMUD Jurisdiction');
 //End of IT Request#2059 - Auto Create SPMUD Flag 
 
 
