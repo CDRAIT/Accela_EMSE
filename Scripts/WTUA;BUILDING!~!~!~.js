@@ -91,6 +91,7 @@
 |         : TDunn 04/02/2025 changed condition type to add for Stormwater Floodplain Review Required
 |         : TDunn 08/29/2025 copied to Non-prod1
 |         : TDunn 08/29/2025 deployed to Github repository
+|         : Abe   09/10/2025 Added IT Request# 2548  
 |
 /---------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 
@@ -106,7 +107,9 @@ if(doDigEplan) loadCustomScript("WTUA:DIGEPLAN");
 if(wfTask == "Process for Issuance" && wfStatus == "Issued"){
 	docArray = aa.document.getCapDocumentList(capId,currentUserID).getOutput(); 
 	for(x in docArray) 
-		if(docArray[x].getDocCategory() == "Application Attachment" || (matches(docArray[x].getDocCategory(),"Plans","Supporting Documents","Approved Report") && docArray[x].getDocStatus() == "Approved")){
+		//IT Request# 2548
+		if((!matches(docArray[x].getDocCategory(),"Internal Only","Comment Report") && docArray[x].getDocStatus() == "Approved")){
+		//if(docArray[x].getDocCategory() == "Application Attachment" || (matches(docArray[x].getDocCategory(),"Plans","Supporting Documents","Approved Report") && docArray[x].getDocStatus() == "Approved")){
 			/* permission string: 0100000000, activates download only for CAP Creator
 			 * setViewRole() sets download permission only 
                          */
