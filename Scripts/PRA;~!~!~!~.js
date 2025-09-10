@@ -14,8 +14,8 @@
 | update  : TDunn 10/04/2021 Added additional criteria for sending notice by module and record type. 
 | update  : TDunn 12/22/2021 added new option to createNotificationTPS3 to send email to both default and assigned staff
 | update  : TDunn 10/28/2022 added rules for Planning records at 'Fees Paid'
-| update  : EAFTAHI 06/27/2023 added auto-advancement for AA initiated permits 
-|
+| update  : Abe   06/27/2023 added auto-advancement for AA initiated permits 
+|         : Abe   09/10/2025 updated Req# 1566 - took the assignment out of if-case
 \-------------------------------------------------------------------------------------------------------*/
 
 if (publicUser) {
@@ -55,22 +55,18 @@ if (publicUser) {
  * 
  **/
 if (matches(appTypeArray[1], "Administrative", "MBLA", "Pre Development", "Project", "SB 9")) {
-
     logDebug("Running actions for Online Planning records on PRA event ...");
-
     if (!publicUser) {
-        if (isTaskActive("Permit Initiation") && balanceDue == 0) {
+        if (isTaskActive("Permit Initiation") && balanceDue == 0)
             closeTask("Permit Initiation", "Fees Paid", "Fees paid, updated by script", "");
-            if (AInfo["Project Office"] == "Auburn") assignCap("PLNSUP_ABN");
-            if (AInfo["Project Office"] == "Tahoe") assignCap("PLNSUP_TAH");
-        }
     }
     else {
-        if (isTaskStatus("Permit Initiation", "Payment Requested") && isTaskActive("Permit Initiation")) {
+        if (isTaskStatus("Permit Initiation", "Payment Requested") && isTaskActive("Permit Initiation"))
             closeTask("Permit Initiation", "Fees Paid", "Fees paid, updated by script", "");
-            if (AInfo["Project Office"] == "Auburn") assignCap("PLNSUP_ABN");
-            if (AInfo["Project Office"] == "Tahoe") assignCap("PLNSUP_TAH");
-        }
+    }
+    if (balanceDue == 0) {
+        if (AInfo["Project Office"] == "Auburn") assignCap("PLNSUP_ABN");
+        if (AInfo["Project Office"] == "Tahoe") assignCap("PLNSUP_TAH");
     }
 }
 
@@ -266,5 +262,6 @@ function createNotificationTPS3(emailTemplate, doContacts, vContactTypes, doLp, 
     // vToEmail = "tdunn@truepointsolutions.com"; vCcEmail = "tdunn@truepointsolutions.com";
     vEmailSent = sendNotification(vFromEmail, vToEmail, vCcEmail, emailTemplate, emailParameters, null);
     logDebug("Email Sent = " + vEmailSent);
+
 
 }
