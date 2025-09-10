@@ -14,6 +14,8 @@
 |         : EAFTAHI 07/05/2023 Auto-assign "ELECTRONIC UNASSIGNED - AUBURN/Tahoe" to "Plan Check"
 |         : mbecker 09/01/2023 PCCP Required Y auto email send task for PCCP group 
 |         : TDunn   01/30/2023 PCCP notification requirement from 09/01/2023 superceded and remarked out.
+|         : Abe     04/09/2025 IT Request# 1911 - EV Charging Station
+|         : Abe   09/10/2025 Added IT Request# 2548  
 |
 /------------------------------------------------------------------------------------------------------*/
 
@@ -28,10 +30,9 @@
 showDebug =  false;
 if (wfTask == "Process for Issuance" && wfStatus == "Issued") {
     docArray = aa.document.getCapDocumentList(capId, currentUserID).getOutput();
-    for (x in docArray)
-        if (docArray[x].getDocCategory() == "Application Attachment") {
-
-
+	for(x in docArray) 
+		//IT Request# 2548
+		if((!(matches(docArray[x].getDocCategory(),"Internal Only","Comment Report")) && docArray[x].getDocStatus() == "Approved")){
             docArray[x].setViewRole("0100000000");
             aa.document.updateDocument(docArray[x]);
         }
@@ -62,6 +63,24 @@ if (((wfTask == "Application Submittal" && wfStatus == "Complete") || (wfTask ==
     if (AInfo["Project Office"] == "Auburn") assignTask("Plan Check", "ELECTRONIC UNASSIGNED - AUBURN", "BLD_20181201_MAIN");
     if (AInfo["Project Office"] == "Tahoe") assignTask("Plan Check", "ELECTRONIC UNASSIGNED - TAHOE", "BLD_20181201_MAIN");
 }
+
+
+//IT Request# 1911 - EV Charging Station
+if (matches(appTypeArray[1], "Residential", "Commercial") && appTypeArray[2] == "Limited")
+  if (getAppSpecific("Scope of Work") == "Electric Vehicle Charging Station (EVCS)")
+    //supporting both new and old WfProcess
+    if ((wfProcess == "BLD_20230501_MAIN" && wfTask == "Submittal Review" && wfStatus == "Submittal Accepted") ||
+      (wfProcess == "BLD_20181201_MAIN" && wfTask == "Application Submittal" && wfStatus == "Complete")) {
+
+      if (getAppSpecific("EVCS Units Qty") == "1-25 units")
+        editAppSpecific("EVCS Issuance Deadline", dateAdd(wfDateMMDDYYYY, 20, " "));
+      if (getAppSpecific("EVCS Units Qty") == "26+ units")
+        editAppSpecific("EVCS Issuance Deadline", dateAdd(wfDateMMDDYYYY, 40, " "));
+    }
+
+//End of IT Request# 1911 - EV Charging Station  
+
+
 
 /* Remarked out 01/30/2024 by TDunn per new specification */
 //Workflow process criteria added by TDunn, 07/28/2023
