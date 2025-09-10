@@ -108,7 +108,7 @@ if(wfTask == "Process for Issuance" && wfStatus == "Issued"){
 	docArray = aa.document.getCapDocumentList(capId,currentUserID).getOutput(); 
 	for(x in docArray) 
 		//IT Request# 2548
-		if((!matches(docArray[x].getDocCategory(),"Internal Only","Comment Report") && docArray[x].getDocStatus() == "Approved")){
+		if((!(matches(docArray[x].getDocCategory(),"Internal Only","Comment Report")) && docArray[x].getDocStatus() == "Approved")){
 		//if(docArray[x].getDocCategory() == "Application Attachment" || (matches(docArray[x].getDocCategory(),"Plans","Supporting Documents","Approved Report") && docArray[x].getDocStatus() == "Approved")){
 			/* permission string: 0100000000, activates download only for CAP Creator
 			 * setViewRole() sets download permission only 
