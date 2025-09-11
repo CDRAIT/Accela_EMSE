@@ -14,6 +14,9 @@
 |         : EAFTAHI 07/05/2023 Auto-assign "ELECTRONIC UNASSIGNED - AUBURN/Tahoe" to "Plan Check"
 |         : mbecker 09/01/2023 PCCP Required Y auto email send task for PCCP group 
 |         : TDunn   01/30/2023 PCCP notification requirement from 09/01/2023 superceded and remarked out.
+|         : Abe     04/09/2025 IT Request# 1911 - EV Charging Station
+|         : Abe     09/11/2025 IT Request# 2569 - WF Email Notification (It's for current workflow only - doesn't apply to DigEplan)
+
 |
 /------------------------------------------------------------------------------------------------------*/
 
@@ -63,32 +66,71 @@ if (((wfTask == "Application Submittal" && wfStatus == "Complete") || (wfTask ==
     if (AInfo["Project Office"] == "Tahoe") assignTask("Plan Check", "ELECTRONIC UNASSIGNED - TAHOE", "BLD_20181201_MAIN");
 }
 
-/* Remarked out 01/30/2024 by TDunn per new specification */
-//Workflow process criteria added by TDunn, 07/28/2023
-// Rules for 'current' workflow
-/*
-if (wfProcess == "BLD_20181201_DISTRIBUTION") {
-  // Added by MBecker 9/1/2023
-  if (
-    wfTask == "Planning Review" &&
-    matches(wfStatus, "Complete", "Plan Check Only") &&
-    AInfo["PCCP Required"] == "Yes"
-  ) {
-    logDebug("Sending PCCP Automated notification email...");
-    createNotificationTPS2(
-      "PCCP_REQ_NOTIFICATION",
-      "Y",
-      "Applicant",
-      "N",
-      "N",
-      "N",
-      "N",
-      "N",
-      "Y",
-      "N",
-      "N",
-      ""
-    );
+
+//IT Request# 1911 - EV Charging Station
+if (matches(appTypeArray[1], "Residential", "Commercial") && appTypeArray[2] == "Limited")
+  if (getAppSpecific("Scope of Work") == "Electric Vehicle Charging Station (EVCS)")
+    //supporting both new and old WfProcess
+    if ((wfProcess == "BLD_20230501_MAIN" && wfTask == "Submittal Review" && wfStatus == "Submittal Accepted") ||
+      (wfProcess == "BLD_20181201_MAIN" && wfTask == "Application Submittal" && wfStatus == "Complete")) {
+
+      if (getAppSpecific("EVCS Units Qty") == "1-25 units")
+        editAppSpecific("EVCS Issuance Deadline", dateAdd(wfDateMMDDYYYY, 20, " "));
+      if (getAppSpecific("EVCS Units Qty") == "26+ units")
+        editAppSpecific("EVCS Issuance Deadline", dateAdd(wfDateMMDDYYYY, 40, " "));
+    }
+
+//End of IT Request# 1911 - EV Charging Station 
+
+//Satrt: IT Request# 2569 - WF Email Notification (It's for current workflow only - doesn't apply to DigEplan)    
+if (wfTask == 'Planning Review' && matches(wfStatus, 'Complete', 'Plan Check Only'))
+  if (isTaskStatus('Plan Completeness Review', 'incomplete')) {
+    var templateName = "Staff_BLD_Planning_Approval_Notification";
+    var emailCc = "BLDplancheck@placer.ca.gov";
+    var emailTo = getTasksignedOffEmail("“Plan Completeness Review");
+    var emailParams = aa.util.newHashtable();
+    var contactName = getUserFullName();
+    var contactEmail = getUserEmail();
+    addParameter(emailParams, "$$signoffName$$", contactName);
+    addParameter(emailParams, "$$signoffEmail$$", contactEmail);
+    getRecordParams4Notification(emailParams); //"$$altID$$"
+    var result = sendNotification(defaultFrom,emailTo,emailCC,templateName,emailParams,null);
   }
+//End: IT Request# 2569 
+
+
+/*------------------------------------------------------------------------------------------------------/
+| <=========== Local Functions and Classes (Used by this script) ===========>
+/------------------------------------------------------------------------------------------------------*/
+function getTasksignedOffEmail(wfstr) // optional process name
+{
+    var useProcess = false;
+    var processName = "";
+    if (arguments.length == 3) {
+        processName = arguments[2]; // subprocess
+        useProcess = true;
+    }
+
+    var workflowResult = aa.workflow.getTaskItems(capId, wfstr, processName, null, null, null);
+    if (workflowResult.getSuccess())
+        wfObj = workflowResult.getOutput();
+    else {
+        logDebug("**ERROR: Failed to get workflow object: " + workflowResult.getErrorMessage());
+        return false;
+    }
+
+    for (var i in wfObj) {
+        fTask = wfObj[i];
+        if (fTask.getTaskDescription().toUpperCase().equals(wfstr.toUpperCase()) && (!useProcess || fTask.getProcessCode().equals(processName))) {
+            var taskUserObj = fTask.getTaskItem().getSysUser();
+            var userObj = aa.person.getUser(taskUserObj.getFirstName(), taskUserObj.getMiddleName(), taskUserObj.getLastName()).getOutput();
+            // var userEmail = taskUserObj.getEmail();
+            // if (userEmail)
+            //     return userEmail;
+            // else
+            //     return false;
+        }
+        return userObj.getEmail();
+        
+    }
 }
-*/
