@@ -126,10 +126,5 @@ function getTasksignedOffEmail(wfstr) // optional process name
       var userObj = aa.person.getUser(taskUserObj.getFirstName(), taskUserObj.getMiddleName(), taskUserObj.getLastName()).getOutput();
       return userObj.getEmail();
     }
-<<<<<<< HEAD
   }
 }
-=======
-
-}
->>>>>>> 9beb55b43b00809757c609675257ab94926ddf90
