@@ -87,14 +87,14 @@ if (wfTask == 'Planning Review' && matches(wfStatus, 'Complete', 'Plan Check Onl
   if (isTaskStatus('Plan Completeness Review', 'incomplete')) {
     var templateName = "Staff_BLD_Planning_Approval_Notification";
     var emailCc = "BLDplancheck@placer.ca.gov";
-    var emailTo = getTasksignedOffEmail("“Plan Completeness Review");
+    var emailTo = getTasksignedOffEmail("Plan Completeness Review", "BLD_20181201_DISTRIBUTION");
     var emailParams = aa.util.newHashtable();
     var contactName = getUserFullName();
     var contactEmail = getUserEmail();
     addParameter(emailParams, "$$signoffName$$", contactName);
     addParameter(emailParams, "$$signoffEmail$$", contactEmail);
     getRecordParams4Notification(emailParams); //"$$altID$$"
-    var result = sendNotification(defaultFrom,emailTo,emailCC,templateName,emailParams,null);
+    var result = sendNotification(defaultFrom,emailTo,emailCc,templateName,emailParams,null);
   }
 //End: IT Request# 2569 
 
@@ -104,33 +104,27 @@ if (wfTask == 'Planning Review' && matches(wfStatus, 'Complete', 'Plan Check Onl
 /------------------------------------------------------------------------------------------------------*/
 function getTasksignedOffEmail(wfstr) // optional process name
 {
-    var useProcess = false;
-    var processName = "";
-    if (arguments.length == 3) {
-        processName = arguments[2]; // subprocess
-        useProcess = true;
-    }
+  var useProcess = false;
+  var processName = "";
+  if (arguments.length == 2) {
+    processName = arguments[1]; // subprocess
+    useProcess = true;
+  }
 
-    var workflowResult = aa.workflow.getTaskItems(capId, wfstr, processName, null, null, null);
-    if (workflowResult.getSuccess())
-        wfObj = workflowResult.getOutput();
-    else {
-        logDebug("**ERROR: Failed to get workflow object: " + workflowResult.getErrorMessage());
-        return false;
-    }
+  var workflowResult = aa.workflow.getTaskItems(capId, wfstr, processName, null, null, null);
+  if (workflowResult.getSuccess())
+    wfObj = workflowResult.getOutput();
+  else {
+    logDebug("**ERROR: Failed to get workflow object: " + workflowResult.getErrorMessage());
+    return false;
+  }
 
-    for (var i in wfObj) {
-        fTask = wfObj[i];
-        if (fTask.getTaskDescription().toUpperCase().equals(wfstr.toUpperCase()) && (!useProcess || fTask.getProcessCode().equals(processName))) {
-            var taskUserObj = fTask.getTaskItem().getSysUser();
-            var userObj = aa.person.getUser(taskUserObj.getFirstName(), taskUserObj.getMiddleName(), taskUserObj.getLastName()).getOutput();
-            // var userEmail = taskUserObj.getEmail();
-            // if (userEmail)
-            //     return userEmail;
-            // else
-            //     return false;
-        }
-        return userObj.getEmail();
-        
+  for (var i in wfObj) {
+    fTask = wfObj[i];
+    if (fTask.getTaskDescription().toUpperCase().equals(wfstr.toUpperCase()) && (!useProcess || fTask.getProcessCode().equals(processName))) {
+      var taskUserObj = fTask.getTaskItem().getSysUser();
+      var userObj = aa.person.getUser(taskUserObj.getFirstName(), taskUserObj.getMiddleName(), taskUserObj.getLastName()).getOutput();
+      return userObj.getEmail();
     }
+  }
 }
