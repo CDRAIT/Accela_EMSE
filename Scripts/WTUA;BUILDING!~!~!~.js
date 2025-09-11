@@ -94,7 +94,7 @@ if (wfTask == 'Planning Review' && matches(wfStatus, 'Complete', 'Plan Check Onl
     addParameter(emailParams, "$$signoffName$$", contactName);
     addParameter(emailParams, "$$signoffEmail$$", contactEmail);
     getRecordParams4Notification(emailParams); //"$$altID$$"
-    var result = sendNotification(defaultFrom,emailTo,emailCC,templateName,emailParams,null);
+    var result = sendNotification(defaultFrom,emailTo,emailCc,templateName,emailParams,null);
   }
 //End: IT Request# 2569 
 
@@ -133,4 +133,5 @@ function getTasksignedOffEmail(wfstr) // optional process name
         return userObj.getEmail();
         
     }
+
 }
