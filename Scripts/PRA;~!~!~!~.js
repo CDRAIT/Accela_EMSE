@@ -57,17 +57,19 @@ if (publicUser) {
 if (matches(appTypeArray[1], "Administrative", "MBLA", "Pre Development", "Project", "SB 9")) {
     logDebug("Running actions for Online Planning records on PRA event ...");
     if (!publicUser) {
-        if (isTaskActive("Permit Initiation") && balanceDue == 0.00)
+        if (isTaskActive("Permit Initiation") && !(isTaskComplete("Permit Initiation")) && balanceDue == 0.00){
             closeTask("Permit Initiation", "Fees Paid", "Fees paid, updated by script", "");
+            if (AInfo["Project Office"] == "Auburn") assignCap("PLNSUP_ABN");
+            if (AInfo["Project Office"] == "Tahoe") assignCap("PLNSUP_TAH");
+        }
     }
     else {
-        if (isTaskStatus("Permit Initiation", "Payment Requested") && isTaskActive("Permit Initiation"))
+        if (isTaskStatus("Permit Initiation", "Payment Requested") && isTaskActive("Permit Initiation")){
             closeTask("Permit Initiation", "Fees Paid", "Fees paid, updated by script", "");
-    }
-    if (balanceDue == 0.00) {
-        if (AInfo["Project Office"] == "Auburn") assignCap("PLNSUP_ABN");
-        if (AInfo["Project Office"] == "Tahoe") assignCap("PLNSUP_TAH");
-    }
+            if (AInfo["Project Office"] == "Auburn") assignCap("PLNSUP_ABN");
+            if (AInfo["Project Office"] == "Tahoe") assignCap("PLNSUP_TAH");
+        }
+    }    
     var endResult = aa.sendMail(defaultFrom,"eaftahi@placer.ca.gov", "", "PRA in prod for Planning payments", debug);
 }
 
@@ -266,5 +268,6 @@ function createNotificationTPS3(emailTemplate, doContacts, vContactTypes, doLp, 
 
 
 }
+
 
 
