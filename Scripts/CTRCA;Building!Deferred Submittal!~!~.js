@@ -128,16 +128,21 @@ try {
 catch (err) {
 	logDebug("A JavaScript Error occured: " + err.message + " at line " + err.lineNumber + " stack: " + err.stack);
 }
+try 
+{
+	if(publicUser) {
+		//enter as many of these as there are customizations for doc groups by record type
+		if(appMatch("Building/*/*/*")) docGroupForDPC = String("BLD_PLANREVIEW_DPC");
+		if(appMatch("Building/Deferred Submittal/*/*")) docGroupForDPC = String("DEFERRED");
 
-if(publicUser) {
-	//enter as many of these as there are customizations for doc groups by record type
-	if(appMatch("Building/*/*/*")) docGroupForDPC = String("BLD_PLANREVIEW_DPC");
-
-	if(AInfo["DocumentGroupforDPC"] == null) editAppSpecific("DocumentGroupforDPC",docGroupForDPC);
-	editAppSpecific("AdditionalDocumentTypes",selectDocConfigByGroupPermissions(docGroupForDPC));
-	editAppSpecific("RequiredDocumentTypes","");
+		if(AInfo["DocumentGroupforDPC"] == null) editAppSpecific("DocumentGroupforDPC",docGroupForDPC);
+		editAppSpecific("AdditionalDocumentTypes",selectDocConfigByGroupPermissions(docGroupForDPC,[]));
+		editAppSpecific("RequiredDocumentTypes","");
+	}
 }
-
+catch (err2) {
+	logDebug("A JavaScript Error occured: " + err2.message + " at line " + err2.lineNumber + " stack: " + err2.stack);
+}
 sendResult = aa.sendMail("noreply@placer.ca.gov","tdunn@truepointsolutions.com","","Test: PLACERCO CTRCA Deferred created " + newAltID, debug);
 
 // sendResult = aa.sendMail("noreply@placer.ca.gov","tdunn@truepointsolutions.com", "", "Testing Deferred submittal ", debug);
