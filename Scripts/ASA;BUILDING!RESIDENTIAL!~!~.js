@@ -19,10 +19,11 @@
 |         : TDunn 11/06/2023 added SolarApp+ fee rules
 |         : TDunn 11/14/2023 added additional logic to include SolarApp+ as an 'exception' for adding and collecting fees online.
 |         : EAftahi 12/07/2023 IT Request # 1865 - added "Addressing" Ad Hoc task 
-|	      : EAftahi 11/18/2023 IT Request # 1590 - Tracking ADUs - changed the code based on new ASI fields		
+|	  : EAftahi 11/18/2023 IT Request # 1590 - Tracking ADUs - changed the code based on new ASI fields		
 |         : EAftahi 03/07/2024 IT Request # 1978 - do not Auto Invoice 'Solar Roof Mount' fees
-|	      : EAftahi 04/29/2024 IT Request # 1998 - ADU Ad-Hoc Task - adds Ad-Hoc task for ADU/JADU permits(ADU Review & Addressing)
+|	  : EAftahi 04/29/2024 IT Request # 1998 - ADU Ad-Hoc Task - adds Ad-Hoc task for ADU/JADU permits(ADU Review & Addressing)
 |         : TDunn   08/14/2024 during restore process kept production version and added new editDueDate rule for new workflow.
+|         : Abe     10/17/2024 IT Request # 2059 Auto Create Flag for SPMUD (Utility Geocode)
 |         : TDunn   03/22/2025 Disabled dolimited flag for limited scope records to eliminate add fees at ACA for testing.
 |         : TDunn   08/28/2025 Added Abe IT request #2221 code to 'test' script version
 |         : TDunn   08/28/2025 added Abe IT request # 2493
@@ -43,19 +44,26 @@ var varAutoInvoiceFees = "N";
 // {
 // 	varAutoInvoiceFees = "Y";
 // }
+try
+{
+	if (cap.isCreatedByACA() && ((appMatch("Building/Residential/Limited/*") && !matches(getAppSpecific("Scope of Work"), "Solar Roof Mount")) || appTypeArray[3] == "Solar App")) 
+	{
+		varAutoInvoiceFees = "Y";
+	}
+	//end of IT Request # 1978 - Online Solar Submittal
 
-if (cap.isCreatedByACA() && (appMatch("Building/Residential/Limited/*") && !matches(getAppSpecific("Scope of Work"), "Solar Roof Mount") || appTypeArray[3] == "Solar App")) {
-    varAutoInvoiceFees = "Y";
+	//IT Request# 2221 - SB937 - Fee Deferral
+	if (!publicUser)
+		if (appTypeArray[2] == "Full Review" && (matches(appTypeArray[3], "Other", "Residential<3000", "Residential>3000", "Tract < 3000", "Tract > 3000")))
+			if (matches(getAppSpecific("Type of Work"), "Addition", "Manufactured Home", "New", "Farmworker Housing") && getAppSpecific("YesToFeeDeferral") == "CHECKED")
+				addStdCondition("Building - Prevent Final / Completion", "SB-937 Mitigation Fee Act");
+
+	//End of IT Request# 2221
+}catch(err)
+{
+	aa.sendMail("noreply@placer.ca.gov","tdunn@truepointsolutions.com", "", "Test: ASA:Building/Residential try error1 ", err.message);	
 }
-//end of IT Request # 1978 - Online Solar Submittal
 
-//IT Request# 2221 - SB937 - Fee Deferral
-if (!publicUser)
-    if (appTypeArray[2] == "Full Review" && (matches(appTypeArray[3], "Other", "Residential<3000", "Residential>3000", "Tract < 3000", "Tract > 3000")))
-        if (matches(getAppSpecific("Type of Work"), "Addition", "Manufactured Home", "New", "Farmworker Housing") && getAppSpecific("YesToFeeDeferral") == "CHECKED")
-            addStdCondition("Building - Prevent Final / Completion", "SB-937 Mitigation Fee Act");
-
-//End of IT Request# 2221
 
 try
 {
@@ -294,7 +302,7 @@ try
 	
 } catch(e)
 {
-	aa.sendMail("noreply@placer.ca.gov","tdunn@truepointsolutions.com", "", "Test: ASA:Building/Residential try error ", e.message);	
+	aa.sendMail("noreply@placer.ca.gov","tdunn@truepointsolutions.com", "", "Test: ASA:Building/Residential try error2 ", e.message);	
 }
  aa.sendMail("noreply@placer.ca.gov","tdunn@truepointsolutions.com", "", "Test: ASA:Building/Residential: debug ", debug);
  
