@@ -30,6 +30,7 @@
 |         : TDunn   08/29/2025 copied to Non-prod1
 |         : TDunn   08/29/2025 deployed to GitHub
 |         : Abe     09/02/2025 IT Request # 2504 - Added Fee code 0515 to the SolarApp Fee Calculations
+|         : TDunn   09/23/2025 added try clause on IT requests 1978 and 2221
 |
 /================================================================================================================================*/
 if (currentUserID == "TDUNN" || currentUserID == "EAFTAHI") {
@@ -305,35 +306,3 @@ try
 	aa.sendMail("noreply@placer.ca.gov","tdunn@truepointsolutions.com", "", "Test: ASA:Building/Residential try error2 ", e.message);	
 }
  aa.sendMail("noreply@placer.ca.gov","tdunn@truepointsolutions.com", "", "Test: ASA:Building/Residential: debug ", debug);
- 
-
-// PVLDAIR,PVLDAIW,PVLDAIRW,PVLDAIJT,PVLDAIS,PVLDAISD,PVLDAIOS,PVLDAIROW,PVLDAIEM,PVLDAIRVSP,PVLDAIADM,PVLDASS,PVLDAST,PVLDASADM,PVLDANP,PVLDANPIL,PVLDANPADM,PVLDACP,PVLDACPADM,PVLDASAC,PVLDASACADM,PVRIEGO99-AR,PVROSETMPR-AR,PVTIER2R-AR,PVAGWATER
-/* FF|0903,FF|0790,FF|0711 ELEC
-FF|0903,FF|0790,FF|0712	Mech
-FF|0903,FF|0790,FF|0710	Plumb
-FF|0903,FF|0790,FF|0722 Reroof
-FF|0903,FF|0790,FF|0731 Solar
-FF|0903,FF|0790,FF|0710	WTR
-FF|0903,FF|0790,FF|0734 Window
-*/
-
-
-/*================================================
-**
-** Internal Functions
-**
-================================================*/
-function getAppProcessCode(capIdItem) 
-{
-    var workflowResult = aa.workflow.getMasterProcess(capIdItem);
-    if (workflowResult.getSuccess()) {
-        var wfObj = workflowResult.getOutput();
-
-        var fTask = wfObj[0];
-        return fTask.getProcessCode();
-    }
-    else {
-        logDebug("**ERROR: Failed to get workflow object: " + workflowResult.getErrorMessage());
-        return false;
-    }
-}
