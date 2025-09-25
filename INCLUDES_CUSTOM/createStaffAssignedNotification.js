@@ -113,6 +113,7 @@ function createStaffAssignedNotification(emailTemplate, vContactType, defaultPho
 			var staffFirst = staffObject.getFirstName();
 			var staffLast = staffObject.getLastName();
 			var staffPhone = staffObject.getPhoneNumber();
+			var staffTitle = staffObject.getTitle();
 			logDebug(staffFirst + " " + staffLast + " at " + staffEmail + "; Phone: " + staffPhone);
 		}
 		if (matches(staffPhone, "", null, undefined)) {
@@ -124,6 +125,7 @@ function createStaffAssignedNotification(emailTemplate, vContactType, defaultPho
 			addParameter(emailParameters, "$$staffEmailParam$$", staffEmail);
 			addParameter(emailParameters, "$$staffNameParam$$", staffName);
 			addParameter(emailParameters, "$$staffPhoneParam$$", formatStaffPhone(staffPhone));
+			addParameter(emailParameters,"$$staffTitleParam$$",staffTitle);
 			vCcEmail = vCcEmail + staffEmail + "; ";
 		}
 	}
