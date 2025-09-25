@@ -38,6 +38,17 @@ addParameter(reportParams,"RecordID",capIDString);
 // add short notes parameter
 var sNotes = getShortNotes();
 addParameter(emailParameters,"$$shortNotes$$",sNotes);
+	
+if(appTypeArray[0] == "Building")
+	{
+		var nScope = getAppSpecific("Scope of Work",capId);
+		var nOffice = getAppSpecific("Project Office",capId);
+		var nTypeOfWork = getAppSpecific("Type of Work",capId);
+		addParameter(emailParameters,"$$scopeOfWork$$",nScope);
+		addParameter(emailParameters,"$$typeOfWork$$",nTypeOfWork);
+		addParameter(emailParameters,"$$projectoffice$$",nOffice);
+	}
+
 
 if(vEventName == "WorkflowTaskUpdateAfter") {
 	addParameter(emailParameters,"$$wfStatusParam$$", wfStatus); 
