@@ -71,10 +71,12 @@
 |                                                       - externalLP_CA_SOAP.js
 |                                                       - XMLTagValue.js 
 |   10/20/2021 TDunn >> Added custom function to add special SP fees for Commercial Full Review permits.
-|   04/20/2023 EAftahi >> Added custom function, customComment
-|   10/18/2023 TDunn >> Added new functions for utility release notification
+|   04/20/2023 EAftahi >> Added function customComment
+|   07/21/2023 Ngraf >> Added function getRenewalCapByParentCapIDForReviewTPS(parentCapid) to get throughput records.
+|   10/18/2023 TDunn >> Added custom functions for IRSA utility release notifications
 |   10/19/2023 TDunn >> Added new function for adding a row to the Valuation table: addCalcValuation()
 |   11/16/2023 TDunn >> Added new custom functions for worklfow management
+|   12/19/2023 TDunn >> Added $$shortNotes$$ notification parameter to custom function: createNotificationTPS2()
 |   01/10/2024 TDunn >> Added new function for creating PCCP record created notification: createPCCPNotification(emailTemplate,pccpCapIDString) 
 |   01/12/2024 TDunn >> Added new function for staff assignment notification: function createStaffAssignedNotification(emailTemplate,vContactType) 
 |   01/12/2024 TDunn >> Added new function to format staff phone numbers for notifications or other applications: formatStaffPhone()
@@ -84,10 +86,15 @@
 |   08/28/2024 Abe   >> Modified function getAPOParams4Notification(), added ownerEmail and address to the params
 |   09/27/2024 TDunn >> Added new function copyDocumentsTPS()
 |   09/27/2024 TDunn >> Added new function createChildNoContacts for creating EOT child records without copying contact or APO information
+|   10/21/2024 TDunn >> Added new functions formatRevNumber and formatResubNum
 |   10/25/2024 TDunn >> added status update in autoRouteReviewsTD for full review cycle activation.
 |   11/05/2024 TDunn >> updated getTaskStatus to take capId as a third parameter
+|   12/03/2024 Abe   >> Added TPS function generateReportTPS_CustomFileName for altering the name of the file and email attachment 
 |   12/06/2024 TDunn >> updated name of custom 'generateReport' to 'generateReportPCO'
+|   12/10/2024 Abe   >> Commented function getRecordParams4Notification(), it's a duplicate of main version
 |   12/19/2024 Abe   >> Added function sendAcknowledgementLtr2Applicant() for sending email for Code and HazVeg modules 
+|   01/01/2025 Abe   >> Added function updateAppFileDate() to update cap FileDate for PLN PREAPPs
+|   01/30/2025 Abe   >> Added function sendAcknowledgementLtr2Applicant() to create and send Ack Letter for Code, and HazVeg modules
 |   01/03/2025 TDunn >> added functions assignConcurrent(lkupCriteria,tprocess,vCycle) and assignPreissue(pTask,tprocess) to support auto-assignment
 |   01/03/2025 TDunn >> added functions  getDueInDays(vtable,vcriteria,vcycle) and setDueDate(lkupCriteria,numDays,tprocess) to support automating due dates
 |   02/12/2025 TDunn >> added functions assignThisTask() and generateStormFloodNotice()
@@ -96,6 +103,8 @@
 |   03/07/2025 TDunn >> added function generateNoticeToStaff()
 |   03/14/2025 TDunn >> added custom functions: getPCOasi4BuildingNotification(params,deptCrit); generateAddlPermitRequiredNotice(vTemplate,rpList); getTaskAssignToEmail(thisTaskArg,tprocess)
 |   03/14/2025 TDunn >> added custom function getAppProcessCode(capIdItem) 
-|   03/31/2025 TDunn >> added custom function  getPreIssuanceListForNotification  requires name of std choice lookup for list.      
-|
+|   03/31/2025 TDunn >> added custom function  getPreIssuanceListForNotification  requires name of std choice lookup for list.
+|   05/22/2025 Abe   >> Replaced all instances of "noreply@placer.ca.gov" email address with INCLUDES_CUSTOM_GLOBALS variable "defaultFrom" 
+|   07/30/2025 Abe   >> updated formatStaffPhone() to clear any format before processing the phone number     
+|   09/18/2025 RMoore >> removed functions, main function copytoxics, copies toxics table from record to another
 /---------------------------------------------------------------------------------------------------------------------------------------------------------*/
