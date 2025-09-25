@@ -8,7 +8,7 @@ function generateReportPCO(aaReportName,parameters,rModule) {
     report.setCapId(capId);
 
     report.setReportParameters(parameters);
-
+	logDebug(parameters);
     var permit = aa.reportManager.hasPermission(reportName,currentUserID);
 
     if(permit.getOutput().booleanValue()) {
