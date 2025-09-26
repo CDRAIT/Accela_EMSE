@@ -17,7 +17,7 @@
 if (currentUserID == "EAFTAHI") {
     showDebug = 1;
 }
-logDebug("Running ASA:TRPA>> PLANNING>> Site ASSESSMENT");
+logDebug("Running ASA:TRPA; PLANNING; Site ASSESSMENT");
 
 if (AInfo["ParcelAttribute.SUBDIVISION"] != null) {
     editAppSpecific("Subdivision", AInfo["ParcelAttribute.SUBDIVISION"]);
@@ -26,4 +26,5 @@ if (AInfo["ParcelAttribute.SUBDIVISION"] != null) {
 
 if (AInfo["ParcelAttribute.YEAR STRUCTURE BUILT"] != null) {
     editAppSpecific("Year Structure Built", AInfo["ParcelAttribute.YEAR STRUCTURE BUILT"]);
+
 }
