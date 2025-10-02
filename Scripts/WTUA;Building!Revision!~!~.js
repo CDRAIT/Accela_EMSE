@@ -44,6 +44,7 @@
 |         : TDunn  04/22/2025 deprecated 'Update Fee' TSI and references
 |         : TDunn  08/29/2025 copied to Non-prod1
 |         : TDunn  08/31/2025 deployed to Github
+|         : TDunn  10/02/2025 reorginized and added useTaskspecificGroupName to add fees to parent.
 |
 /---------------------------------------------------------------------------------------------------------------------------------*/
 
@@ -1513,6 +1514,7 @@ if(matches(appTypeArray[1],"Revision") && wfProcess == "BLD_20231116_REV")
 			vTotHrs = (AInfo["Total Hours Charged"] *1);
 			vTotHrs = (vTotHrs *1) + (wfHours * 1);
 			editTaskSpecific("Distribution Reconciliation","Total Hours Charged",vTotHrs);
+			editTaskSpecific("Process for Issuance","Total Hours Charged",vTotHrs);
 			logDebug("Total Hours : " + vTotHrs);
 			AInfo["Total Hours Charged"] = vTotHrs;
 		}
@@ -1844,9 +1846,9 @@ if(matches(appTypeArray[1],"Revision") && wfProcess == "BLD_20231116_REV")
 			TsiInfo = new Array();
 			loadTaskSpecific(TsiInfo,capId);
 			
-			if(matches(TsiInfo[wfProcess + "." + wfTask + "." + "Assess Fee"],"Y","YES","Yes") && AInfo["Total Hours Charged"] > 0)
+			if(matches(TsiInfo[wfProcess + "." + wfTask + "." + "Assess Fee"],"Y","YES","Yes") && TsiInfo[wfProcess + "." + wfTask + "." + "Total Hours Charged"] > 0)
 			{
-				feeQty = AInfo["Total Hours Charged"]; 
+				feeQty = TsiInfo[wfProcess + "." + wfTask + "." + "Total Hours Charged"];
 				addFee("0913","B_RES","FINAL",feeQty,"N",pCapId);
 			}
 			useTaskSpecificGroupName = false;
