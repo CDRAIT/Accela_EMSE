@@ -1800,12 +1800,7 @@ if(matches(appTypeArray[1],"Revision") && wfProcess == "BLD_20231116_REV")
 			editTaskDueDate("Process for Issuance",dateAdd(null,2,"Y"),wfProcess);
 			assignThisTask("Process for Issuance",wfProcess);
 			
-			if(AInfo["Total Hours Charged"] > 0)
-			{
-				feeQty = AInfo["Total Hours Charged"];
-				if(matches(AInfo["Assess Fee"],"Y","YES","Yes")) {addFee("0913","B_RES","FINAL",feeQty,"N",pCapId);}
-			}
-			
+
 			// New block for setting reminder/due dates for Preissuance tasks
 			var preIssueListSD = lookup("PLAN REVIEW - REQUIRED REVIEWS","PREISSUE"); // Get list of preissuance tasks
 			preTasksArraySD = preIssueListSD.split(",");
@@ -1842,15 +1837,23 @@ if(matches(appTypeArray[1],"Revision") && wfProcess == "BLD_20231116_REV")
 				}
 			}			
 		}
-		
+		if(matches(wfStatus,"Complete","Withdrawn"))
+		{
+			// Make sure getting correct task tsi
+			useTaskSpecificGroupName = true;
+			TsiInfo = new Array();
+			loadTaskSpecific(TsiInfo,capId);
+			
+			if(matches(TsiInfo[wfProcess + "." + wfTask + "." + "Assess Fee"],"Y","YES","Yes") && AInfo["Total Hours Charged"] > 0)
+			{
+				feeQty = AInfo["Total Hours Charged"]; 
+				addFee("0913","B_RES","FINAL",feeQty,"N",pCapId);
+			}
+			useTaskSpecificGroupName = false;
+		}			
 		// Distribution Reconciliation - Withdrawn
 		if(wfStatus == "Withdrawn")
 		{
-			if(matches(AInfo["Assess Fee"],"Yes","Y","YES") && AInfo["Total Hours Charged"] > 0)
-			{
-				feeQty = AInfo["Total Hours Charged"];
-				addFee("0913","B_RES","FINAL",feeQty,"N",pCapId);
-			}
 			setTask(wfTask,"N","Y");
 			var preIssueListWD = lookup("PLAN REVIEW - REQUIRED REVIEWS","PREISSUE"); // Get list of preissuance tasks
 			preTasksArrayWD = preIssueListWD.split(",");
