@@ -1515,7 +1515,6 @@ if(matches(appTypeArray[1],"Revision") && wfProcess == "BLD_20231116_REV")
 		{
 			vTotHrs = (AInfo["Total Hours Charged"] *1);
 			vTotHrs = (vTotHrs *1) + (wfHours * 1);
-			editTaskSpecific("Distribution Reconciliation","Total Hours Charged",vTotHrs);
 			editTaskSpecific("Process for Issuance","Total Hours Charged",vTotHrs);
 			logDebug("Total Hours : " + vTotHrs);
 			AInfo["Total Hours Charged"] = vTotHrs;
@@ -1794,7 +1793,7 @@ if(matches(appTypeArray[1],"Revision") && wfProcess == "BLD_20231116_REV")
 			editTaskDueDate("Distribution",dateAdd(null,1,"Y"),wfProcess);
 			presetTSIpco("BLDPERMIT","Distribution","Approved","Cleared","ThirdStatus");
 			//if(AInfo["Update hours"] != null) {editTaskSpecific("Distribution Reconciliation","Update hours",null);}
-			if(AInfo["Assess Fee"] != null) {editTaskSpecific("Distribution Reconciliation","Assess Fee",null);}
+			
 		}
 		
 		// Distribution Reconciliation - Complete
@@ -1841,20 +1840,7 @@ if(matches(appTypeArray[1],"Revision") && wfProcess == "BLD_20231116_REV")
 				}
 			}			
 		}
-		if(matches(wfStatus,"Complete","Withdrawn"))
-		{
-			// Make sure getting correct task tsi
-			useTaskSpecificGroupName = true;
-			TsiInfo = new Array();
-			loadTaskSpecific(TsiInfo,capId);
 			
-			if(matches(TsiInfo[wfProcess + "." + wfTask + "." + "Assess Fee"],"Y","YES","Yes") && TsiInfo[wfProcess + "." + wfTask + "." + "Total Hours Charged"] > 0)
-			{
-				feeQty = TsiInfo[wfProcess + "." + wfTask + "." + "Total Hours Charged"];
-				addFee("0913","B_RES","FINAL",feeQty,"N",pCapId);
-			}
-			useTaskSpecificGroupName = false;
-		}			
 		// Distribution Reconciliation - Withdrawn
 		if(wfStatus == "Withdrawn")
 		{
@@ -1926,6 +1912,24 @@ if(matches(appTypeArray[1],"Revision") && wfProcess == "BLD_20231116_REV")
 	
 	if(wfTask == "Process for Issuance") 
 	{
+		
+		// if(AInfo["Assess Fee"] != null) {editTaskSpecific("Distribution Reconciliation","Assess Fee",null);}
+		
+		if(matches(wfStatus,"Approved","Payment Requested"))
+		{
+			// Make sure getting correct task tsi
+			useTaskSpecificGroupName = true;
+			TsiInfo = new Array();
+			loadTaskSpecific(TsiInfo,capId);
+			
+			if(matches(TsiInfo[wfProcess + "." + wfTask + "." + "Assess Fee"],"Y","YES","Yes") && TsiInfo[wfProcess + "." + wfTask + "." + "Total Hours Charged"] > 0)
+			{
+				feeQty = TsiInfo[wfProcess + "." + wfTask + "." + "Total Hours Charged"];
+				addFee("0913","B_RES","FINAL",feeQty,"N",pCapId);
+			}
+			useTaskSpecificGroupName = false;
+		}
+			
 		if(wfStatus == "Approved") 
 		{
 			var cWorkDesc = workDescGet(capId);
