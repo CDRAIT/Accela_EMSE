@@ -26,6 +26,7 @@
 |         : TDunn 08/29/2025 added Abe IT request #1911
 |         : TDunn 08/29/2025 deployed to non-prod1 via GitHub
 |         : Abe   09/03/2025 IT Request #2059 - Auto Create SPMUD Flag
+|         : TDunn 10/03/2025 removed wfprocess criteria for staff record creation notification
 |
 /=============================================================================================*/
 if(matches(currentUserID,"TDUNN","JMCKENZI", "EAFTAHI")) { showDebug = 1;}
@@ -390,44 +391,32 @@ if(!publicUser)
 {	
 	try
 	{
-		var wfProcess = "";
-		var isWfProcess = getAppProcessCode(capId);
-		logDebug("process code is " + isWfProcess);
-		if(isWfProcess) 
-		{ 
-			wfProcess = isWfProcess;
-			logDebug("wfProcess = " + wfProcess);
-		}
-		if(wfProcess == "BLD_20230501_MAIN")
+		var notificationTemplate = "NEW_ONLINE_PERMIT_SUBMITTED";
+		var contactTypes = new Array("Applicant","Owner");
+		iCon = null;
+		var contactArray = new Array();
+		contactArray = getContactArray();
+		for (iCon in contactArray) 
 		{
-
-			var notificationTemplate = "NEW_ONLINE_PERMIT_SUBMITTED";
-			var contactTypes = new Array("Applicant","Owner");
-			iCon = null;
-			var contactArray = new Array();
-			contactArray = getContactArray();
-			for (iCon in contactArray) 
-			{
-				if (exists(contactArray[iCon]["contactType"],contactTypes))
-				{			
-					// converted from branch("ES_EMAIL_NEW_ONLINE_PERMIT")
-					params = aa.util.newHashtable();
-					tContact =contactArray[iCon];
-					getRecordParams4NotificationJM(params);
-					getContactParams4Notification(params,tContact);
-					aa.print("ContactName: " + tContact["firstName"] + " " + tContact["lastName"]);
-					getPrimaryAddressLineParam4Notification(params);
-					emailSendFrom = null;
-					emailTo = null;
-					emailCC = null;
-					report = null;
-					emailSendFrom = "";
-					emailTo = tContact["email"];
-					emailCC = "";
-					if (!matches(tContact["email"],null,"",undefined) && !appMatch("Building/Residential/PV Solar/*")) 
-					{
-						sendNotification(emailSendFrom,emailTo,emailCC,notificationTemplate,params,report);
-					}
+			if (exists(contactArray[iCon]["contactType"],contactTypes))
+			{			
+				// converted from branch("ES_EMAIL_NEW_ONLINE_PERMIT")
+				params = aa.util.newHashtable();
+				tContact =contactArray[iCon];
+				getRecordParams4NotificationJM(params);
+				getContactParams4Notification(params,tContact);
+				aa.print("ContactName: " + tContact["firstName"] + " " + tContact["lastName"]);
+				getPrimaryAddressLineParam4Notification(params);
+				emailSendFrom = null;
+				emailTo = null;
+				emailCC = null;
+				report = null;
+				emailSendFrom = "";
+				emailTo = tContact["email"];
+				emailCC = "";
+				if (!matches(tContact["email"],null,"",undefined) && !appMatch("Building/Residential/PV Solar/*")) 
+				{
+					sendNotification(emailSendFrom,emailTo,emailCC,notificationTemplate,params,report);
 				}
 			}
 		}
