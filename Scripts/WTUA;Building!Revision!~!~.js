@@ -45,7 +45,7 @@
 |         : TDunn  08/29/2025 copied to Non-prod1
 |         : TDunn  08/31/2025 deployed to Github
 |         : TDunn  10/02/2025 reorginized and added useTaskspecificGroupName to add fees to parent.
-|
+|         : TDunn  10/02/2025 added new ESD Improvement plan notification
 /---------------------------------------------------------------------------------------------------------------------------------*/
 
 if(matches(currentUserID,"TDUNN","EAFTAHI","MHELVIC"))
@@ -1349,6 +1349,8 @@ if(matches(appTypeArray[1],"Revision") && wfProcess == "BLD_20231116_REV")
 						apList = apList + ", Improvement Plan";
 					}
 					addlPermitRequiredFlag = true;
+					// create notification to applicant
+					createNotificationTPS2("NOTICE_ESD_IMPROVEMENT_PLAN_REQ","Y","Applicant","N","","N","N","N","Y","N","N","");					
 				}
 				if(thisTask == "DPW Encroachment Permit Issuance")
 				{
