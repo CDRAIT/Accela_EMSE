@@ -92,6 +92,7 @@
 |         : TDunn 08/29/2025 copied to Non-prod1
 |         : TDunn 08/29/2025 deployed to Github repository
 |         : Abe   09/10/2025 Added IT Request# 2548  
+|         : TDunn 10/02/2025 added new ESD Improvement plan req notification
 |
 /---------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 
@@ -1429,6 +1430,8 @@ if(wfProcess == "BLD_20230501_MAIN")
 						apList = apList + ", Improvement Plan";
 					}
 					addlPermitRequiredFlag = true;
+					// create notification to applicant
+					createNotificationTPS2("NOTICE_ESD_IMPROVEMENT_PLAN_REQ","Y","Applicant","N","","N","N","N","Y","N","N","");
 				}
 				if(thisTask == "DPW Encroachment Permit Issuance")
 				{
