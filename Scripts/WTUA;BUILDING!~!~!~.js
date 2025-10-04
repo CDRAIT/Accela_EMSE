@@ -2036,16 +2036,16 @@ if(wfProcess == "BLD_20230501_MAIN")
 			}
 			
 			// Get report info
-			if (aa.reportManager.getReportModelByName(reportName)){
-				report = generateReport(reportName,paramMap,reportModule);
-			}
-			else logDebug("Unable to find report: " + reportName);
-			logDebug("vFromEmail= " + vFromEmail + "; vToEmail= " + vToEmail + "; vCcEmail = " + vCcEmail + "; vEmailTemplate= " + emailTemplate + "; emailParameters= " + emailParameters);
+			// if (aa.reportManager.getReportModelByName(reportName)){
+				// report = generateReport(reportName,paramMap,reportModule);
+			// }
+			// else logDebug("Unable to find report: " + reportName);
+			// logDebug("vFromEmail= " + vFromEmail + "; vToEmail= " + vToEmail + "; vCcEmail = " + vCcEmail + "; vEmailTemplate= " + emailTemplate + "; emailParameters= " + emailParameters);
 
 			// var	emailResult = sendNotification(vFromEmail,vToEmail,vCcEmail,emailTemplate,emailParameters, new Array(report));
 			var	emailResult = sendNotification(vFromEmail,vToEmail,vCcEmail,emailTemplate,emailParameters, null);
 						
-			// var sendResult = aa.sendMail("noreply@placer.ca.gov","tdunn@truepointsolutions.com", "", "Testing WTUA sent permit script ", debug);	
+			var sendResult = aa.sendMail("noreply@placer.ca.gov","tdunn@truepointsolutions.com", "", "Testing WTUA sent permit script ", debug);	
 			
 		}
 		if(wfStatus == "Payment Requested")
