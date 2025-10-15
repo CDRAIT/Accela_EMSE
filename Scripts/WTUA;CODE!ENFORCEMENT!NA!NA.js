@@ -63,10 +63,13 @@ if (wfProcess == "CODE_ENF") { //New Workflow
         if (wfTask == "Citation & Notice of Nuisance") {
             //Create Nuisance Letter (11)
             //Nuisance Email to Staff (12)
-        }
-        if (wfTask == "Notice of Nuisance") {
-            closeTask("Enforcement Action", "Notice of Nuisance", "Updated by Script", null);
+
+            //Create the fork manually
+            activateTask("Citation");
             activateTask("Nuisance Outcome");
+            closeTask("Enforcement Action", "Citation & Notice of Nuisance","Closed by Script","Forked by Script");
+        }
+        if (wfTask == "Notice of Nuisance") {            
             //Create Nuisance Letter (11)
         }
     }
@@ -95,7 +98,10 @@ if (wfProcess == "CODE_ENF") { //New Workflow
             //Send Complainant Hearing Notice (19)
         }
         if (wfStatus == "Citation Upheld") {
-            //Email Citaion Upheld to Officer (10)            
+            //Email Citaion Upheld to Officer (10)
+
+            //Create fork Manually
+            activateTask("Enforcement Action");
         }        
     }
 
