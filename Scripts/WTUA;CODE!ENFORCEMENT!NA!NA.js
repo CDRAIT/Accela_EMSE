@@ -81,9 +81,7 @@ if (wfProcess == "CODE_ENF") { //New Workflow
     if (wfTask == "Appeal") {
         if (wfStatus == "No Appeal") {
             //Create the fork manually
-            closeTask("Appeal");
             activateTask("Citation");
-            activateTask("Fine Processing");
         }
     }
 
@@ -112,8 +110,7 @@ if (wfProcess == "CODE_ENF") { //New Workflow
 
     if (wfTask == "Reinspection Outcome") {
         if (wfStatus == "In Violation - Enforcement") {
-            // Create the fork manually
-            closeTask("Reinspection Outcome", "In Violation - Enforcement", "Closed by Script");
+            // Create the fork manually            
             activateTask("Enforcement Action");            
         }
     }
