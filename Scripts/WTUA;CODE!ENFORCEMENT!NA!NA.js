@@ -113,9 +113,8 @@ if (wfProcess == "CODE_ENF") { //New Workflow
     if (wfTask == "Reinspection Outcome") {
         if (wfStatus == "In Violation - Enforcement") {
             // Create the fork manually
-            closeTask("Reinspection Outcome");
-            activateTask("Enforcement Action");
-            activateTask("Abatement Processing");
+            closeTask("Reinspection Outcome", "In Violation - Enforcement", "Closed by Script");
+            activateTask("Enforcement Action");            
         }
     }
 
