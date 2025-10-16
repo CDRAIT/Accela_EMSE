@@ -60,16 +60,17 @@ if (wfProcess == "CODE_ENF") { //New Workflow
         if (wfStatus == "NOV Mailed") {
             //Create NOV Letter (6)
         }
-        if (wfTask == "Citation & Notice of Nuisance") {
-            //Create Nuisance Letter (11)
-            //Nuisance Email to Staff (12)
-
+        if (wfStatus == "Citation & Notice of Nuisance") {
             //Create the fork manually
             activateTask("Citation");
             activateTask("Nuisance Outcome");
             closeTask("Enforcement Action", "Citation & Notice of Nuisance","Closed by Script","Forked by Script");
+
+            //Create Nuisance Letter (11)
+            //Nuisance Email to Staff (12)
+
         }
-        if (wfTask == "Notice of Nuisance") {            
+        if (wfStatus == "Notice of Nuisance") {            
             //Create Nuisance Letter (11)
         }
     }
