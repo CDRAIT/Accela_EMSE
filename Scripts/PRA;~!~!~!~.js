@@ -70,7 +70,7 @@ if (matches(appTypeArray[1], "Administrative", "MBLA", "Pre Development", "Proje
             if (AInfo["Project Office"] == "Tahoe") assignCap("PLNSUP_TAH");
         }
     }    
-    var endResult = aa.sendMail(defaultFrom,"eaftahi@placer.ca.gov", "", "PRA in prod for Planning payments", debug);
+    //var endResult = aa.sendMail(defaultFrom,"eaftahi@placer.ca.gov", "", "PRA in prod for Planning payments", debug);
 }
 
 
@@ -268,6 +268,7 @@ function createNotificationTPS3(emailTemplate, doContacts, vContactTypes, doLp, 
 
 
 }
+
 
 
 
