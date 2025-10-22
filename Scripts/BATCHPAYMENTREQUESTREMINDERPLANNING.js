@@ -77,7 +77,7 @@ var capId;
 // Variable used to hold the Cap Id value.
 
 // email parameters for batch results, must be added to batch job.  if a second one is needed, change the second value from "" to a parameter.
-var senderEmailAddr = "noreply@placer.ca.gov";                                  // Email address of the sender
+var senderEmailAddr = defaultFrom;                                  // Email address of the sender
 var emailAddrAdmin = getParam("emailAddrAdmin");                              // This must be added to batch job parameters. 
 var ccEmailAddrAdmin = getParam("ccEmailAddrAdmin");                          // This must be added to batch job parameters. 
 
@@ -336,4 +336,5 @@ function getACARecordURLBatch(acaUrl) {
     acaRecordUrl += "&agencyCode=" + aa.getServiceProviderCode();
 
     return acaRecordUrl;
+
 }
