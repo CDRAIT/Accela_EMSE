@@ -32,18 +32,22 @@ if(appTypeArray[3] == "Solar App")
 	// Rules for standard issuance and post issuance audit
 	logDebug("executing code to test for select for audit");
 	var dontAudit = true;
-	var fAudit = 6;
+	var fAudit = 4;
 	var numCount = 0;
+	if(lookup("lkupScriptConstants","frequency") != undefined)
+	{
+		fAudit = lookup("lkupScriptConstants","frequency");	
+	}
 	if(lookup("lkupScriptConstants","solarApp") != undefined)
 	{
 		var strCount = lookup("lkupScriptConstants","solarApp");
 		numCount = strCount * 1;
-		bySix = numCount/fAudit;
-		if(bySix == bySix.toFixed())
+		var byFreq = numCount/fAudit;
+		if(byFreq == byFreq.toFixed())
 		{
 		   dontAudit = false;
 		}
-		logDebug("Current count: " + numCount + ", bySix: " + bySix + ", dontAudit = " + dontAudit);
+		logDebug("Current count: " + numCount + ", byFreq: " + byFreq + ", dontAudit = " + dontAudit);
 		numCount = numCount + 1;
 		editLookup("lkupScriptConstants","solarApp",numCount.toString());
 	}
@@ -56,7 +60,7 @@ if(appTypeArray[3] == "Solar App")
 	}else{
 		logDebug("executing audit workflow updates");
 		branchTask("Process for Issuance","Issued","SolarApp Plus submittal auto issued via script","");
-		assignTask("Document Verification Review","TDUNN");
+		assignTask("Document Verification Review","CSULLIVAN");
 		editTaskDueDate("Document Verification Review",dateAdd(null,3));
 	}
 	
