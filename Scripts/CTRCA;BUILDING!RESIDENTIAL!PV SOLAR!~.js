@@ -20,6 +20,7 @@
 |         : TDunn 10/25/2023 added updating 'Issue Date' field on Record tab
 |         : TDunn 10/26/2023 added new function to add row to Valuation table based on custom field 'Valuation' 
 |         : TDunn 02/02/2024 remarked out Valuation update section.  Replaced by using Valution component in ACA pageflow
+|         : TDunn 10/22/2025 updated logic for audit frequency and auto task assignment.
 |
 /========================================================================================================================================================*/
 if(currentUserID == "TDUNN") 
@@ -32,18 +33,22 @@ if(appTypeArray[3] == "Solar App")
 	// Rules for standard issuance and post issuance audit
 	logDebug("executing code to test for select for audit");
 	var dontAudit = true;
-	var fAudit = 6;
+	var fAudit = 4;
 	var numCount = 0;
+	if(lookup("lkupScriptConstants","frequency") != undefined)
+	{
+		fAudit = lookup("lkupScriptConstants","frequency");	
+	}
 	if(lookup("lkupScriptConstants","solarApp") != undefined)
 	{
 		var strCount = lookup("lkupScriptConstants","solarApp");
 		numCount = strCount * 1;
-		bySix = numCount/fAudit;
-		if(bySix == bySix.toFixed())
+		var byFreq = numCount/fAudit;
+		if(byFreq == byFreq.toFixed())
 		{
 		   dontAudit = false;
 		}
-		logDebug("Current count: " + numCount + ", bySix: " + bySix + ", dontAudit = " + dontAudit);
+		logDebug("Current count: " + numCount + ", byFreq: " + byFreq + ", dontAudit = " + dontAudit);
 		numCount = numCount + 1;
 		editLookup("lkupScriptConstants","solarApp",numCount.toString());
 	}
@@ -56,7 +61,7 @@ if(appTypeArray[3] == "Solar App")
 	}else{
 		logDebug("executing audit workflow updates");
 		branchTask("Process for Issuance","Issued","SolarApp Plus submittal auto issued via script","");
-		assignTask("Document Verification Review","TDUNN");
+		assignTask("Document Verification Review","CSULLIVAN");
 		editTaskDueDate("Document Verification Review",dateAdd(null,3));
 	}
 	
@@ -109,7 +114,7 @@ if(appTypeArray[3] == "Solar App")
 	logDebug("Back from CTRCA_BUILDINGRESIDENTIALPVSOLAR12");	
 
 }
-var sendResult = aa.sendMail("noreply@placer.ca.gov","tdunn@truepointsolutions.com", "", "Testing CTRCA SolarApp script in Prod", debug);	
+var sendResult = aa.sendMail(defaultFrom,"tdunn@truepointsolutions.com", "", "Testing CTRCA SolarApp script in Prod", debug);	
 
 
 function delay(ms) {
