@@ -46,6 +46,7 @@
 |         : TDunn  08/31/2025 deployed to Github
 |         : TDunn  10/02/2025 reorginized and added useTaskspecificGroupName to add fees to parent.
 |         : TDunn  10/02/2025 added new ESD Improvement plan notification
+|         : TDunn  10/23/2025 modified fees to parent wfStatus criteria to just 'Payment Requested'
 /---------------------------------------------------------------------------------------------------------------------------------*/
 
 if(matches(currentUserID,"TDUNN","EAFTAHI","MHELVIC"))
@@ -1915,7 +1916,7 @@ if(matches(appTypeArray[1],"Revision") && wfProcess == "BLD_20231116_REV")
 		
 		// if(AInfo["Assess Fee"] != null) {editTaskSpecific("Distribution Reconciliation","Assess Fee",null);}
 		
-		if(matches(wfStatus,"Approved","Payment Requested"))
+		if(matches(wfStatus,"Payment Requested"))
 		{
 			// Make sure getting correct task tsi
 			useTaskSpecificGroupName = true;
