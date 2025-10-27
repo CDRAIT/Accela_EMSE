@@ -23,6 +23,8 @@
 |         : TDunn 10/01/2024 Remarked out 'addAllFees' function due to fee assessment errors
 |         : TDunn 10/10/2024 changed all 'addFee' to updateFee unless associated with a 'removeAllFees' call.
 |         : Abe   01/16/2025 IT Request# 2221 - SB937 - Fee Deferral
+|         : Abe   04/09/2025 IT Request # 22035 - Updated ADU Fees
+|         : Abe   08/07/2025 IT Request # 2493 - 
 |         : Abe   10/27/2025 IT REQUEST 2694 - Pool Letter ASI
 |
 |
@@ -130,7 +132,7 @@ if(!publicUser || doLimited) {
 					thisQty = thisQty.toFixed(4);
 					logDebug("Quantity = " + thisQty);
 				}
-				if(thisScope =="Accessory Dwelling Unit" && matches(feeName,"0750","0754","0756")) {
+				if(thisScope =="Accessory Dwelling Unit" && matches(feeName,"0751","0754","0752")) {
 					sqftADU = getAppSpecific("ADU SqFt");
 					if(sqftADU < 750) {
 						addFeeFlag = false;
@@ -215,10 +217,19 @@ if(!publicUser || doLimited) {
 	}
 	if(getAppSpecific("HVAC-Mechanical") == "CHECKED") {
 		updateFee("0712","B_RES","FINAL",1,"N");
+	}	
+	
+	//IT Req# 2493
+	// if(publicUser && AInfo["Scope of Work ACA"] == "Mechanical" && AInfo["MECHANICAL - Number of Systems"] > 1) {    //# of Packages
+	// 	updateFee("0712","B_RES","FINAL",getAppSpecific("MECHANICAL - Number of Systems"),"Y");
+	// }	
+	if(publicUser && AInfo["Scope of Work ACA"] == "Mechanical") {
+		if(getAppSpecific("MECHANICAL - System Type") == "Package Unit"  && AInfo["MECHANICAL - Number of Systems"] > 1)     //# of Packages
+			updateFee("0712","B_RES","FINAL",getAppSpecific("MECHANICAL - Number of Systems"),"Y");
+		if(getAppSpecific("MECHANICAL - System Type") == "Split System"  && AInfo["MECHANICAL - Number of Splits"] > 1)     //# of Splits
+			updateFee("0712","B_RES","FINAL",getAppSpecific("MECHANICAL - Number of Splits"),"Y");
 	}
-	if(publicUser && AInfo["Scope of Work ACA"] == "Mechanical" && AInfo["MECHANICAL - Number of Systems"] > 1) {
-		updateFee("0712","B_RES","FINAL",getAppSpecific("MECHANICAL - Number of Systems"),"Y");
-	}
+	// End of IT Req# 2493
 
 	if(publicUser && AInfo["Scope of Work ACA"] == "Solar Roof Mount" && matches(AInfo["SOLAR - Panel Changeout"],"Y","Yes")) {
 		//Abe 03/07/2024 IT Request # 1978 - changed updateFee("0711","B_RES","FINAL",1,"Y") --> updateFee("0711","B_RES","FINAL",1,"N");
@@ -280,12 +291,12 @@ if (thisADU == "Yes" || thisJADU == "Yes")  {
 //End Of IT Request# 1998 & 1865 
 
 
-//IT Req 2695 - Pool Letter ASI
+//IT Req 2694 - Pool Letter ASI
 if(appTypeArray[2]=="FullReview" || appTypeArray[3]== "Other")
 	if(getAppSpecific("Pool Letter Mailed")== "CHECKED"){
 		createCapComment("Pool Safety Regulation letter mailed.");
 	}
-//End of IT Req 2695
+//End of IT Req 2694
 
 
 
