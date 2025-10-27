@@ -9,7 +9,7 @@
 | Requires: EMSE 3.0 and Standard Choice: "EMSE_EXECUTE_OPTIONS": "SCRIPT" to be Active.
 |
 | Notes   : TDunn 10/28/2021 created script.   Manages adding special fees based on land use and scope
-|          : Abe: 10/27/2025 IT REQUEST 2694 - Pool Letter ASI
+|         : Abe   10/27/2025 IT REQUEST 2694 - Pool Letter ASI
 |
 /==============================================================================================*/
 if(currentUserID == "TDUNN") {

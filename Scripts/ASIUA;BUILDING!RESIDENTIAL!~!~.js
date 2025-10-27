@@ -23,6 +23,7 @@
 |         : TDunn 10/01/2024 Remarked out 'addAllFees' function due to fee assessment errors
 |         : TDunn 10/10/2024 changed all 'addFee' to updateFee unless associated with a 'removeAllFees' call.
 |         : Abe   01/16/2025 IT Request# 2221 - SB937 - Fee Deferral
+|         : Abe   10/27/2025 IT REQUEST 2694 - Pool Letter ASI
 |
 |
 /==========================================================================================================*/
@@ -277,6 +278,18 @@ if (thisADU == "Yes" || thisJADU == "Yes")  {
 		addAdHocTask("ADHOC", "ADU Review", "", "TLYKINS");
 }
 //End Of IT Request# 1998 & 1865 
+
+
+//IT Req 2695 - Pool Letter ASI
+if(appTypeArray[2]=="FullReview" || appTypeArray[3]== "Other")
+	if(getAppSpecific("Pool Letter Mailed")== "CHECKED"){
+		createCapComment("Pool Safety Regulation letter mailed.");
+	}
+//End of IT Req 2695
+
+
+
+
 
 //sendResult = aa.sendMail("noreply@placer.ca.gov","tdunn@truepointsolutions.com", "", "Testing Limited submittal in prod", debug);
 //sendResult = aa.sendMail("noreply@placer.ca.gov","eaftahi@placer.ca.gov", "", "ASIUA;Building!Residential!~!~ in prod", debug);
