@@ -89,6 +89,7 @@ for(thisCode in specFeeCodes) {
 
 
 // IT REQUEST 2694 - Pool Letter ASI
-if(getAppSpecific("Pool Letter Required") == "CHECKED") {
+if(getAppSpecific("Pool Letter Mailed") == "CHECKED") {
 	createCapComment("Pool Safety Regulation letter mailed.");
 }
+
