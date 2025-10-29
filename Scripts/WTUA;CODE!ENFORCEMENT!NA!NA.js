@@ -23,10 +23,12 @@ if (matches(wfStatus, "Resolved", "Notes", "Appeal Hearing CBO", "Referred", "Un
     removeParcelCondition(null, "Code Compliance - Notification", "Unlawful Land Use");
 }
 
+var varAInfo = [];
+
 //To append wf process code.wftask. to TSI field label
 useTaskSpecificGroupName==true;
-loadTaskSpecific(AInfo);
-logDebug("*****************The New AInfo: "+ AInfo);
+loadTaskSpecific(varAInfo);
+logDebug("*****************The New AInfo: "+ varAInfo);
 
 
 
