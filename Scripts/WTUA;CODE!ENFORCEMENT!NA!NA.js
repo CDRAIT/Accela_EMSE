@@ -3,7 +3,7 @@
 | Event   : WorkflowTaskUpdateAfter
 |
 | Client  : Placer County, CA
-| Usage   : Workflow Task Update After for all Vehicle Abatement records.
+| Usage   : Workflow Task Update After for all Code Enforcement records.
 | 
 |
 | Requires: EMSE 3.0 and Standard Choice: "EMSE_EXECUTE_OPTIONS": "SCRIPT" to be Active.
@@ -23,9 +23,20 @@ if (matches(wfStatus, "Resolved", "Notes", "Appeal Hearing CBO", "Referred", "Un
     removeParcelCondition(null, "Code Compliance - Notification", "Unlawful Land Use");
 }
 
+//To append wf process code.wftask. to TSI field label
+useTaskSpecificGroupName==true;
+loadTaskSpecific(AInfo);
+logDebug("*****************The New AInfo: "+ AInfo);
+
 
 
 if (wfProcess == "CODE_ENF") { //New Workflow
+
+//assigns the record to the current user regardless of the tasks
+if(matches(wfStatus, "Unfounded", "Referred & Closed", "Duplicate", "Withdrawn" )){
+	assignCap(currentUserID);    
+}
+
     if (wfTask == "Complaint Recieved") {
         if (wfStstus == "Unfounded") {
             //Send Unfounded Letter to Applicant (2)
@@ -78,7 +89,7 @@ if (wfProcess == "CODE_ENF") { //New Workflow
     if (wfTask == "Citation") {
         if (wfStatus == "Citation") {
             // Create Citation Letter (7)}
-            //Email Citation Appeal to Officer (8)
+            //Email Citation Appeal to Officer (8)         
         }
     }
 
