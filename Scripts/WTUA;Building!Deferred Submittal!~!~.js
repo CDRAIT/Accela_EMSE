@@ -68,7 +68,7 @@ if(wfProcess == "BLD_DEFERRED_20240710")
 {
 	if(wfTask == "Submittal Review")
 	{
-		logDebug("running submittal review if clause");
+		logDebug("Running submittal review if clause");
 		if(wfStatus == "Submittal Incomplete")
 		{
 			updateTask("Submittal Review","Pending Resubmittal","Submittal Incomplete. Updated by script","-Pending Resubmittal",wfProcess);
