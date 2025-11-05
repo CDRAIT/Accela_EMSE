@@ -412,7 +412,7 @@ if(!publicUser)
 				getContactParams4Notification(params,tContact);
 				aa.print("ContactName: " + tContact["firstName"] + " " + tContact["lastName"]);
 				getPrimaryAddressLineParam4Notification(params);
-				if(projectOffic = "Tahoe") cdrEmail = "TahoeCounter@placer.ca.gov";
+				if(projectOffice = "Tahoe") cdrEmail = "TahoeCounter@placer.ca.gov";
 				addParameter(params,"$$cdrEmail$$",cdrEmail);
 				emailSendFrom = null;
 				emailTo = null;

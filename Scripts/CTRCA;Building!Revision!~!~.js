@@ -26,7 +26,13 @@ logDebug("Inside CTRCA:Building/Revision/");
 // Auto assign and set due date for Submittal Review
 assignTask("Submittal Review","CDRA_UNASSIGNED");
 editTaskDueDate("Submittal Review",dateAdd(null,2,"Y"));
-
+if(matches(AInfo["Project Office"],"",null,undefined))
+{
+	var projectOffice = getAppSpecific("Project Office");
+} else{
+	var projectOffice = AInfo["Project Office"];
+}
+var cdrEmail = "OnlineBLDPermits@placer.ca.gov";
 // Generate submitted notice
 var vEmailTemplate = "ONLINE_PERMIT_AMENDMENT_SUBMITTED";
 var pCapId = "";
@@ -76,7 +82,8 @@ if (parentCapString) {
 	addParameter(emailParameters,"$$amendType$$","Revision");
 	addParameter(emailParameters,"$$projectoffice$$", getAppSpecific("Project Office", pCapId));
 	addParameter(emailParameters,"$$scopeOfWork$$",getAppSpecific("Scope of Work",pCapId));
-	
+	if(projectOffice = "Tahoe") cdrEmail = "TahoeCounter@placer.ca.gov";
+	addParameter(emailParameters,"$$cdrEmail$$",cdrEmail);	
 	// Parameters returned by getRecordParameters4Notification: $$altID$$; $$capName$$; $$capStatus$$; $$fileDate$$; $$workDesc$$; $$balanceDue$$; $$capTypeAlias$$
 	getRecordParams4Notification(emailParameters); 
 	getPrimaryAddressLineParam4Notification(emailParameters); /* returns $$addressLine$$ parameter */
