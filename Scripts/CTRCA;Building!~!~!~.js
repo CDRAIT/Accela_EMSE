@@ -174,6 +174,12 @@ if(publicUser)
 	}		
 	if(wfProcess == "BLD_20230501_MAIN")
 	{
+		if(matches(AInfo["Project Office"],"",null,undefined))
+		{
+			var projectOffice = getAppSpecific("Project Office");
+		} else{
+			var projectOffice = AInfo["Project Office"];
+		}		
 		var notificationTemplate = "NEW_ONLINE_PERMIT_SUBMITTED";
 		var contactTypes = new Array("Applicant","Owner");
 		iCon = null;
@@ -190,6 +196,8 @@ if(publicUser)
 				getContactParams4Notification(params,tContact);
 				aa.print("ContactName: " + tContact["firstName"] + " " + tContact["lastName"]);
 				getPrimaryAddressLineParam4Notification(params);
+				if(projectOffice = "Tahoe") cdrEmail = "TahoeCounter@placer.ca.gov";
+				addParameter(emailParameters,"$$cdrEmail$$",cdrEmail);			
 				emailSendFrom = null;
 				emailTo = null;
 				emailCC = null;
