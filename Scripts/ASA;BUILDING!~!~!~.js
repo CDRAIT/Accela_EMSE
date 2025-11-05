@@ -27,10 +27,10 @@
 |         : TDunn 08/29/2025 deployed to non-prod1 via GitHub
 |         : Abe   09/03/2025 IT Request #2059 - Auto Create SPMUD Flag
 |         : TDunn 10/03/2025 removed wfprocess criteria for staff record creation notification
-|         : TDunn 11/05/2025 added dynamic parameter for Project Office email address
+|         : TDunn 11/05/2025 added dynamic parameter for Project Office email address.
 |
 /=============================================================================================*/
-if(matches(currentUserID,"TDUNN","JMCKENZI", "EAFTAHI")) { showDebug = 1;}
+if(matches(currentUserID,"TDUNN","JMCKENZI","EAFTAHI")) { showDebug = 1;}
 
 logDebug("Running ASA:Building for SP Fees and std condition");
 
