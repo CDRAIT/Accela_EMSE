@@ -27,6 +27,7 @@
 |         : TDunn 08/29/2025 deployed to non-prod1 via GitHub
 |         : Abe   09/03/2025 IT Request #2059 - Auto Create SPMUD Flag
 |         : TDunn 10/03/2025 removed wfprocess criteria for staff record creation notification
+|         : TDunn 11/05/2025 added dynamic parameter for Project Office email address
 |
 /=============================================================================================*/
 if(matches(currentUserID,"TDUNN","JMCKENZI", "EAFTAHI")) { showDebug = 1;}
@@ -45,6 +46,8 @@ try
 	var thisScope = getAppSpecific("Scope of Work");
 	var thisADU = ""; 
 	var vAddFee = true;
+	var projectOffice = null;
+	var cdrEmail = "OnlineBLDPermits@placer.ca.gov";
 	var slLookupTable = "sdl:Land Use Codes";
 	if(AInfo["ParcelAttribute.SPECIAL_LAND_FEES_FLAGS"] != null) {
 		slFlags = AInfo["ParcelAttribute.SPECIAL_LAND_FEES_FLAGS"];
@@ -258,10 +261,12 @@ try
 	if (AInfo['ParcelAttribute.BLDRESPONSE'] == "Tahoe") 
 	{
 		editAppSpecific("Project Office","Tahoe");
+		projectOffice = "Tahoe";
 		//editAppSpecific("TRPA Permit","Y");
 
 	}else{
 		editAppSpecific("Project Office","Auburn");
+		projectOffice = "Auburn";
 		//editAppSpecific("TRPA Permit","N");
 	}
 	logDebug("trpaFlag = " + trpaFlag);
@@ -407,6 +412,8 @@ if(!publicUser)
 				getContactParams4Notification(params,tContact);
 				aa.print("ContactName: " + tContact["firstName"] + " " + tContact["lastName"]);
 				getPrimaryAddressLineParam4Notification(params);
+				if(projectOffic = "Tahoe") cdrEmail = "TahoeCounter@placer.ca.gov";
+				addParameter(params,"$$cdrEmail$$",cdrEmail);
 				emailSendFrom = null;
 				emailTo = null;
 				emailCC = null;
