@@ -93,6 +93,7 @@
 |         : TDunn 08/29/2025 deployed to Github repository
 |         : Abe   09/10/2025 Added IT Request# 2548  
 |         : TDunn 10/02/2025 added new ESD Improvement plan req notification
+|         : TDunn 11/05/2025 added dynamic CDR Project Office email parameter for notifications.
 |
 /---------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 
@@ -189,6 +190,7 @@ if(wfProcess == "BLD_20230501_MAIN")
 	var closureStaff = "CDRA_UNASSIGNED";
 	var pfiStaff = "CDRA_UNASSIGNED";
 	var defaultStaff = "";
+	var cdrEmail = "OnlineBLDPermits@placerca.gov";
 	var stmTemplate = "TASK_REVIEW_STMWTR";
 	var apcdTemplate = "TASK_REVIEW_APCD";
 	var arpTemplate = "NOTICE_BLD_ADDITIONAL_PERMIT_REQUIRED"
@@ -228,6 +230,7 @@ if(wfProcess == "BLD_20230501_MAIN")
 	var dwSlope = getAppSpecific("Slope of Driveway");
 	var	includesDW = getAppSpecific("Includes Driveway");
 	if(matches(AInfo["Project Office"],"Auburn")) { tahoeFlag = true; }
+	if(matches(AInfo["Project Office"],"Tahoe")) { cdrEmail = "TahoeCounter@placer.ca.gov"; }
 	if(!matches(AInfo["ParcelAttribute.COUNTYPROP"],null,undefined,false)) { reFlag = AInfo["ParcelAttribute.COUNTYPROP"]; }	
 	if(!matches(AInfo["ParcelAttribute.TRPA"],null,undefined,false)) { trpaFlag = AInfo["ParcelAttribute.TRPA"]; }
 	if(!matches(AInfo['ParcelAttribute.STRFLOODPLAIN'],null,undefined,false)) { stmfldFlag = AInfo['ParcelAttribute.STRFLOODPLAIN']; }
@@ -471,7 +474,49 @@ if(wfProcess == "BLD_20230501_MAIN")
 				showMessage = true;
 				comment("<font size = 4 color=ff000><b>No applicant email address found. " + wfStatus + " email notification cannot be sent.</b></font><br><br>A status of " + wfStatus + " for the " + wfTask + " task will send a " + wfStatus + " notification to the applicant.<br>The email notification cannot be sent without a valid applicant email address.<br> Please review applicant contact record for a valid email address.");
 			}
-			createNotificationTPS2("NOTICE_BLD_ADDITIONAL_INFORMATION_REQUIRED","Y","Applicant,Owner","N","","N","N","N","Y","N","N","");
+			var emailTemplate = "NOTICE_BLD_ADDITIONAL_INFORMATION_REQUIRED";
+			var vFromEmail = "";
+			var vToEmail = "";
+			var vCcEmail = "";
+			var cTypeArray = new Array();
+			var vContactTypes = "Applicant,Owner";
+			cTypeArray = vContactTypes.split(",");
+			emailParameters = aa.util.newHashtable();
+			var acaSite = lookup("ACA_CONFIGS","ACA_SITE");
+			acaSite = acaSite.substr(0,acaSite.toUpperCase().indexOf("/ADMIN"));
+			getACARecordParam4Notification(emailParameters,acaSite); // returns $$acaRecordUrl$$; 
+			// Parameters returned by getRecordParameters4Notification: $$altID$$; $$capName$$; $$capStatus$$; $$fileDate$$; $$workDesc$$; $$balanceDue$$; $$recordTypeAlias$$
+			getRecordParams4Notification(emailParameters);
+			getPrimaryAddressLineParam4Notification(emailParameters);
+			addParameter(emailParameters,"$$scopeOfWork$$",getAppSpecific("Scope of Work",capId));
+			addParameter(emailParameters,"$$wfCommentParam$$",wfComment);
+			addParameter(emailParameters,"$$cdrEmail$$",cdrEmail);
+			
+			var conArray = new Array();
+			conArray = getContactArrayWithPrimary(capId); 
+			for (thisCon in conArray) 
+			{
+				if (exists(conArray[thisCon]["contactType"],cTypeArray)) 
+				{
+					logDebug(conArray[thisCon]["contactType"]) ;
+					getContactParams4Notification(emailParameters, conArray[thisCon]);
+					if(!matches(emailParameters.get("$$contactEmail$$"),null,undefined,""))
+					{
+						vToEmail = vToEmail + emailParameters.get("$$contactEmail$$") + "; ";
+					}
+				}
+			}
+			if(vToEmail != "")
+			{
+			logDebug("vFromEmail= " + vFromEmail + "; vToEmail= " + vToEmail + "; vCcEmail = " + vCcEmail + "; vEmailTemplate= " + emailTemplate + "; emailParameters= " + emailParameters);
+			var	emailResult = sendNotification(vFromEmail,vToEmail,vCcEmail,emailTemplate,emailParameters,null);
+			} else
+			{
+				showMessage = true;
+				comment("<font size = 4 color=ff000><b>No applicant email address found. Applicant Request for Information was NOT sent.</b></font><br><br>Please review applicant contact record for a valid email address");
+			}			
+			// createNotificationTPS2("NOTICE_BLD_ADDITIONAL_INFORMATION_REQUIRED","Y","Applicant,Owner","N","","N","N","N","Y","N","N","");
+			
 			updateTask("Submittal Review","Pending Resubmittal","Submittal incomplete. Updated by script","Pending Resubmittal");
 			editTaskDueDate("Distribution",dateAdd(null,2,"Y"),wfProcess);
 			editTaskDueDate("Submittal Review",dateAdd(null,1,"Y"),wfProcess);
@@ -2115,7 +2160,7 @@ if(wfProcess == "BLD_20230501_MAIN")
 			getPrimaryAddressLineParam4Notification(emailParameters);
 			addParameter(emailParameters,"$$scopeOfWork$$",getAppSpecific("Scope of Work",capId));
 			addParameter(emailParameters,"$$wfCommentParam$$",wfComment);
-			
+			addParameter(emailParameters,"$$cdrEmail$$",cdrEmail);
 			// Get list of any active preissuance tasks
 			var piListParam = "No active preissuance requirements";
 			var found = 0;
@@ -2187,7 +2232,7 @@ if(wfProcess == "BLD_20230501_MAIN")
 			getPrimaryAddressLineParam4Notification(emailParameters);
 			addParameter(emailParameters,"$$scopeOfWork$$",getAppSpecific("Scope of Work",capId));
 			addParameter(emailParameters,"$$wfCommentParam$$",wfComment);
-			
+			addParameter(emailParameters,"$$cdrEmail$$",cdrEmail);
 			// Get list of any active preissuance tasks
 			var piNoticeList = getPreIssuanceListForNotification("SDL:PreissueAlias");
 			logDebug("New list is " + piNoticeList);
@@ -2222,12 +2267,55 @@ if(wfProcess == "BLD_20230501_MAIN")
 		// Generate signature requested notification
 		if(wfStatus == "Signature Requested")
 		{
-			if(checkForContactEmail("Applicant"))
+			var emailTemplate = "SIG_REQUEST";
+			var vFromEmail = "";
+			var vToEmail = "";
+			var vCcEmail = "";
+			var cTypeArray = new Array();
+			var vContactTypes = "Applicant,Owner";
+			cTypeArray = vContactTypes.split(",");
+			emailParameters = aa.util.newHashtable();
+			var acaSite = lookup("ACA_CONFIGS","ACA_SITE");
+			acaSite = acaSite.substr(0,acaSite.toUpperCase().indexOf("/ADMIN"));
+			getACARecordParam4Notification(emailParameters,acaSite); // returns $$acaRecordUrl$$; 
+			// Parameters returned by getRecordParameters4Notification: $$altID$$; $$capName$$; $$capStatus$$; $$fileDate$$; $$workDesc$$; $$balanceDue$$; $$recordTypeAlias$$
+			getRecordParams4Notification(emailParameters);
+			getPrimaryAddressLineParam4Notification(emailParameters);
+			addParameter(emailParameters,"$$scopeOfWork$$",getAppSpecific("Scope of Work",capId));
+			addParameter(emailParameters,"$$wfCommentParam$$",wfComment);
+			addParameter(emailParameters,"$$cdrEmail$$",cdrEmail);
+			
+			var conArray = new Array();
+			conArray = getContactArrayWithPrimary(capId); 
+			for (thisCon in conArray) 
+			{
+				if (exists(conArray[thisCon]["contactType"],cTypeArray)) 
+				{
+					logDebug(conArray[thisCon]["contactType"]) ;
+					getContactParams4Notification(emailParameters, conArray[thisCon]);
+					if(!matches(emailParameters.get("$$contactEmail$$"),null,undefined,""))
+					{
+						vToEmail = vToEmail + emailParameters.get("$$contactEmail$$") + "; ";
+					}
+				}
+			}
+			if(vToEmail != "")
+			{
+			logDebug("vFromEmail= " + vFromEmail + "; vToEmail= " + vToEmail + "; vCcEmail = " + vCcEmail + "; vEmailTemplate= " + emailTemplate + "; emailParameters= " + emailParameters);
+			var	emailResult = sendNotification(vFromEmail,vToEmail,vCcEmail,emailTemplate,emailParameters,null);
+			} else
 			{
 				showMessage = true;
-				comment("<font size = 4 color=ff000><b>No applicant email address found. " + wfStatus + " email notification cannot be sent.</b></font><br><br>A status of " + wfStatus + " for the " + wfTask + " task will send a " + wfStatus + " notification to the applicant.<br>The email notification cannot be sent without a valid applicant email address.<br> Please review applicant contact record for a valid email address.");
+				comment("<font size = 4 color=ff000><b>No applicant email address found. Applicant Request for Information was NOT sent.</b></font><br><br>Please review applicant contact record for a valid email address");
 			}
-			createNotificationTPS2("SIG_REQUEST","Y","Applicant,Owner","N","","N","N","N","Y","N","N","");
+		}
+			
+			// if(checkForContactEmail("Applicant"))
+			// {
+				// showMessage = true;
+				// comment("<font size = 4 color=ff000><b>No applicant email address found. " + wfStatus + " email notification cannot be sent.</b></font><br><br>A status of " + wfStatus + " for the " + wfTask + " task will send a " + wfStatus + " notification to the applicant.<br>The email notification cannot be sent without a valid applicant email address.<br> Please review applicant contact record for a valid email address.");
+			// }
+			// createNotificationTPS2("SIG_REQUEST","Y","Applicant,Owner","N","","N","N","N","Y","N","N","");
 		}
 	}
 	/*----------------------------------------------------------
