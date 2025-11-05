@@ -79,7 +79,48 @@ if(wfProcess == "BLD_DEFERRED_20240710")
 				showMessage = true;
 				comment("<font size = 4 color=ff000><b>No applicant email address found. " + wfStatus + " email notification cannot be sent.</b></font><br><br>A status of " + wfStatus + " for the " + wfTask + " task will send a " + wfStatus + " notification to the applicant.<br>The email notification cannot be sent without a valid applicant email address.<br> Please review applicant contact record for a valid email address.");
 			}
-			createNotificationTPS2("NOTICE_BLD_ADDITIONAL_INFORMATION_REQUIRED","Y","Applicant","N","","N","N","N","Y","N","N","");
+			var emailTemplate = "NOTICE_BLD_ADDITIONAL_INFORMATION_REQUIRED";
+			var vFromEmail = "";
+			var vToEmail = "";
+			var vCcEmail = "";
+			var cTypeArray = new Array();
+			var vContactTypes = "Applicant,Owner";
+			cTypeArray = vContactTypes.split(",");
+			emailParameters = aa.util.newHashtable();
+			var acaSite = lookup("ACA_CONFIGS","ACA_SITE");
+			acaSite = acaSite.substr(0,acaSite.toUpperCase().indexOf("/ADMIN"));
+			getACARecordParam4Notification(emailParameters,acaSite); // returns $$acaRecordUrl$$; 
+			// Parameters returned by getRecordParameters4Notification: $$altID$$; $$capName$$; $$capStatus$$; $$fileDate$$; $$workDesc$$; $$balanceDue$$; $$recordTypeAlias$$
+			getRecordParams4Notification(emailParameters);
+			getPrimaryAddressLineParam4Notification(emailParameters);
+			addParameter(emailParameters,"$$scopeOfWork$$",getAppSpecific("Scope of Work",capId));
+			addParameter(emailParameters,"$$wfCommentParam$$",wfComment);
+			addParameter(emailParameters,"$$cdrEmail$$",cdrEmail);
+			
+			var conArray = new Array();
+			conArray = getContactArrayWithPrimary(capId); 
+			for (thisCon in conArray) 
+			{
+				if (exists(conArray[thisCon]["contactType"],cTypeArray)) 
+				{
+					logDebug(conArray[thisCon]["contactType"]) ;
+					getContactParams4Notification(emailParameters, conArray[thisCon]);
+					if(!matches(emailParameters.get("$$contactEmail$$"),null,undefined,""))
+					{
+						vToEmail = vToEmail + emailParameters.get("$$contactEmail$$") + "; ";
+					}
+				}
+			}
+			if(vToEmail != "")
+			{
+			logDebug("vFromEmail= " + vFromEmail + "; vToEmail= " + vToEmail + "; vCcEmail = " + vCcEmail + "; vEmailTemplate= " + emailTemplate + "; emailParameters= " + emailParameters);
+			var	emailResult = sendNotification(vFromEmail,vToEmail,vCcEmail,emailTemplate,emailParameters,null);
+			} else
+			{
+				showMessage = true;
+				comment("<font size = 4 color=ff000><b>No applicant email address found. Applicant Request for Information was NOT sent.</b></font><br><br>Please review applicant contact record for a valid email address");
+			}				
+			// createNotificationTPS2("NOTICE_BLD_ADDITIONAL_INFORMATION_REQUIRED","Y","Applicant","N","","N","N","N","Y","N","N","");
 			editTaskDueDate("Submittal Review",dateAdd(null,1,"Y"));
 			if(getAssignedToStaff()!= null) 
 			{
@@ -390,7 +431,7 @@ if(wfProcess == "BLD_DEFERRED_20240710")
 			getPrimaryAddressLineParam4Notification(emailParameters);
 			addParameter(emailParameters,"$$scopeOfWork$$",getAppSpecific("Scope of Work",capId));
 			addParameter(emailParameters,"$$wfCommentParam$$",wfComment);
-			
+			addParameter(emailParameters,"$$cdrEmail$$",cdrEmail);
 			// Get list of any active preissuance tasks - Not applicable to Deferred Submittals
 			var piListParam = "No preissuance requirements for Deferred Submittals";
 			// var found = 0;
@@ -451,7 +492,48 @@ if(wfProcess == "BLD_DEFERRED_20240710")
 				showMessage = true;
 				comment("<font size = 4 color=ff000><b>No applicant email address found. " + wfStatus + " email notification cannot be sent.</b></font><br><br>A status of " + wfStatus + " for the " + wfTask + " task will send a " + wfStatus + " notification to the applicant.<br>The email notification cannot be sent without a valid applicant email address.<br> Please review applicant contact record for a valid email address.");
 			}
-			createNotificationTPS2("SIG_REQUEST","Y","Applicant,Owner","N","","N","N","N","Y","N","N","");
+			var emailTemplate = "SIG_REQUEST";
+			var vFromEmail = "";
+			var vToEmail = "";
+			var vCcEmail = "";
+			var cTypeArray = new Array();
+			var vContactTypes = "Applicant,Owner";
+			cTypeArray = vContactTypes.split(",");
+			emailParameters = aa.util.newHashtable();
+			var acaSite = lookup("ACA_CONFIGS","ACA_SITE");
+			acaSite = acaSite.substr(0,acaSite.toUpperCase().indexOf("/ADMIN"));
+			getACARecordParam4Notification(emailParameters,acaSite); // returns $$acaRecordUrl$$; 
+			// Parameters returned by getRecordParameters4Notification: $$altID$$; $$capName$$; $$capStatus$$; $$fileDate$$; $$workDesc$$; $$balanceDue$$; $$recordTypeAlias$$
+			getRecordParams4Notification(emailParameters);
+			getPrimaryAddressLineParam4Notification(emailParameters);
+			addParameter(emailParameters,"$$scopeOfWork$$",getAppSpecific("Scope of Work",capId));
+			addParameter(emailParameters,"$$wfCommentParam$$",wfComment);
+			addParameter(emailParameters,"$$cdrEmail$$",cdrEmail);
+			
+			var conArray = new Array();
+			conArray = getContactArrayWithPrimary(capId); 
+			for (thisCon in conArray) 
+			{
+				if (exists(conArray[thisCon]["contactType"],cTypeArray)) 
+				{
+					logDebug(conArray[thisCon]["contactType"]) ;
+					getContactParams4Notification(emailParameters, conArray[thisCon]);
+					if(!matches(emailParameters.get("$$contactEmail$$"),null,undefined,""))
+					{
+						vToEmail = vToEmail + emailParameters.get("$$contactEmail$$") + "; ";
+					}
+				}
+			}
+			if(vToEmail != "")
+			{
+			logDebug("vFromEmail= " + vFromEmail + "; vToEmail= " + vToEmail + "; vCcEmail = " + vCcEmail + "; vEmailTemplate= " + emailTemplate + "; emailParameters= " + emailParameters);
+			var	emailResult = sendNotification(vFromEmail,vToEmail,vCcEmail,emailTemplate,emailParameters,null);
+			} else
+			{
+				showMessage = true;
+				comment("<font size = 4 color=ff000><b>No applicant email address found. Applicant Request for Information was NOT sent.</b></font><br><br>Please review applicant contact record for a valid email address");
+			}			
+			//createNotificationTPS2("SIG_REQUEST","Y","Applicant,Owner","N","","N","N","N","Y","N","N","");
 		}		
 	}
 }
