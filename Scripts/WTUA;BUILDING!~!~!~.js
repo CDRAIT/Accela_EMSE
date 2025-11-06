@@ -2316,7 +2316,7 @@ if(wfProcess == "BLD_20230501_MAIN")
 				// comment("<font size = 4 color=ff000><b>No applicant email address found. " + wfStatus + " email notification cannot be sent.</b></font><br><br>A status of " + wfStatus + " for the " + wfTask + " task will send a " + wfStatus + " notification to the applicant.<br>The email notification cannot be sent without a valid applicant email address.<br> Please review applicant contact record for a valid email address.");
 			// }
 			// createNotificationTPS2("SIG_REQUEST","Y","Applicant,Owner","N","","N","N","N","Y","N","N","");
-		}
+		
 	}
 	/*----------------------------------------------------------
 	|  Added Revision child process to WTUA:Building/ 10/28/2023
