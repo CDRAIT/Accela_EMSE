@@ -27,7 +27,7 @@
 |         : TDunn 04/09/2025 added 'notTract' flag to new Master record type to skip assessing fees.
 |         : TDunn 08/29/2025 copied to Non-prod1
 |         : TDunn 08/31/2025 deployed to GitHub
-|
+|         : Abe   11/07/2025 added IT Req 2694 - Pool Letter ASI
 |
 /==========================================================================================================*/
 if(matches(currentUserID,"TDUNN","EAFTAHI")) {
@@ -254,7 +254,16 @@ if((notTract || doLimited) && updateOn)
 		updateFee("TECH","ACCOUNTING","FINAL",1,varAutoInvoiceFees);
 	}
 
-} //End of if(!publicUser || doLimited)
+} 
+
+//IT Req 2694 - Pool Letter ASI
+if (appTypeArray[2] == "FullReview" || appTypeArray[3] == "Other")
+	if (getAppSpecific("Pool Letter Mailed") == "CHECKED") {
+		createCapComment("Pool Safety Regulation letter mailed.");
+	}
+//End of IT Req 2694
+
+
 
 
 //IT Request# 1998 & 1865 
