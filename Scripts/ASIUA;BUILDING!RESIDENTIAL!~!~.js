@@ -25,6 +25,7 @@
 |         : Abe   01/16/2025 IT Request# 2221 - SB937 - Fee Deferral
 |         : Abe   04/09/2025 IT Request# 2035 - Updated ADU Fees
 |         : eaftahi 08/07/2025 IT Request # 2493 - 
+|         : Abe   11/07/2025 added IT Req 2694 - Pool Letter ASI
 |
 |
 /==========================================================================================================*/
@@ -290,6 +291,14 @@ if (thisADU == "Yes" || thisJADU == "Yes")  {
 }
 //End Of IT Request# 1998 & 1865 
 
+//IT Req 2694 - Pool Letter ASI
+if (appTypeArray[2] == "FullReview" || appTypeArray[3] == "Other")
+	if (getAppSpecific("Pool Letter Mailed") == "CHECKED") {
+		createCapComment("Pool Safety Regulation letter mailed.");
+	}
+//End of IT Req 2694
+
+
 //sendResult = aa.sendMail(defaultFrom,"tdunn@truepointsolutions.com", "", "Testing Limited submittal in prod", debug);
 //sendResult = aa.sendMail(defaultFrom,"eaftahi@placer.ca.gov", "", "ASIUA;Building!Residential!~!~ in prod", debug);
 
@@ -302,4 +311,5 @@ FF|0903,FF|0790,FF|0722 Reroof
 FF|0903,FF|0790,FF|0731 Solar
 FF|0903,FF|0790,FF|0710	WTR
 FF|0903,FF|0790,FF|0734 Window
+
 */
