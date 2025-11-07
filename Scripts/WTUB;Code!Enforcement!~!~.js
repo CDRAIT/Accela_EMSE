@@ -20,12 +20,12 @@ showMessage = false;
 
 if (wfTask == "Citation") {
     if (wfStatus == "Citation") {
-        var vCitationRecc = getAppSpecific("Number_of_Citations");
-        if (vCitationRecc + 1 < 4)
-            editAppSpecific("Number_of_Citations", vCitationRecc + 1);
+        var vCitationSeq = getAppSpecific("Number_of_Citations");
+        if (vCitationSeq + 1 < 4)
+            editAppSpecific("Number_of_Citations", vCitationSeq + 1);
         else {
             showMessage = true;
-            customComment("Error - Three citations already applied to this complaint!");
+            customComment("Error - Three citations already created to this complaint!");
             cancle = true;
         }
     }

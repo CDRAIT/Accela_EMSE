@@ -1,20 +1,17 @@
-//Designed for code and HazVeg modules - their new workflow
-function sendAcknowledgementLtr2Applicant() {
+function sendAcknowledgementLtr2Applicant() { //Designed for code and HazVeg modules - their new workflow
 	var reportName = "";
 	var reportModule = "";
 	var reportFile = null;
 	var reportParams = aa.util.newHashMap();
 	addParameter(reportParams, "altID", capIDString);
 
-	//var emailFrom = "noreply@placer.ca.gov";
 	var emailFrom = defaultFrom;
 	var emailTo = "";
-	var emailCC = "";   //Use the email template
+	var emailCC = "";   
 
 	var emailTemp = "";
 	var emailParams = aa.util.newHashtable();
-	addParameter(emailParams, "$$altID$$", capIDString);
-	//addParameter(emailParams, "$$emailSubject$$", "ACKNOWLEDGMENT OF VEHICLE ABATEMENT REQUEST");
+	addParameter(emailParams, "$$altID$$", capIDString);	
 
 	if (appTypeArray[0] == "Code") {
 		if (appTypeArray[1] == "Enforcement") {

@@ -15,12 +15,9 @@
 |         : 
 |         
 /=============================================================================================*/
-if (publicUser) {
-    logDebug("Entring the EMSE CTRCA:Code/*/*/* ....");
+if (publicUser) {    
 
-    editAppSpecific("Application Received", "Online");
-
-    //var notificationTemplate = "NEW_ONLINE_CODE_CASE_ACK_LETTER";  /* this is for sending ack to complainant */
+    editAppSpecific("Application Received", "Online");    
 
     var notificationTemplate = "STAFF_NEW_ONLINE_CASE_SUBMITTED_CODE"; /* This is for Staff notice */
     var complainantName = "";
@@ -28,14 +25,14 @@ if (publicUser) {
     var complainantPhone = "";
 
     var emailParams = aa.util.newHashtable();
-    var emailSendFrom = "";
-    var toEmailStaff = "";
-    var emailStaffCC = "";
+    var sendFrom = defaultFrom;
+    var toEmail = "";
+    var ccEmail = "";
 
-
-    toEmailStaff = (getAppSpecific("Project Office") == "Tahoe") ? "codeCompTahoe@placer.ca.gov" : "codeComp@placer.ca.gov";
+    toEmail = (getAppSpecific("Project Office") == "Tahoe") ? "codeCompTahoe@placer.ca.gov" : "codeComp@placer.ca.gov";
 
     if (appTypeArray[1] == "Enforcement") {
+        editAppSpecific("Complainant Communication Preference", "Email");
         complainantName = getAppSpecific("Complaintant");
         complainantEmail = getAppSpecific("Complaintant Email");
         complainantPhone = getAppSpecific("Complaintant Phone");
@@ -49,7 +46,7 @@ if (publicUser) {
         else
             complainantPhone = getAppSpecific("Complainant Work Phone");
 
-        //Copying ASITable to ASI Fields 
+        //Copying ASITable to ASI Fields for VA
         var vIndex = 1;
         if (typeof (VEHICLEDESCRIPTION) == "object") {
             for (thisRow in VEHICLEDESCRIPTION) {
@@ -67,7 +64,7 @@ if (publicUser) {
             }
             editAppSpecific("Number of Vehicles", (vIndex - 1));
         }
-   }
+    }
 
 
     if (complainantName)
@@ -88,9 +85,6 @@ if (publicUser) {
 
     //"$$addressLine$$", "$$parcelNumber$$", "$$ownerFullName$$" ,"$$ownerPhone$$" 
     getAPOParams4Notification(emailParams);
-    sendNotification(emailSendFrom, toEmailStaff, emailStaffCC, notificationTemplate, emailParams, null);
-    //sendResult = aa.sendMail("noreply@placer.ca.gov","eaftahi@placer.ca.gov", "", "C_VA CTRCA Debug ", debug);
+    var sendResult= sendNotification(sendFrom, toEmail, ccEmail, notificationTemplate, emailParams, null);
+    //sendResult = aa.sendMail(defaultFrom,"eaftahi@placer.ca.gov", "", "C_VA CTRCA Debug ", debug);
 }
-
-
-
