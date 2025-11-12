@@ -64,19 +64,20 @@ if (wfProcess == "CODE_ENF") { //New Workflow
         assignCap(currentUserID);
     }
 
-    if (wfTask == "Complaint Recieved") {
+    if (wfTask == "Complaint Received") {
         if (wfStatus == "Unfounded") {
             //Send Unfounded Letter to Applicant (2)
             emailTo = emailParams.get("$$compEmail$$");
             addParameter(emailParams, "$$emailSubject$$", "COMPLAINT OUTCOME");
+            logDebug("*** Complainant Email is : " + emailParams.get("$$compEmail$$"));
             reportName = "Complaint Unfounded Letter";
             reportFile = generateReportTPS_CustomFileName(reportName, reportParams, reportModule, "Complaint_Outcome_Case# " + capIDString + ".pdf");
             if (!isBlank(emailTo))
                 if (emailTo.indexOf('@') != -1)
-                    var sendResult = sendNotification(emailFrom, emailTo, emailCC, generalEmailTemplate, emailParams, new Array(reportFile));
+                    var sendResult = sendNotification(emailFrom, emailTo, emailCc, generalEmailTemplate, emailParams, new Array(reportFile));
         }
 
-        if (wfStstus == "Referred & Closed" || wfStstus == "Referred & Investigation") {
+        if (wfStatus == "Referred & Closed" || wfStatus == "Referred & Investigation") {
             var agencies = getCodeReferralAgencyArray();
 
             //(1) Send Referral Email to Agencies (4)
@@ -86,7 +87,7 @@ if (wfProcess == "CODE_ENF") { //New Workflow
             });
             if (varAInfo[wfProcess + "." + wfTask + "." + "Other"] == "CHECKED")
                 emailTo += varAInfo[wfProcess + "." + wfTask + "." + "Other Email"] + ";";
-            var sendResult = sendNotification(emailFrom, emailTo, emailCC, emailTemplate, emailParams, null);
+            var sendResult = sendNotification(emailFrom, emailTo, emailCc, emailTemplate, emailParams, null);
 
             //(2) Send Referral Letter to Applicant Only (3)
             emailTo = emailParams.get("$$compEmail$$");
@@ -95,7 +96,7 @@ if (wfProcess == "CODE_ENF") { //New Workflow
             reportFile = generateReportTPS_CustomFileName(reportName, reportParams, reportModule, "Complaint_Referral_Case# " + capIDString + ".pdf");
             if (!isBlank(emailTo))
                 if (emailTo.indexOf('@') != -1)
-                    var sendResult = sendNotification(emailFrom, emailTo, emailCC, generalEmailTemplate, emailParams, new Array(reportFile));
+                    var sendResult = sendNotification(emailFrom, emailTo, emailCc, generalEmailTemplate, emailParams, new Array(reportFile));
         }
         if (wfStatus == "Referred & Investigation" || wfStatus == "Courtesy Notice Sent") {
             //Send Courtesy Notice to Parties
@@ -114,7 +115,7 @@ if (wfProcess == "CODE_ENF") { //New Workflow
             });
             if (varAInfo[wfProcess + "." + wfTask + "." + "Other"] == "CHECKED")
                 emailTo += varAInfo[wfProcess + "." + wfTask + "." + "Other Email"] + ";";
-            var sendResult = sendNotification(emailFrom, emailTo, emailCC, emailTemplate, emailParams, null);
+            var sendResult = sendNotification(emailFrom, emailTo, emailCc, emailTemplate, emailParams, null);
             
         }
         if (wfStatus == "Referred & Violation") {
@@ -184,7 +185,7 @@ if (wfProcess == "CODE_ENF") { //New Workflow
             if (!isBlank(emailTo))
                 if (emailTo.indexOf('@') != -1) {
                     //send email with report attached
-                    var sendResult = sendNotification(emailFrom, emailTo, emailCC, generalEmailTemplate, emailParams, new Array(reportFile));
+                    var sendResult = sendNotification(emailFrom, emailTo, emailCc, generalEmailTemplate, emailParams, new Array(reportFile));
                 }
         }
         if (wfStatus == "Continued") {
@@ -208,7 +209,7 @@ if (wfProcess == "CODE_ENF") { //New Workflow
             if (!isBlank(emailTo))
                 if (emailTo.indexOf('@') != -1) {
                     //send email with report attached
-                    var sendResult = sendNotification(emailFrom, emailTo, emailCC, generalEmailTemplate, emailParams, new Array(reportFile));
+                    var sendResult = sendNotification(emailFrom, emailTo, emailCc, generalEmailTemplate, emailParams, new Array(reportFile));
                 }
         }
         if (wfStatus == "Abatement Upheld") {
@@ -234,7 +235,7 @@ if (wfProcess == "CODE_ENF") { //New Workflow
         emailTo += getUserEmail(getAssignedToStaff()); 
          if (!isBlank(emailTo))
                 if (emailTo.indexOf('@') != -1)
-                    var sendResult = sendNotification(emailFrom, emailTo, emailCC, emailTemplate, emailParams, null);
+                    var sendResult = sendNotification(emailFrom, emailTo, emailCc, emailTemplate, emailParams, null);
     }
 
     if (wfTask == "Fine Processing") {
@@ -321,7 +322,7 @@ function sendNotice2Recipients(fileName) {
             if (!isBlank(emailTo))
                 if (emailTo.indexOf('@') != -1) {
                     //send email with report attached
-                    var sendResult = sendNotification(emailFrom, emailTo, emailCC, generalEmailTemplate, emailParams, new Array(reportFile));
+                    var sendResult = sendNotification(emailFrom, emailTo, emailCc, generalEmailTemplate, emailParams, new Array(reportFile));
                 }   
         }
 }
