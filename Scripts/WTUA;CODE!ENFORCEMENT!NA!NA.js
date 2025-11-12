@@ -105,14 +105,20 @@ if (wfProcess == "CODE_ENF") { //New Workflow
         }
     }
 
-    if (wfTask == "Investigation") { //Talk to Kayla ...?
-        if (wfStatus == "Referred & Closed") {
+    if (wfTask == "Investigation") { 
+        if (wfStatus == "Referred & Closed" || wfStatus == "Referred & Violation") {
             //send Referral Email to Agencies (4)
-            //Send Referral Letter to Applicant (3)
+                        emailTemplate = "CE_REFERRAL_AGENCIES_NOTIFICTION";
+            agencies.forEach(function (item) {
+                emailTo += lookup(refAgenciesStdChoice, item) + ';';
+            });
+            if (varAInfo[wfProcess + "." + wfTask + "." + "Other"] == "CHECKED")
+                emailTo += varAInfo[wfProcess + "." + wfTask + "." + "Other Email"] + ";";
+            var sendResult = sendNotification(emailFrom, emailTo, emailCC, emailTemplate, emailParams, null);
+            
         }
         if (wfStatus == "Referred & Violation") {
-            //send Referral Email to Agencies (4)
-            //Send Referral Letter to Applicant (3)
+            //TBD....
 
         }
     }
@@ -166,12 +172,12 @@ if (wfProcess == "CODE_ENF") { //New Workflow
     if (wfTask == "Administrative Hearing") {
         if (wfStatus == "Pending Hearing" || wfStatus == "Continued") {
             //Send Hearing Letter (9)
-            reportName = "Citation Appeal Hearing Letter";
+            reportName = "Citation Hearing Letter";
             addParameter(emailParams, "$$emailSubject$$", "CITATION APPEAL HEARING");
             sendNotice2Recipients("Citation_Appeal_Hearing");
 
             //Send Complainant Hearing Notice (19)
-            reportName = "Complainant Citation Appeal Hearing Letter";
+            reportName = "Complainant Citation Hearing Letter";
             addParameter(emailParams, "$$emailSubject$$", "CITATION APPEAL HEARING");
             reportFile = generateReportTPS_CustomFileName(reportName, reportParams, reportModule, "Complainant_Citation_Appeal_Hearing_Case# " + capIDString + ".pdf");
             emailTo = emailParams.get("$$compEmail$$");
@@ -222,7 +228,13 @@ if (wfProcess == "CODE_ENF") { //New Workflow
         (wfTask == "Abatement Processing" && wfStatus == "Abatement Complete") ||
         (wfTask == "Administrative Hearing" && matches(wfStatus, "Complied", "Citation Upheld")) ||
         (wfTask == "Appeal" && wfStatus == "No Appeal")) {
-        //Send Case Closed Letter (15)
+        //Send Process Fine email to Staff (15)
+        emailTemplate = "CE_STAFF_PROCESS_FINE_NOTIFICATION";
+        emailTo = (getAppSpecific("Project Office")= "Auburn")? "CodeEnforce@placer.ca.gov": "CodeEnforceTahoe@placer.ca.gov" +";";        
+        emailTo += getUserEmail(getAssignedToStaff()); 
+         if (!isBlank(emailTo))
+                if (emailTo.indexOf('@') != -1)
+                    var sendResult = sendNotification(emailFrom, emailTo, emailCC, emailTemplate, emailParams, null);
     }
 
     if (wfTask == "Fine Processing") {
