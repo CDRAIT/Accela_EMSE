@@ -307,7 +307,7 @@ function sendNotice2Recipients(fileName) {
     //Get email for checked TSI
     if (checkedRecipients.length > 0)
         for (each in checkedRecipients) {
-            addParameter(reportParams, "contactType", checkedRecipients[each]);
+            addParameter(reportParams, "conatctType", checkedRecipients[each]);
             reportFile = generateReportTPS_CustomFileName(reportName, reportParams, reportModule, fileName + "_Case# " + capIDString + "_" + checkedRecipients[each] + ".pdf");
             if (checkedRecipients[each] == "Owner") {
                 emailTo = emailParams.get("$$ownerEmail$$");
