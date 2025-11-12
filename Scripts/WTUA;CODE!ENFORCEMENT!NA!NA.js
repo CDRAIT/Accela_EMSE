@@ -35,7 +35,7 @@ loadTaskSpecific(varAInfo);
 if (wfProcess == "CODE_ENF") { //New Workflow
 
     var reportParams = aa.util.newHashMap();
-    var emailParams = aa.util.newhashtable();
+    var emailParams = aa.util.newHashtable();
     var emailFrom = defaultFrom;
     var emailTo = "";
     var emailCc = "";
