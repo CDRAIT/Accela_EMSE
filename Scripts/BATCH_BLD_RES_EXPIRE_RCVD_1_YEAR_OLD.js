@@ -1,9 +1,9 @@
 /*
-Batch Job: Update AirQuality Records Status
-Description: Find all AirQuality records with Application Status = "Test" 
-            and update their status to "Active".
-Author: Russell
-Date: 2025-11-12
+Batch Job: Auto expires "Received" BLD RES Records
+Description: Finds all BLD RES records with Application Status = "RECEIVED" 
+            and update their status to "EXPIRED" if "Filedate" greater than a year
+Author: Abe
+Date: 2025-11-13
 */
 
 try {
