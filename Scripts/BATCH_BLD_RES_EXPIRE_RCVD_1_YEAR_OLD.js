@@ -22,14 +22,14 @@ try {
 
     var recordGroup = "Building";     // Top-level record type
     var recordType = "Residential";   // Leave null to include all subtypes
-    var recordSubType = "";
-    var recordCategory = "";
+    var recordSubType = "Limited";
+    var recordCategory = "NA";
     var currentStatus = "Received";         // Only update records in this status
     var newStatus = "Expired";           // Desired new status
     var statusComment = "Updated by batch job"; // Optional comment
 
     //Get all Building/Residential records   
-    var capListResult = aa.cap.getByAppType(recordGroup, recordType);
+    var capListResult = aa.cap.getByAppType(recordGroup, recordType, recordSubType, recordCategory);
     if (!capListResult.getSuccess()) {
         aa.print("ERROR getting records: " + capListResult.getErrorMessage());
         throw "Failed to get record list.";
@@ -50,8 +50,10 @@ try {
         }
         var capModel = capModelResult.getOutput().getCapModel();
         var capFileDate = capModel.getFileDate()
+        //logDebug("capFileDatte = " + capFileDate);
         var appStatus = capModel.getCapStatus();
         // Only update if status matches "Test"
+        logDebug("getDateDiff output = " + getDateDiff(capFileDate));
         if (appStatus == currentStatus) {
             if (getDateDiff(capFileDate)>365) {
                 var updateResult = updateAppStatus(newStatus, statusComment, capId);
@@ -94,9 +96,9 @@ function updateAppStatus(stat, cmt, capId) { // optional cap id
 }
 
 
-function getDateDiff(date1) {
+function getDateDiff(DatetoComp) {
 
-    //var date1 = new Date(DatetoComp);
+    var date1 = new Date(DatetoComp);
 
     var sysDate = aa.date.getCurrentDate();
 
