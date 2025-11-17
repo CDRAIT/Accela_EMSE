@@ -21,6 +21,7 @@
 |         : TDunn 03/19/2025 added try/catch clause to instantiate wfProcess code to control notification.
 |         : TDunn 08/29/2025 copied from onsite dev/test
 |         : TDunn 08/29/2025 deployed to Github repository
+|         : TDunn 11/17/2025 fixed issue with email parameters
 |
 /======================================================================================================*/
 showDebug = 1
