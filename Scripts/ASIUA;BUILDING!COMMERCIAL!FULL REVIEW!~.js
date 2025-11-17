@@ -9,7 +9,7 @@
 | Requires: EMSE 3.0 and Standard Choice: "EMSE_EXECUTE_OPTIONS": "SCRIPT" to be Active.
 |
 | Notes   : TDunn 10/28/2021 created script.   Manages adding special fees based on land use and scope
-|
+|         : Abe   11/07/2025 added IT REQUEST 2694 - Pool Letter ASI
 |
 /==============================================================================================*/
 if(currentUserID == "TDUNN") {
@@ -86,3 +86,9 @@ for(thisCode in specFeeCodes) {
 		}
 	}
 }
+
+// IT REQUEST 2694 - Pool Letter ASI
+if(getAppSpecific("Pool Letter Mailed") == "CHECKED") {
+	createCapComment("Pool Safety Regulation letter mailed.");
+}
+//End of IT REQUEST 2694
