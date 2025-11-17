@@ -226,7 +226,7 @@ if(publicUser && !appMatch("Building/Residential/Limited/*")) {
 	}
 }
 
-// sendResult = aa.sendMail("noreply@placer.ca.gov","tdunn@truepointsolutions.com", "", "Testing Commercial submittal ", debug);
+sendResult = aa.sendMail("noreply@placer.ca.gov","tdunn@truepointsolutions.com", "", "Testing Residential Full review submittal ", debug);
 
 if((getAppSpecific("ADU Required") == "Yes" || getAppSpecific("JADU Required") == "Yes"))
 	sendResult = aa.sendMail("noreply@placer.ca.gov","eaftahi@placer.ca.gov", "", "CTRCA;Building!Residential!Full Review!NA: ADU/JADU in prod", debug);
