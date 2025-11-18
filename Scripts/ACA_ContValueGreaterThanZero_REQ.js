@@ -208,7 +208,7 @@ try
 	var capTypeString = capTypeResult.toString();
 	var capTypeArray = capTypeString.split("/");
 	var capType = capTypeArray[1];
-	if (calcValue <= 1) 
+	if (calcValue <= 1 && estValue <=1 ) 
 	{
 		varCancel = true;
 		varShowMessage = true;
