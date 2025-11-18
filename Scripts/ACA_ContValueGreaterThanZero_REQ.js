@@ -135,10 +135,16 @@ var feeFactor; // Init Valuations
 
 // Modified to pull from capModel instead of from DB.
 valuatnModel = capModel.getBValuatnModel();
-if (valuatnModel) {
+if (valuatnModel) 
+{
 	estValue = valuatnModel.getEstimatedValue();
 	calcValue = valuatnModel.getCalculatedValue();
 	feeFactor = valuatnModel.getFeeFactorFlag();
+	if(valuatnModel.getCalculatedValuation(capId))
+	{
+		logDebug("Getting calcValue from alternate method");
+		calcValue = valuatnModel.getCalculatedValuation(capId);
+	}
 }
 
 var balanceDue = 0;
@@ -176,6 +182,7 @@ logDebug("parcelArea = " + parcelArea);
 logDebug("estValue = " + estValue);
 logDebug("calcValue = " + calcValue);
 logDebug("feeFactor = " + feeFactor);
+logDebug("valuatnmodel = " + valuatnModel);
 
 logDebug("houseCount = " + houseCount);
 logDebug("feesInvoicedTotal = " + feesInvoicedTotal);
@@ -208,7 +215,7 @@ try
 	var capTypeString = capTypeResult.toString();
 	var capTypeArray = capTypeString.split("/");
 	var capType = capTypeArray[1];
-	if (calcValue <= 1 && estValue <=1 ) 
+	if (calcValue <= 1 ) 
 	{
 		//varCancel = true;
 		varShowMessage = true;
