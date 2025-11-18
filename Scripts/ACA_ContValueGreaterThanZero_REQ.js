@@ -87,7 +87,7 @@ function getScriptText(vScriptName) {
   );
   return emseScript.getScriptText() + "";
 }
-
+var capModel = aa.env.getValue("CapModel");
 var cap = aa.env.getValue("CapModel");
 var capId = cap.getCapID();
 var servProvCode = capId.getServiceProviderCode(); // Service Provider Code
