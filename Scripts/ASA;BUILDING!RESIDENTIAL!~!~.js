@@ -268,9 +268,12 @@ try
 			if (matches(AInfo["Panel Upgrade"], "Y", "Yes") || AInfo["Project Type"] == "PV Solar and Storage") {
 				updateFee("0711", "B_RES", "FINAL", 1, varAutoInvoiceFees);
 			}
-			if (matches(AInfo["Panel Upgrade"], "Y", "Yes") && AInfo["Project Type"] == "PV Solar and Storage") {
-				updateFee("0711", "B_RES", "FINAL", 2, varAutoInvoiceFees);
-			}			
+
+			//Commented this according to Mark regarding IT Request # 2504
+			// if (matches(AInfo["Panel Upgrade"], "Y", "Yes") && AInfo["Project Type"] == "PV Solar and Storage") {
+			// 	updateFee("0711", "B_RES", "FINAL", 2, varAutoInvoiceFees);
+			// }
+
 			//Start: Abe - IT Request # 2504 
 			if (AInfo["Project Type"] == "PV Solar and Storage") {
 				updateFee("0515", "B_RES", "FINAL", 1, varAutoInvoiceFees);
