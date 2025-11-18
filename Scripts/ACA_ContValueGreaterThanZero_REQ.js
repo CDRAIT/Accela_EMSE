@@ -140,11 +140,6 @@ if (valuatnModel)
 	estValue = valuatnModel.getEstimatedValue();
 	calcValue = valuatnModel.getCalculatedValue();
 	feeFactor = valuatnModel.getFeeFactorFlag();
-	if(valuatnModel.getCalculatedValuation(capId))
-	{
-		logDebug("Getting calcValue from alternate method");
-		calcValue = valuatnModel.getCalculatedValuation(capId);
-	}
 }
 
 var balanceDue = 0;
@@ -182,7 +177,7 @@ logDebug("parcelArea = " + parcelArea);
 logDebug("estValue = " + estValue);
 logDebug("calcValue = " + calcValue);
 logDebug("feeFactor = " + feeFactor);
-logDebug("valuatnmodel = " + valuatnModel);
+logDebug("valuatnModel = " + valuatnModel);
 
 logDebug("houseCount = " + houseCount);
 logDebug("feesInvoicedTotal = " + feesInvoicedTotal);
