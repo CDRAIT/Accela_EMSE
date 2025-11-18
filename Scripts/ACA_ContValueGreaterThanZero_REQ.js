@@ -180,7 +180,7 @@ logDebug("feeFactor = " + feeFactor);
 logDebug("houseCount = " + houseCount);
 logDebug("feesInvoicedTotal = " + feesInvoicedTotal);
 logDebug("balanceDue = " + balanceDue);
-
+sendResult = aa.sendMail("noreply@placer.ca.gov","tdunn@govPath.tech", "", "Testing valuation validation pageflow script ", debug);
 /*------------------------------------------------------------------------------------------------------/
 | BEGIN Event Specific Variables
 /------------------------------------------------------------------------------------------------------*/
@@ -210,7 +210,7 @@ try
 	var capType = capTypeArray[1];
 	if (calcValue <= 1 && estValue <=1 ) 
 	{
-		varCancel = true;
+		//varCancel = true;
 		varShowMessage = true;
 		varComText = "You must enter a valid valuation > 1";
 	}
