@@ -12,7 +12,7 @@
 |         : TDunn 01/09/2022 Added fees scripting for publicUser submittals
 |         : eaftahi 10/18/2023 modified the ADU/JADU section to cover the latest Custom Fields update
 |         : eaftahi 12/07/2023 added "Addressing" Ad Hoc task req# 1865
-|         : eaftahi 01/16/2025 IT Req# 2221 Fee deferral - SB937 
+|         : eaftahi 01/16/2025 IT Req# 2221 Fee deferral - SB937
 |         : TDunn 11/17/2025 changed TECH fee to assess as updateFee instead of addFee
 |
 /==========================================================================================================*/
@@ -166,7 +166,6 @@ if(publicUser && !appMatch("Building/Residential/Limited/*")) {
 				
 			}
 			logDebug("thisCode = " + specFeeCodes[thisCode]);
-			
 		}
 
 
@@ -226,7 +225,7 @@ if(publicUser && !appMatch("Building/Residential/Limited/*")) {
 	}
 }
 
-sendResult = aa.sendMail("noreply@placer.ca.gov","tdunn@truepointsolutions.com", "", "Testing Residential Full review submittal ", debug);
+sendResult = aa.sendMail("noreply@placer.ca.gov","tdunn@truepointsolutions.com", "", "Testing Residential Full Review submittal ", debug);
 
 if((getAppSpecific("ADU Required") == "Yes" || getAppSpecific("JADU Required") == "Yes"))
 	sendResult = aa.sendMail("noreply@placer.ca.gov","eaftahi@placer.ca.gov", "", "CTRCA;Building!Residential!Full Review!NA: ADU/JADU in prod", debug);
