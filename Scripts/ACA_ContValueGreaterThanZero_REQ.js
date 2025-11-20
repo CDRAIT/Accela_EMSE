@@ -121,26 +121,27 @@ var parcelArea = 0;
 
 var estValue = 0;
 var calcValue = 0;
-var feeFactor; // Init Valuations
-// var valobj = aa.finance.getContractorSuppliedValuation(capId, null).getOutput();	// Calculated valuation
-// if (valobj.length) 
-// {
-    // estValue = valobj[0].getEstimatedValue();
-    // calcValue = valobj[0].getCalculatedValue();
-    // feeFactor = valobj[0].getbValuatn().getFeeFactorFlag();
-// }
+var feeFactor; 
+// Init Valuations
+var valobj = aa.finance.getContractorSuppliedValuation(capId, null).getOutput();	// Calculated valuation
+if (valobj.length) 
+{
+    estValue = valobj[0].getEstimatedValue();
+    calcValue = valobj[0].getCalculatedValue();
+    feeFactor = valobj[0].getbValuatn().getFeeFactorFlag();
+}
 
 // capBValuatn = cap.getBValuatnModel();
 // estValue = capBValuatn.getEstimatedValue();
 
 // Modified to pull from capModel instead of from DB.
-valuatnModel = capModel.getBValuatnModel();
-if (valuatnModel) 
-{
-	estValue = valuatnModel.getEstimatedValue();
-	calcValue = valuatnModel.getCalculatedValue();
-	feeFactor = valuatnModel.getFeeFactorFlag();
-}
+// valuatnModel = capModel.getBValuatnModel();
+// if (valuatnModel) 
+// {
+	// estValue = valuatnModel.getEstimatedValue();
+	// calcValue = valuatnModel.getCalculatedValue();
+	// feeFactor = valuatnModel.getFeeFactorFlag();
+// }
 
 var balanceDue = 0;
 var houseCount = 0;
