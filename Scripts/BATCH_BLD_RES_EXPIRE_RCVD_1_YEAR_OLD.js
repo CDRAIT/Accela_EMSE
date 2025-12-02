@@ -6,6 +6,8 @@ Author: Abe
 Date: 2025-11-13
 */
 
+logDebug("TeST");
+
 try {
     aa.print("===== STARTING BATCH JOB =====");
     //Configuration
