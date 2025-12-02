@@ -25,7 +25,7 @@ if (matches(currentUserID, "TDUNN", "EAFTAHI", "MHELVIC")) {
 }
 
 // Workflow for Planning Review for Commercial
-if (wfProcess == "BLD_20181201_DISTRIBUTION" || wfProcess == "BLD_20230501_MAIN") {
+if (wfProcess == "BLD_20181201_DISTRIBUTION" || wfProcess == "BLD_20181201_MAIN") {
 	if (appTypeArray[2] == "Full Review") {
 		logDebug("School is: " + AInfo["ParcelAttribute.SCHOOL"]);
 		if (matches(AInfo["Elementary School District"], null, "", "NA") && AInfo["ParcelAttribute.SCHOOL"] != null) {
@@ -188,4 +188,5 @@ if (wfProcess == "BLD_20181201_DISTRIBUTION" || wfProcess == "BLD_20181201_MAIN"
 			editTaskSpecific("Planning Review", "PCCP Record Number", cCapId.getCustomID());
 		}
 	}
+
 }
