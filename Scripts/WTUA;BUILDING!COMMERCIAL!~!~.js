@@ -46,6 +46,7 @@ if (wfProcess == "BLD_20181201_DISTRIBUTION" || wfProcess == "BLD_20230501_MAIN"
 				}
 			}
 		}
+	}
 		//Abe- 06/27/2024: IT Request # 1924 - ESD Building Permit Sign Off - "ESD Checklist"
 		if (wfTask == "Engineering and Surveying Review") {
 			var hasFloodZoneRev = false;
@@ -115,8 +116,7 @@ if (wfProcess == "BLD_20181201_DISTRIBUTION" || wfProcess == "BLD_20230501_MAIN"
 				}
 			}
 		}
-		//End of IT Request # 1924
-	}
+		//End of IT Request # 1924	
 }
 
 // Replaces EMSE 2.0 WTUA:Building/Commercial
