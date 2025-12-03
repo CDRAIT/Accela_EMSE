@@ -293,7 +293,7 @@ if (!publicUser) {
 	}
 
 	//IT Request# 2698
-	if (appTypeArray[2] == "Other" && AInfo["Scope of Work"] == "Permanent Membrane Structure"){
+	if (appTypeArray[3] == "Other" && AInfo["Scope of Work"] == "Permanent Membrane Structure"){
 		addFee("0913", "B_RES", "FINAL", 2, "N");
 	}
 	//end of IT Request# 2698
