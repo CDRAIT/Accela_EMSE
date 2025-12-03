@@ -11,6 +11,7 @@
 |
 | Notes   : TDunn 01/11/2022 created 3.0 version
 |         : TDunn 07/18/2024 remarked out section that calls addSPFees to eliminate error.
+|         : eaftahi 12/03/2025 Added IT Request# 2698
 |         
 |
 /=============================================================================================*/
@@ -83,6 +84,11 @@ if(publicUser) {
 	if(matches(appTypeArray[2],"Full Review","Limited")){
 		updateFee("TECH","ACCOUNTING","FINAL",1,varAutoInvoiceFees);
 	}
+	//IT Request# 2698
+	if(AInfo["Scope of Work"] == "Permanent Membrane Structure"){
+		addFee("0913", "B_COM", "FINAL",2,"N");
+	}
+	//end of IT Request# 2698
 }
 	
 /*=======================

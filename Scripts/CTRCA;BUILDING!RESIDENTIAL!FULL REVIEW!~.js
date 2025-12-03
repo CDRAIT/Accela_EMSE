@@ -13,6 +13,7 @@
 |         : eaftahi 10/18/2023 modified the ADU/JADU section to cover the latest Custom Fields update
 |         : eaftahi 12/07/2023 added "Addressing" Ad Hoc task req# 1865
 |         : eaftahi 01/16/2025 IT Req# 2221 Fee deferral - SB937 
+|         : eaftahi 12/03/2025 Added IT Request# 2698
 |
 /==========================================================================================================*/
 
@@ -22,16 +23,23 @@ var varAutoInvoiceFees = "N";
 
 
 //IT Request# 1865 & 1998
-if (publicUser)
-    if (matches(appTypeArray[2], "Full Review") && (matches(AInfo["ADU Required"], "Yes") || matches(AInfo["JADU Required"], "Yes")))
-        if (getAppProcessCode(capId) == "BLD_20181201_MAIN") {
-            addAdHocTask("ADHOC", "Addressing", "", "LDEROBER");
+if (publicUser) {
+	if (matches(appTypeArray[2], "Full Review") && (matches(AInfo["ADU Required"], "Yes") || matches(AInfo["JADU Required"], "Yes"))) {
+		if (getAppProcessCode(capId) == "BLD_20181201_MAIN") {
+			addAdHocTask("ADHOC", "Addressing", "", "LDEROBER");
 
-            if (AInfo["Project Office"] == "Auburn")
-                addAdHocTask("ADHOC", "ADU Review", "", "PHOFFMAN");
-            else
-                addAdHocTask("ADHOC", "ADU Review", "", "TLYKINS");
-        }
+			if (AInfo["Project Office"] == "Auburn")
+				addAdHocTask("ADHOC", "ADU Review", "", "PHOFFMAN");
+			else
+				addAdHocTask("ADHOC", "ADU Review", "", "TLYKINS");
+		}
+	}
+	//IT Request# 2698
+	if (appTypeArray[2] == "Other" && AInfo["Scope of Work"] == "Permanent Membrane Structure") {
+		addFee("0913", "B_RES", "FINAL", 2, "N");
+	}
+	//end of IT Request# 2698
+}
 //End of IT Request# 1865 & 1998
 
 //IT Request# 2221 - SB937 - Fee Deferral

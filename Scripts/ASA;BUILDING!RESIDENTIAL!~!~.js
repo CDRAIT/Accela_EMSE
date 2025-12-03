@@ -19,11 +19,11 @@
 |         : TDunn 11/06/2023 added SolarApp+ fee rules
 |         : TDunn 11/14/2023 added additional logic to include SolarApp+ as an 'exception' for adding and collecting fees online.
 |         : EAftahi 12/07/2023 IT Request # 1865 - added "Addressing" Ad Hoc task 
-|	  : EAftahi 11/18/2023 IT Request # 1590 - Tracking ADUs - changed the code based on new ASI fields		
+|	      : EAftahi 11/18/2023 IT Request # 1590 - Tracking ADUs - changed the code based on new ASI fields		
 |         : EAftahi 03/07/2024 IT Request # 1978 - do not Auto Invoice 'Solar Roof Mount' fees
-|	  : EAftahi 04/29/2024 IT Request # 1998 - ADU Ad-Hoc Task - adds Ad-Hoc task for ADU/JADU permits(ADU Review & Addressing)
+|	      : EAftahi 04/29/2024 IT Request # 1998 - ADU Ad-Hoc Task - adds Ad-Hoc task for ADU/JADU permits(ADU Review & Addressing)
 |         : eaftahi 01/16/2025 IT Request # 2221 - Fee Deferral - SB937
-
+|         : eaftahi 12/03/2025 Added IT Request# 2698
 |
 /==========================================================================================================*/
 if(currentUserID == "TDUNN" || currentUserID == "EAFTAHI") 
@@ -280,17 +280,25 @@ if(!publicUser || doLimited || doSolarApp)
 }
 
 //IT Request# 1865 & 1998
-if (!publicUser)
-    if (matches(appTypeArray[2], "Full Review") && (matches(AInfo["ADU Required"], "Yes") || matches(AInfo["JADU Required"], "Yes")))
-        if (getAppProcessCode(capId) == "BLD_20181201_MAIN") {
-            addAdHocTask("ADHOC", "Addressing", "", "LDEROBER");
+if (!publicUser) {
+	if (matches(appTypeArray[2], "Full Review") && (matches(AInfo["ADU Required"], "Yes") || matches(AInfo["JADU Required"], "Yes"))) {
+		if (getAppProcessCode(capId) == "BLD_20181201_MAIN") {
+			addAdHocTask("ADHOC", "Addressing", "", "LDEROBER");
 
-            if (AInfo["Project Office"] == "Auburn")
-                addAdHocTask("ADHOC", "ADU Review", "", "PHOFFMAN");
-            else
-                addAdHocTask("ADHOC", "ADU Review", "", "TLYKINS");
-        }
-//End of IT Request# 1865 & 1998
+			if (AInfo["Project Office"] == "Auburn")
+				addAdHocTask("ADHOC", "ADU Review", "", "PHOFFMAN");
+			else
+				addAdHocTask("ADHOC", "ADU Review", "", "TLYKINS");
+		}
+	}
+
+	//IT Request# 2698
+	if (appTypeArray[2] == "Other" && AInfo["Scope of Work"] == "Permanent Membrane Structure"){
+		addFee("0913", "B_RES", "FINAL", 2, "N");
+	}
+	//end of IT Request# 2698
+}//End of IT Request# 1865 & 1998
+
 
 if(publicUser && appTypeArray[3] == "Solar App")
 {

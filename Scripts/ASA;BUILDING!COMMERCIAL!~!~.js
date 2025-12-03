@@ -11,6 +11,7 @@
 |
 | Notes   : TDunn 01/11/2022 created 3.0 version
 |         : TDunn Note disable the corresponding standard choice script.
+|         : eaftahi 12/03/2025 Added IT Request# 2698
 |
 /=============================================================================================*/
 if(currentUserID == "TDUNN") {
@@ -88,14 +89,3 @@ if(!publicUser) {
 		updateFee("TECH","ACCOUNTING","FINAL",1,varAutoInvoiceFees);
 	}
 }
-
-	
-/*=======================
-Notes
-
-
-
-
-
-
-========================*/
