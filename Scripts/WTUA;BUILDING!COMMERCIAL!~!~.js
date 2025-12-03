@@ -18,6 +18,7 @@
 |         : TDunn 01/24/2024 deployed updates to production and disabled standard choice WTUA:Building/Commercial
 |         : TDunn 03/05/2024 added BLD_20181201_MAIN criteria to rules for issuance
 |         : Abe   06/27/2024 added IT Request # 1924 - ESD Building Permit Sign Off - "ESD Checklist"
+|         : Abe   12/03/2025 closed the FullReview if-clause before IT Request # 1924 code block to prevent errors
 |
 /------------------------------------------------------------------------------------------------------*/
 if (matches(currentUserID, "TDUNN", "EAFTAHI", "MHELVIC")) {
@@ -46,6 +47,7 @@ if (wfProcess == "BLD_20181201_DISTRIBUTION" || wfProcess == "BLD_20181201_MAIN"
 				}
 			}
 		}
+	}
 		//Abe- 06/27/2024: IT Request # 1924 - ESD Building Permit Sign Off - "ESD Checklist"
 		if (wfTask == "Engineering and Surveying Review") {
 			var hasFloodZoneRev = false;
@@ -115,8 +117,7 @@ if (wfProcess == "BLD_20181201_DISTRIBUTION" || wfProcess == "BLD_20181201_MAIN"
 				}
 			}
 		}
-		//End of IT Request # 1924
-	}
+		//End of IT Request # 1924	
 }
 
 // Replaces EMSE 2.0 WTUA:Building/Commercial
