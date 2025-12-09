@@ -2015,6 +2015,7 @@ if(wfProcess == "BLD_20230501_MAIN")
 			/* Remarked out 12/05/2025. Moved setting dates to 'Signature Requested' task status **
 			logDebug("Updating Issued Date " + dateAdd(null,0));
 			editAppSpecific("Issue Date",dateAdd(null,0));
+			editFirstIssuedDate(dateAdd(null,0));
 			editAppSpecific("Expiration Date",dateAdd(null,730));
 			if(trpaFlag.indexOf("Tahoe Regional") > -1)
 			{
@@ -2274,6 +2275,7 @@ if(wfProcess == "BLD_20230501_MAIN")
 			logDebug("Updating Issued Date " + dateAdd(null,0));
 			editAppSpecific("Issued Date",dateAdd(null,0));
 			editAppSpecific("Issue Date",dateAdd(null,0));
+			editFirstIssuedDate(dateAdd(null,0));
 			editAppSpecific("Expiration Date",dateAdd(null,730));
 			if(trpaFlag.indexOf("Tahoe Regional") > -1)
 			{
