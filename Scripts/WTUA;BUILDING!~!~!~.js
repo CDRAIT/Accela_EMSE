@@ -2011,6 +2011,7 @@ if(wfProcess == "BLD_20230501_MAIN")
 	{
 		if(wfStatus == "Issued") 
 		{
+			/* Remarked out 12/05/2025. Moved setting dates to 'Signature Requested' task status **
 			logDebug("Updating Issued Date " + dateAdd(null,0));
 			editAppSpecific("Issued Date",dateAdd(null,0));
 			editAppSpecific("Expiration Date",dateAdd(null,730));
@@ -2018,7 +2019,7 @@ if(wfProcess == "BLD_20230501_MAIN")
 			{
 				editAppSpecific("TRPA Permit Expiration",dateAdd(null,1095));
 			}
-			
+			/--------------------------------------------------------------------------------------*/
 			if(matches(AInfo["Last Revision Number"],null,"")) {
 				editAppSpecific("Last Revision Number",0);
 				AInfo["Last Revision Number"] = 0;
@@ -2268,6 +2269,15 @@ if(wfProcess == "BLD_20230501_MAIN")
 		// Generate signature requested notification
 		if(wfStatus == "Signature Requested")
 		{
+			/* Moved from 'Issued' status -------------*/
+			logDebug("Updating Issued Date " + dateAdd(null,0));
+			editAppSpecific("Issued Date",dateAdd(null,0));
+			editAppSpecific("Expiration Date",dateAdd(null,730));
+			if(trpaFlag.indexOf("Tahoe Regional") > -1)
+			{
+				editAppSpecific("TRPA Permit Expiration",dateAdd(null,1095));
+			}			
+			/*---------------------------------------*/
 			var emailTemplate = "SIG_REQUEST";
 			var vFromEmail = "";
 			var vToEmail = "";
@@ -2309,8 +2319,8 @@ if(wfProcess == "BLD_20230501_MAIN")
 				showMessage = true;
 				comment("<font size = 4 color=ff000><b>No applicant email address found. Applicant Request for Information was NOT sent.</b></font><br><br>Please review applicant contact record for a valid email address");
 			}
+		
 		}
-			
 			// if(checkForContactEmail("Applicant"))
 			// {
 				// showMessage = true;
