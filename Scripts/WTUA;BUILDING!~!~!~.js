@@ -95,6 +95,7 @@
 |         : TDunn 10/02/2025 added new ESD Improvement plan req notification
 |         : TDunn 11/05/2025 added dynamic CDR Project Office email parameter for notifications.
 |         : TDunn 11/05/2025 updated multiple notifications to accommodate addition of project office email parameter.
+|         : TDunn 12/05/2025 moved setting issued dates to 'Signature Requested' from 'Issued' status a process issuance
 |
 /---------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 
@@ -2013,7 +2014,7 @@ if(wfProcess == "BLD_20230501_MAIN")
 		{
 			/* Remarked out 12/05/2025. Moved setting dates to 'Signature Requested' task status **
 			logDebug("Updating Issued Date " + dateAdd(null,0));
-			editAppSpecific("Issued Date",dateAdd(null,0));
+			editAppSpecific("Issue Date",dateAdd(null,0));
 			editAppSpecific("Expiration Date",dateAdd(null,730));
 			if(trpaFlag.indexOf("Tahoe Regional") > -1)
 			{
@@ -2272,6 +2273,7 @@ if(wfProcess == "BLD_20230501_MAIN")
 			/* Moved from 'Issued' status -------------*/
 			logDebug("Updating Issued Date " + dateAdd(null,0));
 			editAppSpecific("Issued Date",dateAdd(null,0));
+			editAppSpecific("Issue Date",dateAdd(null,0));
 			editAppSpecific("Expiration Date",dateAdd(null,730));
 			if(trpaFlag.indexOf("Tahoe Regional") > -1)
 			{
