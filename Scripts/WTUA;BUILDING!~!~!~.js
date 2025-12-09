@@ -96,6 +96,7 @@
 |         : TDunn 11/05/2025 added dynamic CDR Project Office email parameter for notifications.
 |         : TDunn 11/05/2025 updated multiple notifications to accommodate addition of project office email parameter.
 |         : TDunn 12/05/2025 moved setting issued dates to 'Signature Requested' from 'Issued' status a process issuance
+|         : TDunn 12/09/2025 added 'firstIssuedDate' to sections setting issued date
 |
 /---------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 
