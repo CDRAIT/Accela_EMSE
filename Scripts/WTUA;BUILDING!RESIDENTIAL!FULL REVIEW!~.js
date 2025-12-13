@@ -17,8 +17,9 @@
 |         : TDunn 03/07/2024 fixed logic error for generating PCCP notification when creating PCCP record.
 |         : Abe   06/26/2024 IT Request # 1924 - ESD Building Permit Sign Off - "ESD Checklist"
 |         : Abe   02/11/2025 IT Request# 2164 - Swimming Pool Safety Req. Email Notification
+|         : TDunn 12/12/2025 Backed this in from nonpro1 into local and nonprod1 repositorys to sync with script window version
 |
-/------------------------------------------------------------------------------------------------------*/
+/-----------------------------------------------------------------------------------------------------------*/
 if(matches(currentUserID,"EAFTAHI","TDUNN")) { showDebug = 1;}
 logDebug("Running EMSE WTUA:/Building/Residential/Full Review/...");
 
