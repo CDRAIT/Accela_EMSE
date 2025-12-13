@@ -16,6 +16,7 @@
 |         : TDunn 01/24/2024 added new PCCP created notification logic for BLD_20181201_DISTRIBUTION wf process
 |         : TDunn 03/07/2024 fixed logic error for generating PCCP notification when creating PCCP record.
 |         : Abe   06/26/2024 IT Request # 1924 - ESD Building Permit Sign Off - "ESD Checklist"
+|         : Abe   02/11/2025 IT Request# 2164 - Swimming Pool Safety Req. Email Notification
 |
 /------------------------------------------------------------------------------------------------------*/
 if(matches(currentUserID,"EAFTAHI","TDUNN")) { showDebug = 1;}
@@ -142,8 +143,28 @@ if(wfProcess == "BLD_20181201_DISTRIBUTION" && wfTask == "Engineering and Survey
 		assignTask("Flood Zone Review","MKELLER");
 	}
 
-	//aa.sendMail("noreply@placer.ca.gov", "eaftahi@placer.ca.gov", "", "WTUA|Res|Full Review|Debug Results #1924 ESD Check List", debug);
+	//aa.sendMail(defaultFrom, "eaftahi@placer.ca.gov", "", "WTUA|Res|Full Review|Debug Results #1924 ESD Check List", debug);
 }// End of IT Request # 1924
+
+
+//START of: IT Request# 2164 - Swimming Pool Safety Req. Email Notification
+if (appTypeArray[3] == "Other" && wfTask == "Process for Issuance" && wfStatus == "Issued")
+	if (matches(getAppSpecific("Scope of Work"), "Swimming Pool", "Swimming Pool Above Ground", "Swimming Pool Remodel or Repair")) {
+
+		var emailFrom = defaultFrom;
+		var emailParams = aa.util.newHashtable();
+		getPrimaryOwnerParams4NotificationWithEmail(emailParams);
+		addParameter(emailParams, "$$altID$$", capId.getCustomID());
+		var emailTemp = "BLD_RES_SWIMMING_POOL_LETTER";
+		var defaultEmail = "Building@Placer.ca.gov";
+		var emailTo = emailParams.get("$$ownerEmail$$");
+
+		if (!(isEmptyOrNull(emailTo)) && emailTo.indexOf('@') != -1)
+			emailResult = sendNotification(emailFrom, emailTo, "", emailTemp, emailParams, null);
+	}
+
+//END of:  IT Request# 2164
+
 
 
 
