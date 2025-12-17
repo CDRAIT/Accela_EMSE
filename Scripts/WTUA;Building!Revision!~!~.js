@@ -1562,6 +1562,10 @@ if(matches(appTypeArray[1],"Revision") && wfProcess == "BLD_20231116_REV")
 			logDebug("Total Hours : " + vTotHrs);
 			AInfo["Total Hours Charged"] = vTotHrs;
 		}
+		if(AInfo["Plan Check Type"] != AInfo["Plan Check Type Override"])
+		{
+			editAppSpecific("Plan Check Type",AInfo["Plan Check Type Override"])
+		}		
 		if(isTaskStatus("Distribution","Not Required - Plan Check Only"))
 		{
 			var allRevComplete = true;	

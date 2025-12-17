@@ -1630,6 +1630,10 @@ if(wfProcess == "BLD_20230501_MAIN")
 	// Building Plan Check/Approved Pending Resubmittal ----------------------------
 	if(wfTask == "Building Plan Check")
 	{
+		if(AInfo["Plan Check Type"] != AInfo["Plan Check Type Override"])
+		{
+			editAppSpecific("Plan Check Type",AInfo["Plan Check Type Override"])
+		}
 
 		if(isTaskStatus("Distribution","Not Required - Plan Check Only"))
 		{
