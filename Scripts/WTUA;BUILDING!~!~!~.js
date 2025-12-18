@@ -98,6 +98,7 @@
 |         : TDunn 12/05/2025 moved setting issued dates to 'Signature Requested' from 'Issued' status a process issuance
 |         : TDunn 12/09/2025 added 'firstIssuedDate' to sections setting issued date
 |         : TDunn 12/17/2025 added updating Plan Check Type ASI based on Building Plan Check TSI 'Plan Check Type Override' value
+|         : TDunn 12/18/2025 added new trigger to adding Sewer Permit Issuance on scope = SFD Production
 |
 /---------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 
@@ -1354,6 +1355,13 @@ if(wfProcess == "BLD_20230501_MAIN")
 			updateTask("ADU Addressing Review","Completion Pending","","(Preissuance Requirement)",wfProcess);
 			assignPreissue("ADU Addressing Review",wfProcess);
 		}
+		if(matches(AInfo["Scope of Work"],"SFD Production") && !isTaskActive("Sewer Permit Issuance") && !isTaskStatus("Sewer Permit Issuance","Complete"))
+		{
+			activateTask("Sewer Permit Issuance",wfProcess);
+			updateTask("Sewer Permit Issuance","Completion Pending","","(Preissuance Requirement)",wfProcess);
+			assignPreissue("Sewer Permit Issuance",wfProcess);
+			generateAddlPermitRequiredNotice(arpTemplate,"Sewer Permit");				
+		}		
 	}
 	
 	// Rules for activating Distribution Reconciliation task when all triage tasks are resulted when one or more failed

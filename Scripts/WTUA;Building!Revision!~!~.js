@@ -48,6 +48,7 @@
 |         : TDunn  10/02/2025 added new ESD Improvement plan notification
 |         : TDunn  10/23/2025 modified fees to parent wfStatus criteria to just 'Payment Requested'
 |         : TDunn 12/17/2025 added updating Plan Check Type ASI based on Building Plan Check TSI 'Plan Check Type Override' value
+||        : TDunn 12/18/2025 added new trigger to adding Sewer Permit Issuance on scope = SFD Production
 | 
 /---------------------------------------------------------------------------------------------------------------------------------*/
 
@@ -1263,6 +1264,13 @@ if(matches(appTypeArray[1],"Revision") && wfProcess == "BLD_20231116_REV")
 			updateTask("ADU Addressing Review","Completion Pending","","-(Preissuance Requirement)",wfProcess);
 			assignPreissue("ADU Addressing Review",wfProcess);
 		}
+		if(matches(AInfo["Scope of Work"],"SFD Production") && !isTaskActive("Sewer Permit Issuance") && !isTaskStatus("Sewer Permit Issuance","Complete"))
+		{
+			activateTask("Sewer Permit Issuance",wfProcess);
+			updateTask("Sewer Permit Issuance","Completion Pending","","(Preissuance Requirement)",wfProcess);
+			assignPreissue("Sewer Permit Issuance",wfProcess);
+			generateAddlPermitRequiredNotice(arpTemplate,"Sewer Permit");				
+		}		
 	}
 	
 	// Rules for activating Distribution Reconciliation task when all triage tasks are resulted when one or more failed
