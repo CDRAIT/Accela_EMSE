@@ -47,6 +47,8 @@
 |         : TDunn  10/02/2025 reorginized and added useTaskspecificGroupName to add fees to parent.
 |         : TDunn  10/02/2025 added new ESD Improvement plan notification
 |         : TDunn  10/23/2025 modified fees to parent wfStatus criteria to just 'Payment Requested'
+|         : TDunn 12/17/2025 added updating Plan Check Type ASI based on Building Plan Check TSI 'Plan Check Type Override' value
+| 
 /---------------------------------------------------------------------------------------------------------------------------------*/
 
 if(matches(currentUserID,"TDUNN","EAFTAHI","MHELVIC"))
