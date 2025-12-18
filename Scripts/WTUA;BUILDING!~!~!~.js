@@ -1019,7 +1019,14 @@ if(wfProcess == "BLD_20230501_MAIN")
 				activateTask("ADU Addressing Review");
 				updateTask("ADU Addressing Review","Completion Pending","","(Preissuance Requirement)",wfProcess);
 				assignPreissue("ADU Addressing Review",wfProcess);
-			}				
+			}
+			if(matches(AInfo["Scope of Work"],"SFD Production") && !isTaskActive("Sewer Permit Issuance") && !isTaskStatus("Sewer Permit Issuance","Complete"))
+			{
+				activateTask("Sewer Permit Issuance",wfProcess);
+				updateTask("Sewer Permit Issuance","Completion Pending","","(Preissuance Requirement)",wfProcess);
+				assignPreissue("Sewer Permit Issuance",wfProcess);
+				generateAddlPermitRequiredNotice(arpTemplate,"Sewer Permit");				
+			}
 		}
 	}
 	

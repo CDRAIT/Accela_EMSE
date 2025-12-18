@@ -847,7 +847,14 @@ if(matches(appTypeArray[1],"Revision") && wfProcess == "BLD_20231116_REV")
 				activateTask("ADU Addressing Review");
 				updateTask("ADU Addressing Review","Completion Pending","","-(Preissuance Requirement)",wfProcess);
 				assignPreissue("ADU Addressing Review",wfProcess);
-			}				
+			}
+			if(matches(AInfo["Scope of Work"],"SFD Production") && !isTaskActive("Sewer Permit Issuance") && !isTaskStatus("Sewer Permit Issuance","Complete"))
+			{
+				activateTask("Sewer Permit Issuance",wfProcess);
+				updateTask("Sewer Permit Issuance","Completion Pending","","(Preissuance Requirement)",wfProcess);
+				assignPreissue("Sewer Permit Issuance",wfProcess);
+				generateAddlPermitRequiredNotice(arpTemplate,"Sewer Permit");				
+			}			
 		}
 		
 		// When Distribution is Distribute and no default review tasks are defined and no TSI have manually been set to 'Y', force activation of 'Process for Issuance'			
