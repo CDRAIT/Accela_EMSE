@@ -946,6 +946,14 @@ if(matches(appTypeArray[1],"Revision") && wfProcess == "BLD_20231116_REV")
 		activateTask("Building Plan Check",wfProcess);
 		assignThisTask(thisTask,wfProcess);
 		editTaskDueDate(thisTask,dateAdd(null,addNumDays,"Y"));
+		
+		if(matches(AInfo["Scope of Work"],"SFD Production") && !isTaskActive("Sewer Permit Issuance") && !isTaskStatus("Sewer Permit Issuance","Complete"))
+		{
+			activateTask("Sewer Permit Issuance",wfProcess);
+			updateTask("Sewer Permit Issuance","Completion Pending","","(Preissuance Requirement)",wfProcess);
+			assignPreissue("Sewer Permit Issuance",wfProcess);
+			generateAddlPermitRequiredNotice(arpTemplate,"Sewer Permit");				
+		}		
 	}
 
 	// Distribution/ Not Required - Process for Issuance
