@@ -100,7 +100,7 @@ try
 			spTypeFlag = false;
 		}
 	}
-	if (appTypeArray[2] == "Master") {varLookupTable = "Residential Master<3000"; }
+	if (appTypeArray[2] == "Master") {varLookupTable = "SDL:PCMasterPlanScope"; }
 	if (appTypeArray[3] == "Master < 3000") { varLookupTable = "Residential Master<3000"; }
 	if (appTypeArray[3] == "Master > 3000") { varLookupTable = "Residential Master>3000"; }
 	if (appTypeArray[3] == "Tract-Third Party Rev > 3000") { varLookupTable = "Third Party Review"; }

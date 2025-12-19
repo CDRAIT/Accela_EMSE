@@ -9,6 +9,7 @@
 | Requires: EMSE 3.0 and Standard Choice: "EMSE_EXECUTE_OPTIONS": "SCRIPT" to be Active.
 |
 | Notes   : TDunn 12/18/2025 Adapted from CTRCA;Building!Residential!Full Review!~ 
+|           TDunn 12/19/2025 updated lookup table 
 |         
 |
 /==========================================================================================================*/
@@ -18,7 +19,7 @@ logDebug("Running CTRCA:Building Residential");
 var varAutoInvoiceFees = "N";
 
 var spTypeFlag = false;
-var varLookupTable = "Residential Master<3000";
+var varLookupTable = "SDL:PCMasterPlanScope";
 // Assess Fees
 logDebug("Fee lookup table is " + varLookupTable);
 
