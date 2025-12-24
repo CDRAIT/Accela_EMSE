@@ -182,6 +182,7 @@ if(publicUser)
 			var projectOffice = AInfo["Project Office"];
 		}		
 		var notificationTemplate = "NEW_ONLINE_PERMIT_SUBMITTED";
+		var cdrEmail = "OnlineBLDPermits@placer.ca.gov";
 		var contactTypes = new Array("Applicant","Owner");
 		iCon = null;
 		var contactArray = new Array();
