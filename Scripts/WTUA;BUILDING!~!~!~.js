@@ -3,7 +3,7 @@
 | Event   : WorkflowTaskUpdateAfter
 |
 | Client  : Placer County, CA
-| Usage   : Workflow Task Update After for all Building Residential records.
+| Usage   : Workflow Task Update After for all Building records.
 | 
 |
 | Requires: EMSE 3.0 and Standard Choice: "EMSE_EXECUTE_OPTIONS": "SCRIPT" to be Active.
