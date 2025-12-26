@@ -22,6 +22,7 @@
 |         : TDunn 08/29/2025 copied to Non-prod1
 |         : TDunn 08/31/2025 deployed to Github
 |         : TDunn 12/26/2025 removed getTaskAssignUserHistTD() function script and added to INCLUDES_CUSTOM
+|         : TDunn 12/26/2025 corrected parameters for call to getTaskAssignUserHistTD
 |
 \-------------------------------------------------------------------------------------------------------------------------*/
 if(matches(currentUserID,"TDUNN")) {showDebug = 1;}
@@ -163,7 +164,7 @@ if(wfProcess == "BLD_DEFERRED_20240710")
 				if(pCapId != null)
 				{
 					capId = pCapId;
-					planCheckStaff = getTaskAssignUserHistTD("Building Plan Check","BLD_20230501_MAIN");
+					planCheckStaff = getTaskAssignUserHistTD("Building Plan Check","",pCapId);
 					logDebug("Plan check staff: " + planCheckStaff);
 					capId = dCapId;
 					if(!matches(planCheckStaff,"",false,undefined,null))
@@ -182,7 +183,7 @@ if(wfProcess == "BLD_DEFERRED_20240710")
 			if(resubNum > 1)
 			{
 				addNumDays = getDueInDays("SDL:DueDates","Reviews|" + dueDateRecType,1);
-				cAssigned = getTaskAssignUserHistTD(thisTask);
+				cAssigned = getTaskAssignUserHistTD(thisTask,"");
 				logDebug("Building Plan Check " + cAssigned);
 				if(!matches(cAssigned,false,"",null,undefined))
 				{
