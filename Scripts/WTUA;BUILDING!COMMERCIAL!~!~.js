@@ -156,7 +156,6 @@ if (wfProcess == "BLD_20181201_DISTRIBUTION" || wfProcess == "BLD_20181201_MAIN"
 		editAppSpecific("Plan Check Expiration",dateAdd(null,365));
 	if(isTaskStatus("Application Submittal","Complete","BLD_20181201_MAIN") && AInfo["Application Received"] == "Online" && AInfo["Code Enforcement Action"] == "Yes")
 		editAppSpecific("Plan Check Expiration",dateAdd(null,182));
-	}
 
 	if (wfTask == "Planning Review") {
 		if (wfStatus == "Complete" && AInfo["Open Space Fee"] == "Yes") {
