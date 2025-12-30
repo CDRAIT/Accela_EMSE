@@ -152,16 +152,10 @@ if (wfProcess == "BLD_20181201_DISTRIBUTION" || wfProcess == "BLD_20181201_MAIN"
 		addStdCondition("Other - Prevent Final / Completion", "APCD Final Inspection Required");
 	}
 
-	if (matches(wfTask, "Application Submittal") && wfStatus == "Complete" && AInfo['Code Enforcement Action'] != "Yes") {
-		editAppSpecific("Plan Check Expiration", dateAdd(null, 365));
-	}
-
-	if (isTaskStatus("Application Submittal", "Complete", "BLD_20181201_MAIN") && (AInfo['Plan Check Expiration'] == "" || AInfo['Plan Check Expiration'] == null) && AInfo['Code Enforcement Action'] != "Yes") {
-		editAppSpecific("Plan Check Expiration", dateAdd(null, 365));
-	}
-
-	if (isTaskStatus("Application Submittal", "Complete", "BLD_20181201_MAIN") && (AInfo['Plan Check Expiration'] == "" || AInfo['Plan Check Expiration'] == null) && AInfo['Code Enforcement Action'] == "Yes") {
-		editAppSpecific("Plan Check Expiration", dateAdd(null, 182));
+	if(isTaskStatus("Application Submittal","Complete","BLD_20181201_MAIN") && AInfo["Application Received"] == "Online" && AInfo["Code Enforcement Action"] != "Yes")
+		editAppSpecific("Plan Check Expiration",dateAdd(null,365));
+	if(isTaskStatus("Application Submittal","Complete","BLD_20181201_MAIN") && AInfo["Application Received"] == "Online" && AInfo["Code Enforcement Action"] == "Yes")
+		editAppSpecific("Plan Check Expiration",dateAdd(null,182));
 	}
 
 	if (wfTask == "Planning Review") {
