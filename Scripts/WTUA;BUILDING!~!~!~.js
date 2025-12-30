@@ -467,7 +467,8 @@ if(wfProcess == "BLD_20230501_MAIN")
 			}			
 			editTaskDueDate("Distribution",dateAdd(null,1,"Y"),wfProcess);
 			assignThisTask("Distribution",wfProcess);			
-			// assignTask("Distribution","CDRA_UNASSIGNED",wfProcess);
+			if(AInfo["Application Received"] == "Online" && AInfo["Code Enforcement Action"] != "Yes") editAppSpecific("Plan Check Expiration",dateAdd(null,365));
+			if(AInfo["Application Received"] == "Online" && AInfo["Code Enforcement Action"] == "Yes") editAppSpecific("Plan Check Expiration",dateAdd(null,182));
 		}
 		// End review preset rules -----------------
 

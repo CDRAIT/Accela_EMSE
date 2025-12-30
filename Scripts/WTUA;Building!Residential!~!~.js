@@ -8,13 +8,15 @@
 |
 | Requires: EMSE 3.0 and Standard Choice: "EMSE_EXECUTE_OPTIONS": "SCRIPT" to be Active.
 |
-| Notes   : TDunn TPS 12/24/2025 Converted EMSE 2.0 script
+| Notes   : TDunn TPS 12/24/2025 Converted from EMSE 2.0 script
+|         : TDunn 12/30/2025 updated criteria for setting Plan Check Expiration
 /---------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 
 if(matches(currentUserID,"TDUNN","EAFTAHI","MHELVIC"))
 {
  	showDebug = 1;
 }
+
 logDebug("Running WTUA:Building/Residential ");
 if(wfProcess == "BLD_20181201_DISTRIBUTION")
 {
@@ -24,9 +26,9 @@ if(wfProcess == "BLD_20181201_DISTRIBUTION")
 		editAppSpecific("Expiration Date",dateAdd(null,182));
 	if(matches(wfTask,"Application Submittal") && wfStatus == "Complete" && AInfo["Code Enforcement Action"] != "Yes")
 		editAppSpecific("Plan Check Expiration",dateAdd(null,365));
-	if(isTaskStatus("Application Submittal","Complete","BLD_20181201_MAIN") && (AInfo['Plan Check Expiration']== "" || AInfo['Plan Check Expiration']== null) && AInfo["Code Enforcement Action"] != "Yes")
+	if(isTaskStatus("Application Submittal","Complete","BLD_20181201_MAIN") && AInfo["Application Received"] == "Online" && AInfo["Code Enforcement Action"] != "Yes")
 		editAppSpecific("Plan Check Expiration",dateAdd(null,365));
-	if(isTaskStatus("Application Submittal","Complete","BLD_20181201_MAIN") && (AInfo['Plan Check Expiration']== "" || AInfo['Plan Check Expiration']== null) && AInfo["Code Enforcement Action"] == "Yes")
+	if(isTaskStatus("Application Submittal","Complete","BLD_20181201_MAIN") && AInfo["Application Received"] == "Online" && AInfo["Code Enforcement Action"] == "Yes")
 		editAppSpecific("Plan Check Expiration",dateAdd(null,182));
 	if(wfTask == "Fire Review" && matches(wfStatus,"Complete","Revisions") && AInfo["Fire Conditions"] == "Yes")
 		addStdCondition("Fire - Prevent Final / Completion", "Fire Department Final Inspection Required");

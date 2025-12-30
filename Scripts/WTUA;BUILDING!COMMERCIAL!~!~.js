@@ -18,6 +18,7 @@
 |         : TDunn 01/24/2024 deployed updates to production and disabled standard choice WTUA:Building/Commercial
 |         : TDunn 03/05/2024 added BLD_20181201_MAIN criteria to rules for issuance
 |         : Abe   06/27/2024 added IT Request # 1924 - ESD Building Permit Sign Off - "ESD Checklist"
+|         : TDunn 12/30/2025 updated criteria for setting Plan Check Expiration date
 |
 /------------------------------------------------------------------------------------------------------*/
 if (matches(currentUserID, "TDUNN", "EAFTAHI", "MHELVIC")) {
@@ -25,7 +26,8 @@ if (matches(currentUserID, "TDUNN", "EAFTAHI", "MHELVIC")) {
 }
 
 // Workflow for Planning Review for Commercial
-if (wfProcess == "BLD_20181201_DISTRIBUTION" || wfProcess == "BLD_20230501_MAIN") {
+if (wfProcess == "BLD_20181201_DISTRIBUTION" || wfProcess == "BLD_20230501_MAIN") 
+{
 	if (appTypeArray[2] == "Full Review") {
 		logDebug("School is: " + AInfo["ParcelAttribute.SCHOOL"]);
 		if (matches(AInfo["Elementary School District"], null, "", "NA") && AInfo["ParcelAttribute.SCHOOL"] != null) {
@@ -120,8 +122,7 @@ if (wfProcess == "BLD_20181201_DISTRIBUTION" || wfProcess == "BLD_20230501_MAIN"
 }
 
 // Replaces EMSE 2.0 WTUA:Building/Commercial
-if (wfProcess == "BLD_20181201_DISTRIBUTION" || wfProcess == "BLD_20181201_MAIN")
-//if(wfProcess == "BLD_20181201_DISTRIBUTION" || wfProcess == "BLD_20230501_MAIN")	
+if (wfProcess == "BLD_20181201_DISTRIBUTION" || wfProcess == "BLD_20181201_MAIN")	
 {
 	if (matches(wfTask, "Ready to Issue", "Plan Check", "Issue Status", "Process for Issuance") && wfStatus == "Issued" && AInfo['Code Enforcement Action'] != "Yes") {
 		editAppSpecific("Expiration Date", dateAdd(null, 730));

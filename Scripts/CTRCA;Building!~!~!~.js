@@ -150,6 +150,7 @@ if(publicUser)
 	
 	editAppSpecific("Application Received","Online");
 	editAppSpecific("Primary Plan Check Contact", "Agent");
+	editAppSpecific("Plan Check Expiration",dateAdd(null,182));
 	
 	if (AInfo['ParcelAttribute.COUNTYPROP'] == "COUNTYPROP" || AInfo['ParcelAttribute.COUNTYPROP'] == "County Property") 
 	{
