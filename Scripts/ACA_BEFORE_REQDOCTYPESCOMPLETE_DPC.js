@@ -12,7 +12,7 @@
 /------------------------------------------------------------------------------------------------------*/
 if (aa.env.getValue("ScriptName") == "Test") {     // Setup parameters for Script Test.
     var CurrentUserID = "PUBLICUSER124450"; // Public User ID: rschug
-    var CurrentUserID = "PUBLICUSER387358"; // Public User ID: mhelvick
+    var CurrentUserID = "PUBLICUSER14501"; // Public User ID: mhelvick
     var capIDString = "21TMP-000172";            // Test Temp Record from ACA.
     var capIDString = "22TMP-000017";            // Test Temp Record from ACA.
     aa.env.setValue("ScriptCode", "Test");
@@ -594,22 +594,63 @@ try {
     if (fromReviewPage == "Y") { // Already initialized. Editing from Review Page.
         logDebug("fromReviewPage: " + fromReviewPage);
     } else {
-		if(!matches(AInfo["RequiredDocumentTypes"],null,"",undefined)) {
-			// Update Fields in DB from fields in CapModel
-			var fieldNamesDPC = ["RequiredDocumentTypesComplete"];
-			logDebug("Checking fields: " + String(fieldNamesDPC));
-			for (var ff in fieldNamesDPC) {
-				var fieldName = fieldNamesDPC[ff];
-				logDebug("Checking " + fieldName
-					+ ": (DB) " + getAppSpecific(fieldName)
-					+ ": (ACA) " + getAppSpecific4ACA(fieldName)
-				);
-				var fieldValueACA = getAppSpecific4ACA(fieldName);
-				var fieldValueDB = getAppSpecific(fieldName);
-				if(!matches(fieldValueDB,"Y","Yes")) {
+
+		stageENV = lookup("EXTERNAL_DOC_REVIEW", "DIGEPLAN_US-STAGE");
+		uswENV = lookup("EXTERNAL_DOC_REVIEW", "DIGEPLAN_USW");
+		pfEnv = getAccelaEnvironment();
+		if(pfEnv) logDebug("<font color='green'>pfEnv: " + pfEnv + "</font>");
+
+		digEplanEnv = lookup("EXTERNAL_DOC_REVIEW", "DIGEPLAN_ENV"); //logDebug("<font color='green'>digEplanEnv: " + digEplanEnv + "</font>");
+		digEplanSubDomain = lookup("EXTERNAL_DOC_REVIEW", "DIGEPLAN_SUBDOMAIN");
+
+		if(pfEnv == uswENV && digEplanEnv.indexOf("usw") >=0) {
+			digEplanPAT = lookup("EXTERNAL_DOC_REVIEW", "DIGEPLAN_PAT_USW");
+		}
+		if(pfEnv == stageENV && digEplanEnv.indexOf("us-stage") >=0) {
+			digEplanPAT = lookup("EXTERNAL_DOC_REVIEW", "DIGEPLAN_PAT_STAGE");
+		}
+
+		tmpCapIdforDPC = AInfo["TMPRecordID"];
+		logDebug(tmpCapIdforDPC);
+		
+		if(pfEnv && matches(pfEnv,stageENV,uswENV) && matches(publicUserID,"PUBLICUSER14501")) {
+			packageStatus = digEplanCheckSubPkgStatus(tmpCapIdforDPC);
+			if(packageStatus){
+				logDebug("<font color='blue'>readyToSubmit: " + packageStatus.readyToSubmit + "</font>");
+				var packageReady = packageStatus.readyToSubmit;
+				if(packageReady == "false") {
+					logDebug("<font color='red'>Submission Package is not ready: " + packageStatus.submissionStatus + "</font>");
 					showMessage = true;
-					//cancel = true;
-					comment("You have not uploaded all required document types for this record. Please see remaining required documents listed below.");
+					comment("Alert: " + packageStatus.submissionStatus);
+				}
+				if(packageReady == "true") {
+					logDebug("<font color='green'>Submission Package is ready: " + packageStatus.submissionStatus + "</font>");
+				}
+			}
+		
+			if(!packageStatus) {
+				showMessage = true;
+				comment("Alert: Submission Package is not ready: " + packageStatus.submissionStatus);
+			}
+		}
+		if(!matches(publicUserID,"PUBLICUSER14501")) {
+			if(!matches(AInfo["RequiredDocumentTypes"],null,"",undefined)) {
+				// Update Fields in DB from fields in CapModel
+				var fieldNamesDPC = ["RequiredDocumentTypesComplete"];
+				logDebug("Checking fields: " + String(fieldNamesDPC));
+				for (var ff in fieldNamesDPC) {
+					var fieldName = fieldNamesDPC[ff];
+					logDebug("Checking " + fieldName
+						+ ": (DB) " + getAppSpecific(fieldName)
+						+ ": (ACA) " + getAppSpecific4ACA(fieldName)
+					);
+					var fieldValueACA = getAppSpecific4ACA(fieldName);
+					var fieldValueDB = getAppSpecific(fieldName);
+					if(!matches(fieldValueDB,"Y","Yes")) {
+						showMessage = true;
+						//cancel = true;
+						comment("You have not uploaded all required document types for this record. Please see remaining required documents listed below.");
+					}
 				}
 			}
 		}
@@ -923,4 +964,49 @@ function dateFormatted(pMonth, pDay, pYear, pFormat)
 		ret = "" + mth + "/" + day + "/" + pYear.toString();
 
 	return ret;
+}
+
+/* SAAS returns the environment (supp, test, prod) */
+function getAccelaEnvironment() {
+    var tenantName = new com.accela.util.MultiDBJNDIUtil.getTenantName();
+    var tenantNameArray = tenantName.split('-');
+    if(tenantNameArray.length == 2) {
+        return tenantNameArray[1].toUpperCase();
+    }
+    return false;
+}
+
+function digEplanCheckSubPkgStatus(capIDStr) {
+    try {
+ 
+        if (digEplanPAT != undefined && digEplanSubDomain != undefined && digEplanEnv != undefined) {
+            var hparameters = aa.httpClient.initPostParameters();
+            hparameters.put("X-CUSTOMER-NAME", digEplanSubDomain);
+            hparameters.put("X-PRODUCT-NAME", "APP");
+            hparameters.put("X-PAT-TOKEN", digEplanPAT);
+ 
+           var url = "https://" + digEplanSubDomain + "." + digEplanEnv + "/public/v1/submission/packages/status?caseId="+capIDStr;
+           logDebug("url: " + url);
+           logDebug("hparameters: " + hparameters);
+ 
+            var response = aa.httpClient.get(url, hparameters).getOutput();
+ 
+            if (response) {
+				logDebug("<font color='green'>Calling DigEplan Submission Package Status API: " + response + "</font>");
+				var obj = JSON.parse(response);
+				//logDebug("<font color='green'>readyToSubmit: " + obj.readyToSubmit + "</font>");
+				return obj;
+			}
+            if (!response) {
+				logDebug("<font color='red'>UNABLE TO CALL DIGEPLAN SUBMISSION PACKAGE STATUS API</font>");
+				return false;
+			}
+        } else {
+            logDebug("<font color='red'>UNABLE TO CALL DIGEPLAN SUBMISSION PACKAGE STATUS API</font>");
+			return false;
+        }
+    }
+    catch (err) {
+        logDebug("A JavaScript Error occured: " + err.message + " at line " + err.lineNumber + " stack: " + err.stack);
+    }
 }
