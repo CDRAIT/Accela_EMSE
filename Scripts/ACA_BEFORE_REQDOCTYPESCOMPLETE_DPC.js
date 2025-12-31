@@ -613,7 +613,7 @@ try {
 		tmpCapIdforDPC = AInfo["TMPRecordID"];
 		logDebug(tmpCapIdforDPC);
 		
-		if(pfEnv && matches(pfEnv,stageENV,uswENV) && matches(publicUserID,"PUBLICUSER14501")) {
+		if(pfEnv && matches(pfEnv,stageENV,uswENV) /*&& matches(publicUserID,"PUBLICUSER14501")*/) {
 			packageStatus = digEplanCheckSubPkgStatus(tmpCapIdforDPC);
 			if(packageStatus){
 				logDebug("<font color='blue'>readyToSubmit: " + packageStatus.readyToSubmit + "</font>");
@@ -633,6 +633,7 @@ try {
 				comment("Alert: Submission Package is not ready: " + packageStatus.submissionStatus);
 			}
 		}
+		/*
 		if(!matches(publicUserID,"PUBLICUSER14501")) {
 			if(!matches(AInfo["RequiredDocumentTypes"],null,"",undefined)) {
 				// Update Fields in DB from fields in CapModel
@@ -654,6 +655,7 @@ try {
 				}
 			}
 		}
+		*/
     }
 
     if (recordUpdated) { 
