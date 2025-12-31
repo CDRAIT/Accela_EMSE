@@ -13,6 +13,8 @@
 |         : eaftahi 10/18/2023 modified the ADU/JADU section to cover the latest Custom Fields update
 |         : eaftahi 12/07/2023 added "Addressing" Ad Hoc task req# 1865
 |         : eaftahi 01/16/2025 IT Req# 2221 Fee deferral - SB937 
+|         : eaftahi 04/09/2024 IT Request# 2035 - updated ADU Fees
+|         : TDunn  12/31/2025 Remarked out addition of adHoc tasks
 |
 /==========================================================================================================*/
 
@@ -22,16 +24,16 @@ var varAutoInvoiceFees = "N";
 
 
 //IT Request# 1865 & 1998
-if (publicUser)
-    if (matches(appTypeArray[2], "Full Review") && (matches(AInfo["ADU Required"], "Yes") || matches(AInfo["JADU Required"], "Yes")))
-        if (getAppProcessCode(capId) == "BLD_20181201_MAIN") {
-            addAdHocTask("ADHOC", "Addressing", "", "LDEROBER");
+// if (publicUser)
+    // if (matches(appTypeArray[2], "Full Review") && (matches(AInfo["ADU Required"], "Yes") || matches(AInfo["JADU Required"], "Yes")))
+        // if (getAppProcessCode(capId) == "BLD_20181201_MAIN") {
+            // addAdHocTask("ADHOC", "Addressing", "", "LDEROBER");
 
-            if (AInfo["Project Office"] == "Auburn")
-                addAdHocTask("ADHOC", "ADU Review", "", "PHOFFMAN");
-            else
-                addAdHocTask("ADHOC", "ADU Review", "", "TLYKINS");
-        }
+            // if (AInfo["Project Office"] == "Auburn")
+                // addAdHocTask("ADHOC", "ADU Review", "", "PHOFFMAN");
+            // else
+                // addAdHocTask("ADHOC", "ADU Review", "", "TLYKINS");
+        // }
 //End of IT Request# 1865 & 1998
 
 //IT Request# 2221 - SB937 - Fee Deferral
@@ -107,7 +109,7 @@ if(publicUser && !appMatch("Building/Residential/Limited/*")) {
 					thisQty = thisQty.toFixed(4);
 					logDebug("Quantity = " + thisQty);
 				}
-				if(thisScope =="Accessory Dwelling Unit" && matches(feeName,"0750","0754","0756")) {
+				if(thisScope =="Accessory Dwelling Unit" && matches(feeName,"0751","0754","0752")) {
 					sqftADU = getAppSpecific("ADU SqFt");
 					if(sqftADU < 750) {
 						addFeeFlag = false;
@@ -225,10 +227,10 @@ if(publicUser && !appMatch("Building/Residential/Limited/*")) {
 	}
 }
 
-// sendResult = aa.sendMail("noreply@placer.ca.gov","tdunn@truepointsolutions.com", "", "Testing Commercial submittal ", debug);
+// sendResult = aa.sendMail(defaultFrom,"tdunn@truepointsolutions.com", "", "Testing Commercial submittal ", debug);
 
-if((getAppSpecific("ADU Required") == "Yes" || getAppSpecific("JADU Required") == "Yes"))
-	sendResult = aa.sendMail("noreply@placer.ca.gov","eaftahi@placer.ca.gov", "", "CTRCA;Building!Residential!Full Review!NA: ADU/JADU in prod", debug);
+//if((getAppSpecific("ADU Required") == "Yes" || getAppSpecific("JADU Required") == "Yes"))
+//	sendResult = aa.sendMail(defaultFrom,"eaftahi@placer.ca.gov", "", "CTRCA;Building!Residential!Full Review!NA: ADU/JADU in prod", debug);
 
 
 
