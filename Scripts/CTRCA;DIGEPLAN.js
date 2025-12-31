@@ -1,4 +1,4 @@
-//CTRCA:DIGEPLAN
+//CTRCA:DIGEPLAN for NONPROD1
 logDebug("<font color='green'>INSIDE CTRCA DIGEPLAN</font>");
 //create variable for tmpCapID in case the altID is updated earlier in the event.
 tmpCapId = aa.cap.getCapID(capId.getID1(),capId.getID2(),capId.getID3()).getOutput();
