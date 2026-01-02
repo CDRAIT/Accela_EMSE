@@ -83,7 +83,7 @@ try
 	}
 	if (appTypeArray[2] == "Limited" && publicUser) {
 		varLookupTable = "OTC Scope of Work ACA";
-		// doLimited = true;	// Remarked this out for testing to remove adding fees at ACA submittal
+		doLimited = true;
 		spTypeFlag = false;
 		logDebug("Is limited = " + doLimited);
 	}
