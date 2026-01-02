@@ -26,7 +26,7 @@
 |         : TDunn 08/31/2025 deployed to Github
 |
 \-------------------------------------------------------------------------------------------------------*/
-if(matches(currrentUserID,"TDUNN")) showDebug = 1;
+if(matches(currentUserID,"TDUNN","JMCKENZI","EAFTAHI")) { showDebug = 1;}
 
 
 logDebug("Running Staff notification for payment received");
