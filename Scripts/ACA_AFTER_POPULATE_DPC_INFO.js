@@ -40,8 +40,7 @@ if (aa.env.getValue("ScriptName") == "Test" && aa.env.getValue("CapModel") == ""
 }
 var systemMailFrom = "NoReply@accela.com";
 var debugEmailTo = "";
-var debugEmailTo = "mckenzie@truepointsolutions.com";
-//var debugEmailTo = "rschug@truepointsolutions.com";
+//var debugEmailTo = "mckenzie@truepointsolutions.com";
 var errorEmailTo = debugEmailTo;
 
 /*------------------------------------------------------------------------------------------------------/
