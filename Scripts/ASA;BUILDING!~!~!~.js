@@ -430,30 +430,36 @@ if(!publicUser)
 	}
 	catch (err) {
 		logDebug("A JavaScript Error occured: " + err.message + " at line " + err.lineNumber + " stack: " + err.stack);
-		aa.sendMail("noreply@placer.ca.gov","tdunn@truepointsolutions.com", "", "Testing ASA:Building try error ", err.message);
+		aa.sendMail("noreply@placer.ca.gov","tdunn@truepointsolutions.com", "", "Testing ASA:Building not public user try error ", err.message);
 	}
 }
 
 //IT Request# 1911 - EV Charging Station
-if (!publicUser)
-    if (matches(appTypeArray[1], "Residential", "Commercial") && appTypeArray[2] == "Limited")
-        if (getAppSpecific("Scope of Work") == "Electric Vehicle Charging Station (EVCS)") {
-            if (getAppSpecific("EVCS Units Qty") == "1-25 units")
-                editAppSpecific("EVCS Processing Deadline", dateAdd(fileDate, 5, " "));
+try{
+	if (!publicUser)
+		if (matches(appTypeArray[1], "Residential", "Commercial") && appTypeArray[2] == "Limited")
+			if (getAppSpecific("Scope of Work") == "Electric Vehicle Charging Station (EVCS)") {
+				if (getAppSpecific("EVCS Units Qty") == "1-25 units")
+					editAppSpecific("EVCS Processing Deadline", dateAdd(fileDate, 5, " "));
 
-            if (getAppSpecific("EVCS Units Qty") == "26+ units")
-                editAppSpecific("EVCS Processing Deadline", dateAdd(fileDate, 10, " "));
-        }
+				if (getAppSpecific("EVCS Units Qty") == "26+ units")
+					editAppSpecific("EVCS Processing Deadline", dateAdd(fileDate, 10, " "));
+			}
 
-//End of IT Request# 1911 - EV Charging Station
+	//End of IT Request# 1911 - EV Charging Station
 
-//IT Request#2059 - Auto Create SPMUD Flag
-if (AInfo["ParcelAttribute.UTILITY"] != null && AInfo["ParcelAttribute.UTILITY"] != "" && AInfo["ParcelAttribute.UTILITY"] != undefined)
-	if (AInfo["ParcelAttribute.UTILITY"].startsWith("SOUTH PLACER MUD"))
-		if ((appTypeArray[1] == "Commercial" && appTypeArray[2] == "Full Review") || (appTypeArray[1] == "Residential" && appTypeArray[2] == "Full Review" && matches(appTypeArray[3], 'Other', 'Residential<3000', 'Residential>3000', 'Tract < 3000', 'Tract > 3000')))
-			addStdCondition('Env. Engineering - Prevent Issuance / Approval', 'Project in SPMUD Jurisdiction');
-//End of IT Request#2059 - Auto Create SPMUD Flag 
-
+	//IT Request#2059 - Auto Create SPMUD Flag
+	if (AInfo["ParcelAttribute.UTILITY"] != null && AInfo["ParcelAttribute.UTILITY"] != "" && AInfo["ParcelAttribute.UTILITY"] != undefined)
+		if (AInfo["ParcelAttribute.UTILITY"].startsWith("SOUTH PLACER MUD"))
+			if ((appTypeArray[1] == "Commercial" && appTypeArray[2] == "Full Review") || (appTypeArray[1] == "Residential" && appTypeArray[2] == "Full Review" && matches(appTypeArray[3], 'Other', 'Residential<3000', 'Residential>3000', 'Tract < 3000', 'Tract > 3000')))
+				addStdCondition('Env. Engineering - Prevent Issuance / Approval', 'Project in SPMUD Jurisdiction');
+	//End of IT Request#2059 - Auto Create SPMUD Flag 
+}
+catch (err)
+{
+	logDebug("A JavaScript Error occured: " + err.message + " at line " + err.lineNumber + " stack: " + err.stack);
+	aa.sendMail("noreply@placer.ca.gov","tdunn@truepointsolutions.com", "", "Testing ASA:Building EV message try error ", err.message);
+}
 
 aa.sendMail("noreply@placer.ca.gov","tdunn@truepointsolutions.com", "", "Testing ASA:Building: debug ", debug);
 
