@@ -16,8 +16,8 @@
 |
 /--------------------------------------------------------------------------------------------------------------------------------------------*/
 if (aa.env.getValue("ScriptName") == "Test" && aa.env.getValue("CapModel") == "") {     // Setup parameters for Script Test.
-    var CurrentUserID = "PUBLICUSER1282"; // Public User ID: mhelvick, mckenzie@truepointsolutions.com
-	var capIDString = "22TMP-000247";       // Test Temp Record from ACA.
+    var CurrentUserID = "PUBLICUSER14501"; // Public User ID: mhelvick, mckenzie@truepointsolutions.com
+	var capIDString = "26TMP-000001";       // Test Temp Record from ACA.
     aa.env.setValue("ScriptCode", "Test");
     aa.env.setValue("CurrentUserID", CurrentUserID);     // Current User
     sca = capIDString.split("-");
