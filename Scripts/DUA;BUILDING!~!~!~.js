@@ -30,6 +30,14 @@
 /------------------------------------------------------------------------------------------------------*/
 
 if(matches(currentUserID,"JMCKENZIE","KHOBDAY","TDUNN","MHELVICK","JMCKENZI","ADMIN")) {showDebug = 3;}
+
+sendDUAEmails = false;
+fileDateCompare = new Date(fileDate);
+if(fileDateCompare < edrStartDate) { //edrStartDate variable is set in INCLUDES_CUSTOM_GLOBALS
+	sendDUAEmails = true;
+	logDebug("<font color='blue'>Will Send DUA Emails if applicable </font>");
+} else {logDebug("<font color='red'>Will Not Send DUA Emails</font>");}
+
 publicUserEDR = false;
 logDebug("Inside DUA:Building/*/*/* script");
 if(doDigEplan && currentUserID == "SVC_AGENT") loadCustomScript("DUA:DIGEPLAN");
@@ -302,7 +310,7 @@ if((publicUser || publicUserEDR == true) && capIDString.indexOf("TMP") == -1)
 
 	//--- End block for BLD_PLNCHK_20241222	--------------------------/
 
-	if(capStatus == "Received") {
+	if(sendDUAEmails && capStatus == "Received") {
 		if(AInfo["Project Office"]== "Auburn") {
 			addParameter(emailParameters,"$$officeParam$$","Auburn");
 			vToEmail = "OnlineBLDPermits@placer.ca.gov";
@@ -501,5 +509,6 @@ function emailInspDocUploadNotification(docGroups,docCategories) {
 | addParentID = set to "Y" or "N" to control if parent altId of current record is included in the notification. 
 | staffDefault = the email address of the staff member to include in the vToEmail if no staff is assigned to the record. Use userID if toStaffEmail set to 'T'
 /------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
+
 
 
