@@ -25,6 +25,7 @@
 |           TDunn 03/25/2025 added rules for PC Master wf Process for documents uploaded
 |           TDunn 08/29/2025 copied to Non-prod1
 |           TDunn 08/30/2025 deployed to Github
+|			TDunn 01/02/2026 removed random 're' typo
 |
 /------------------------------------------------------------------------------------------------------*/
 
@@ -308,7 +309,7 @@ if((publicUser || publicUserEDR == true) && capIDString.indexOf("TMP") == -1)
 			vCcEmail = "BLDPlanCheck@placer.ca.gov";
 
 		}
-		if(AInfo["Project Office"] == "Tahoe") {Re
+		if(AInfo["Project Office"] == "Tahoe") {
 			addParameter(emailParameters,"$$officeParam$$","Tahoe");
 			vToEmail = "OnlineBLDPermitsTahoe@placer.ca.gov";
 			vCcEmail = "";
@@ -396,7 +397,7 @@ docDescription
 =========================================
 */
 
-email("mckenzie@truepointsolutions.com","noreply@placer.ca.gov","DUA PLACERCO TEST" + capIDString,debug);
+//email("mckenzie@govpath.tech","noreply@placer.ca.gov","DUA PLACERCO NONPROD1" + capIDString,debug);
 sendResult = aa.sendMail("noreply@placer.ca.gov","tdunn@truepointsolutions.com", "", "Testing Building DUA script " + capIDString, debug);
 
 // External functions
@@ -430,8 +431,6 @@ function getTaskAssignUser(wfstr)
 	}
 	return false;
 }
-
-
 
 
 // Example custom function to send notification to staff
