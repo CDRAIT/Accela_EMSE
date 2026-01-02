@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------------------------------------------/
-| Program : IRSA:~/~/~/~  (actually *s not tilde)
+| Program : IRSA;~!~!~!~  (actually *s not tilde)
 | Event   : InspectionResultSubmitAfter
 |
 | Client  : Placerco, CA
@@ -17,11 +17,15 @@
 |         : TDunn 08/11/2023 updated utility notification functions with additional error trapping for bad parcel utility data
 |         : TDunn 08/28/2023 added additionial logic for new error message emails for bad parcel utility data
 |         : TDunn 11/16/2023 added code to ensure parcel attributes are instantiated for use by the utility release script block
-|         : TDunn 12/06/2024 updated generateReport calls to use new name 'generateReportPCO'
-|         : Abe   04/08/2025 added IT Req# 2340 - Auto-result WF when Final Passed on SolarApp+
+|         : TDunn 09/27/2024 added TRPA flag for Expiration date updates.
+|         : TDunn 12/06/2024 updated generateReport function calls to use new name 'generateReportPCO'
+|         : TDunn 03/31/2025 added closeTask on inspection final for workflow process BLD_20230501_MAIN
+|         : TDunn 08/29/2025 copied to Non-prod1
+|         : TDunn 08/29/2025 added two service request by Abe
+|         : TDunn 08/29/2025 deployed to Github
 | 
 /-----------------------------------------------------------------------------------------------------------------*/
-if (matches(currentUserID,"JMCKENZI","TDUNN","EAFTAHI", "SVC_AGENT")) 
+if (matches(currentUserID,"JMCKENZI","TDUNN","EAFTAHI")) 
 {
 	showDebug = 1;
 }
@@ -41,6 +45,14 @@ if(capId != null){
 
 loadParcelAttributes(AInfo);
 logGlobals(AInfo);
+var trpaFlag = "NA";
+var isTRPA = false;
+
+if(!matches(AInfo["ParcelAttribute.TRPA"],null,undefined,false)) { trpaFlag = AInfo["ParcelAttribute.TRPA"]; }	
+if(trpaFlag.indexOf("Tahoe Regional") > -1)
+{
+	isTRPA = true;
+}	
 
 // Controls for InspectionResultModifyAfter event
 if(matches(vEventName,"InspectionResultModifyAfter"))
@@ -75,6 +87,13 @@ if(matches(vEventName,"InspectionResultModifyAfter"))
 		{
 			sendElecUtilRelease();
 		}
+
+		//Start: IT Req# 2504
+		if (inspType == "515 ESS" && (inspResult == "FINALPASS" || inspResult == "Final Pass" || inspResult == "PASS" || inspResult == "Pass"))
+		{
+			sendElecUtilRelease();
+		}
+		//End of IT Req# 2504	
 
 		if (inspResult != "") 
 		{
@@ -112,11 +131,16 @@ if(matches(vEventName,"InspectionResultModifyAfter"))
 			{
 				sendElecUtilRelease();
 			}
+			//Start: IT Req# 2504
+			if ((inspType == "515 ESS") && (inspResult == "FINALPASS" || inspResult == "Final Pass" || inspResult == "PASS" || inspResult == "Pass")) {
+				sendElecUtilRelease();
+			}
+			//End: IT Req# 2504
 
-		if (inspType == "914 TRPA Final" && (inspResult == "FINALPASS" || inspResult == "Final Pass" || inspResult == "PASS" || inspResult == "Pass") && (appMatch("TRPA/Building/Multi-Family/Project") || appMatch("TRPA/Building/Multi-Family/TRPA Review at TRPA") || appMatch("TRPA/Building/Residential/Project") || appMatch("TRPA/Building/Residential/TRPA Review at TRPA") || appMatch("TRPA/Building/TRPA MOU Project/*"))) {
-			sendTRPARelease();
-		}
 
+			if (inspType == "914 TRPA Final" && (inspResult == "FINALPASS" || inspResult == "Final Pass" || inspResult == "PASS" || inspResult == "Pass") && (appMatch("TRPA/Building/Multi-Family/Project") || appMatch("TRPA/Building/Multi-Family/TRPA Review at TRPA") || appMatch("TRPA/Building/Residential/Project") || appMatch("TRPA/Building/Residential/TRPA Review at TRPA") || appMatch("TRPA/Building/TRPA MOU Project/*"))) {
+				sendTRPARelease();
+			}
 			if (inspResult != "") {
 				emailInspectionResultParameters();
 			}
@@ -149,11 +173,11 @@ if(matches(vEventName,"InspectionResultSubmitAfter","V360InspectionResultSubmitA
 		logDebug("Running Inspection result rules for Building");
 		if (inspResult == "Final Pass") {
 			closeTask("Inspections","Construction Complete","Building Granted a Final Pass"," ","BLD_20181201_MAIN");
+			closeTask("Inspections","Construction Complete","Building Granted a Final Pass"," ","BLD_20230501_MAIN");
 			//aa.sendMail(defaultFrom, "eaftahi@placer.ca.gov", "", "IRSA:TRACT Homes - IT Request # 2083 ", debug);
-
-                //Abe 04/08/2025: IT Req# 2340
-                if(appTypeArray[3]== "Solar App")
-                        closeTask("Inspection","Construction Complete","Permit Granted a Final Pass"," ","B_SOLARAPP");
+			//Abe 04/08/2025: IT Req# 2340
+			if (appTypeArray[3] == "Solar App")
+				closeTask("Inspection", "Construction Complete", "Permit Granted a Final Pass", " ", "B_SOLARAPP");
 
 		}
 
@@ -197,6 +221,19 @@ if(matches(vEventName,"InspectionResultSubmitAfter","V360InspectionResultSubmitA
 		if (((inspType == "513 Solar Panel-Final" && AInfo['ParcelAttribute.ELECTRIC UTILITY'] == "SMUD") || (inspType == "501 Temp Power Pole" || inspType == "502 Perm Power Pole" ||  inspType == "503 Electrical Service" ||  inspType == "504 AG Electrical Service" ||  inspType == "507 Electrical Service Change")) && (inspResult == "FINALPASS" || inspResult == "Final Pass" || inspResult == "PASS" || inspResult == "Pass")) 
 		{
 			sendElecUtilRelease();
+		}
+		//Start: IT Req# 2504
+		if (inspType == "515 ESS" && (inspResult == "FINALPASS" || inspResult == "Final Pass" || inspResult == "PASS" || inspResult == "Pass"))
+		{
+			sendElecUtilRelease();
+		}
+		//End of IT Req# 2504		
+		if(isTRPA)
+		{
+			if(inspType == "911 TRPA Pre-Grade" && (inspResult == "Pass" || inspResult == "Final Pass"))
+			{
+				editAppSpecific("TRPA Permit Expiration",dateAdd(null,730));
+			}
 		}
 	}
 	// Controls for IRSA TRPA/Building
@@ -269,7 +306,7 @@ if(matches(vEventName,"InspectionResultSubmitAfter","V360InspectionResultSubmitA
 		}
 	}
 }
-	
+		
 /*----------------------------------------------/
 | Custom functions required by IRSA script
 /-----------------------------------------------*/
@@ -292,7 +329,7 @@ function sendElecUtilRelease()
 	addParameter(params, "$$ScopeOfWork$$", getAppSpecific("Scope of Work"));
 	var vProvider = AInfo["ParcelAttribute.ELECTRIC UTILITY"];
 	if(vProvider != null)
-		vProvider = vProvider.trim();
+		vProvider = vProvider.trim();	
 	var vTemplate = lookup("lkupUtilReleaseElec",vProvider);
 	logDebug("strcontrol = " + vTemplate);
 	if(matches(AInfo['ParcelAttribute.ELECTRIC UTILITY'],null,undefined,""))
@@ -351,7 +388,7 @@ function sendGasUtilRelease()
 	addParameter(params, "$$ScopeOfWork$$", getAppSpecific("Scope of Work"));
 	var vProvider = AInfo["ParcelAttribute.GAS UTILITY"];
 	if(vProvider != null)
-		vProvider = vProvider.trim();
+		vProvider = vProvider.trim();	
 	var vTemplate = lookup("lkupUtilReleaseGas",vProvider);
 	logDebug("strcontrol = " + vTemplate);
 	if(matches(AInfo['ParcelAttribute.GAS UTILITY'],null,undefined,""))
