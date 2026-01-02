@@ -28,6 +28,7 @@
 |         : Abe   09/03/2025 IT Request #2059 - Auto Create SPMUD Flag
 |         : TDunn 10/03/2025 removed wfprocess criteria for staff record creation notification
 |         : TDunn 11/05/2025 added dynamic parameter for Project Office email address.
+|         : TDunn 01/02/2025 added new try clause
 |
 /=============================================================================================*/
 if(matches(currentUserID,"TDUNN","JMCKENZI","EAFTAHI")) { showDebug = 1;}
