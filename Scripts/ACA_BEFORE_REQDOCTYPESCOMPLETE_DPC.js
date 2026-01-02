@@ -11,10 +11,8 @@
 |
 /------------------------------------------------------------------------------------------------------*/
 if (aa.env.getValue("ScriptName") == "Test") {     // Setup parameters for Script Test.
-    var CurrentUserID = "PUBLICUSER124450"; // Public User ID: rschug
     var CurrentUserID = "PUBLICUSER14501"; // Public User ID: mhelvick
-    var capIDString = "21TMP-000172";            // Test Temp Record from ACA.
-    var capIDString = "22TMP-000017";            // Test Temp Record from ACA.
+    var capIDString = "26TMP-000001";            // Test Temp Record from ACA.
     aa.env.setValue("ScriptCode", "Test");
     aa.env.setValue("CurrentUserID", CurrentUserID);     // Current User
     sca = capIDString.split("-");
@@ -38,7 +36,6 @@ if (aa.env.getValue("ScriptName") == "Test") {     // Setup parameters for Scrip
     aa.print("CAP_MODEL_INITED:" + aa.env.getValue("CAP_MODEL_INITED"));
 }
 var systemMailFrom = "NoReply@accela.com";
-//var systemMailFrom = "NoReply@reno.gov";
 var debugEmailTo = "";
 var errorEmailTo = debugEmailTo;
 
