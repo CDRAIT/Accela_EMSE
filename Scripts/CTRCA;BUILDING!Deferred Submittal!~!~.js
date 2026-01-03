@@ -15,7 +15,7 @@
 |         : TDunn 03/26/2025 updated adding condition to block Building Final.
 |         : TDunn 08/29/2025 copied to Non-prod1
 |         : TDunn 08/30/2025 deployed to Github
-|         
+|         | TDunn 12/30/2025 deployed to production
 |           
 /---------------------------------------------------------------------------------------------------------------------*/
 
@@ -150,10 +150,8 @@ try
 catch (err2) {
 	logDebug("A JavaScript Error occured: " + err2.message + " at line " + err2.lineNumber + " stack: " + err2.stack);
 }
-sendResult = aa.sendMail("noreply@placer.ca.gov","tdunn@truepointsolutions.com","","Test: PLACERCO CTRCA Deferred created " + newAltID, debug);
 
-// sendResult = aa.sendMail("noreply@placer.ca.gov","tdunn@truepointsolutions.com", "", "Testing Deferred submittal ", debug);
-//aa.sendMail("noreply@placer.ca.gov","mckenzie@truepointsolutions.com", "", "PLACERCO CTRCA Deferred ", debug);	
+// sendResult = aa.sendMail("noreply@placer.ca.gov","tdunn@govPath.tech","","Prod: PLACERCO CTRCA Deferred created " + newAltID, debug);
 
 
 
