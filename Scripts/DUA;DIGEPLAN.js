@@ -55,5 +55,5 @@ for (dl in newDocModelArray) {
 }
 
 logDebug("<font color='green'>sendUploadEmail: " + sendUploadEmail +  "</font>");
-sendResult = aa.sendMail(defaultFrom,"tdunn@truepointsolutions.com", "", "Testing Building DUA script " + capIDString, debug);
+//sendResult = aa.sendMail(defaultFrom,"tdunn@truepointsolutions.com", "", "Testing Building DUA script " + capIDString, debug);
 //if (sendUploadEmail) emailDocUploadNotification();
