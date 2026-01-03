@@ -25,7 +25,8 @@
 |           TDunn 03/25/2025 added rules for PC Master wf Process for documents uploaded
 |           TDunn 08/29/2025 copied to Non-prod1
 |           TDunn 08/30/2025 deployed to Github
-|			TDunn 01/02/2026 removed random 're' typo
+|           TDunn 01/02/2026 removed random 're' typo
+|           TDunn 01/03/2026 re 'pushed' to prod.
 |
 /------------------------------------------------------------------------------------------------------*/
 
