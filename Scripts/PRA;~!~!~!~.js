@@ -24,10 +24,17 @@
 |         : TDunn 04/17/2025 added test for if the revision is for the Master plan check only
 |         : TDunn 08/29/2025 copied to Non-prod1
 |         : TDunn 08/31/2025 deployed to Github
+|         : TDunn 01/03/2026 added date flag for older records
 |
 \-------------------------------------------------------------------------------------------------------*/
 if(matches(currentUserID,"TDUNN","JMCKENZI","EAFTAHI")) { showDebug = 1;}
 
+sendPraEmails = false;
+fileDateCompare = new Date(fileDate);
+if(fileDateCompare < edrStartDate) { //edrStartDate variable is set in INCLUDES_CUSTOM_GLOBALS
+	sendPraEmails = true;
+	logDebug("<font color='blue'>Will Send PRA Staff Emails if applicable </font>");
+} else {logDebug("<font color='red'>Will Not Send PRA Emails</font>");}
 
 logDebug("Running Staff notification for payment received");
 var praNoticeTemplate = "PRA_STAFF_NOTIFICATION_ONLINE_PAYMENT_RECEIVED";
@@ -37,15 +44,15 @@ var staffCode = "Y";
 // update/activate default email by updating email by module/record type and/or remark out override to tdunn@truepointsolutions
 if(appTypeArray[1] == "Hazardous Vegetation") {
 	var defaultEmail = "cdrcount@placer.ca.gov";
-	defaultEmail = "tdunn@truepointsolutions.com";
+	//defaultEmail = "tdunn@truepointsolutions.com";
 }
 if(appTypeArray[1] == "STR Compliance") {
 	var defaultEmail = "str@placer.ca.gov";
-	defaultEmail = "tdunn@truepointsolutions.com";
+	//defaultEmail = "tdunn@truepointsolutions.com";
 }
 if(appTypeArray[1] == "Short Term Rental") {
 	var defaultEmail = "str@placer.ca.gov";
-	defaultEmail = "tdunn@truepointsolutions.com";
+	//defaultEmail = "tdunn@truepointsolutions.com";
 }
 if(matches(appTypeArray[0],"Building","TRPA")) {
 	var defaultEmail = "cdrcount@placer.ca.gov";
@@ -54,7 +61,7 @@ if(matches(appTypeArray[0],"Building","TRPA")) {
 	sendItFlag = true;
 }
 logDebug("App type = " + appTypeArray[0] + " send it flag is " + sendItFlag);
-if(((cHolderName != null && cHolderName != "") || currentUserID == "TDUNN") && sendItFlag) {
+if(((cHolderName != null && cHolderName != "") || currentUserID == "TDUNN") && sendItFlag && sendPraEmails) {
 	createNotificationTPS3(praNoticeTemplate,"N","Applicant","N","Contractor","N","N","N","Y",staffCode,"N",defaultEmail);
 }
 
@@ -197,7 +204,7 @@ if (matches(appTypeArray[1], "Administrative", "MBLA", "Pre Development", "Proje
     }
 }
 
-var sendResult = aa.sendMail("noreply@placer.ca.gov","tdunn@truepointsolutions.com", "", "Testing PRA script ", debug);	
+// var sendResult = aa.sendMail("noreply@placer.ca.gov","tdunn@truepointsolutions.com", "", "Testing PRA script ", debug);	
 
 /*============================ Internal Functions required for this script =================================================*/
 
