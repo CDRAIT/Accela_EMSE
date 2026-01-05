@@ -25,6 +25,7 @@
 |         : TDunn 08/29/2025 copied to Non-prod1
 |         : TDunn 08/31/2025 deployed to Github
 |         : TDunn 01/03/2026 added date flag for older records
+|         : TDunn 01/05/2026 remarked out override to TDunn emails
 |
 \-------------------------------------------------------------------------------------------------------*/
 if(matches(currentUserID,"TDUNN","JMCKENZI","EAFTAHI")) { showDebug = 1;}
@@ -395,7 +396,7 @@ staffResult = aa.person.getUser(assignedStaff);
 logDebug("vFromEmail= " + vFromEmail + "; vToEmail= " + vToEmail + "; vCcEmail = " + vCcEmail + "; emailTemplate= " + emailTemplate + "; emailParameters= " + emailParameters);
 // aa.print("vFromEmail= " + vFromEmail + "; vToEmail= " + vToEmail + "; vCcEmail = " + vCcEmail + "; emailTemplate= " + emailTemplate + "; emailParameters= " + emailParameters);
 
-vToEmail = "tdunn@govPath.tech"; vCcEmail = "tdunn@truepointsolutions.com";
+// vToEmail = "tdunn@govPath.tech"; vCcEmail = "tdunn@truepointsolutions.com";
 vEmailSent = sendNotification(vFromEmail,vToEmail,vCcEmail,emailTemplate,emailParameters, null);
 logDebug("Email Sent = " + vEmailSent); 
 
