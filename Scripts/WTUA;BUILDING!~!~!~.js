@@ -134,7 +134,7 @@ if(wfTask == "Distribution" && wfStatus == "Distribute" && isTaskActive("Plan Co
 logDebug("wfProcess = " + wfProcess);
 //Workflow process criteria added by TDunn, 07/28/2023
 // Rules for 'current' workflow
-if(wfProcess == "BLD_20181201_DISTRIBUTION","BLD_20181201_MAIN")
+if(matches(wfProcess,"BLD_20181201_DISTRIBUTION","BLD_20181201_MAIN","BLD_20181201_REVISIONS"))
 {
 	// Added by MBecker
     if (
