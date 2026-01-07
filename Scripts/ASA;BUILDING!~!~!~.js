@@ -462,7 +462,7 @@ catch (err)
 	aa.sendMail("noreply@placer.ca.gov","tdunn@truepointsolutions.com", "", "Testing ASA:Building EV message try error ", err.message);
 }
 
-aa.sendMail("noreply@placer.ca.gov","tdunn@truepointsolutions.com", "", "Testing ASA:Building: debug ", debug);
+//aa.sendMail("noreply@placer.ca.gov","tdunn@truepointsolutions.com", "", "Testing ASA:Building: debug ", debug);
 
 /* ---------------------------------------------
 Notes from 04/28/2021
