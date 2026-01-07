@@ -10,6 +10,7 @@
 |
 | Notes   : TDunn TPS 12/24/2025 Converted from EMSE 2.0 script
 |         : TDunn 12/30/2025 updated criteria for setting Plan Check Expiration
+|         : TDunn 01/07/2026 added additional 20181201 processes to criteria for running code
 /---------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 
 if(matches(currentUserID,"TDUNN","EAFTAHI","MHELVIC"))
@@ -18,7 +19,7 @@ if(matches(currentUserID,"TDUNN","EAFTAHI","MHELVIC"))
 }
 
 logDebug("Running WTUA:Building/Residential ");
-if(wfProcess == "BLD_20181201_DISTRIBUTION")
+if(matches(wfProcess,"BLD_20181201_DISTRIBUTION","BLD_20181201_MAIN","BLD_20181201_REVISIONS"))
 {
 	if(matches(wfTask,"Ready to Issue","Plan Check","Issue Status","Process for Issuance") && wfStatus == "Issued" && AInfo["Code Enforcement Action"] != "Yes")
 		editAppSpecific("Expiration Date",dateAdd(null,730));
