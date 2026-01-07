@@ -216,7 +216,7 @@ if(publicUser)
 		}
 	}
 }
-sendResult = aa.sendMail("noreply@placer.ca.gov","tdunn@truepointsolutions.com","","Test: PLACERCO CTRCA Builing for wf process is" + wfProcess, debug);
+// sendResult = aa.sendMail("noreply@placer.ca.gov","tdunn@truepointsolutions.com","","Test: PLACERCO CTRCA Builing for wf process is" + wfProcess, debug);
 
 /*====================================
 Notes
