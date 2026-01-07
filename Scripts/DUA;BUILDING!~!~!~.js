@@ -407,7 +407,7 @@ docDescription
 */
 
 //email("mckenzie@govpath.tech","noreply@placer.ca.gov","DUA PLACERCO NONPROD1" + capIDString,debug);
-sendResult = aa.sendMail("noreply@placer.ca.gov","tdunn@truepointsolutions.com", "", "Testing Building DUA script " + capIDString, debug);
+//sendResult = aa.sendMail("noreply@placer.ca.gov","tdunn@truepointsolutions.com", "", "Testing Building DUA script " + capIDString, debug);
 
 // External functions
 //=============================
