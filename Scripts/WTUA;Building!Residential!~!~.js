@@ -42,7 +42,29 @@ if(matches(wfProcess,"BLD_20181201_DISTRIBUTION","BLD_20181201_MAIN","BLD_201812
 	if(wfTask == "Planning Review" && wfStatus == "Complete" && AInfo["Open Space Fee"] == "Yes") addFee("OSFH-RES","PCCP","FINAL",1,"N");
 }
 
-
+//IT Request# 1911 - EV Charging Station
+if (appTypeArray[2] == "Limited")
+{
+  if (getAppSpecific("Type of Work") == "Alteration" && getAppSpecific("Scope of Work") == "Electric Vehicle Charging Station (EVCS)")
+  {
+    // supporting both new and old WfProcess
+    if ((wfProcess == "BLD_20230501_MAIN" && wfTask == "Submittal Review" && wfStatus == "Submittal Accepted") || (wfProcess == "BLD_20181201_MAIN  " && wfTask == "Application Submittal" && wfStatus == "Complete"))
+	{
+      if (getAppSpecific("EVCS Units Qty") == "1-25 units")
+	  {
+        editAppSpecific("EVCS Issuance Deadline", dateAdd(wfDateMMDDYYYY, 20, " "));
+	  }
+      else if (getAppSpecific("EVCS Units Qty") == "26+ units")
+	  {
+        editAppSpecific("EVCS Issuance Deadline", dateAdd(wfDateMMDDYYYY, 40, " "));
+	  }
+      else {
+        logDebug('***Error***: "EVCS Units Qty" is undefined!');
+	  }
+	}
+  }
+}
+//End of IT Request# 1911 - EV Charging Station  
 
 
 
