@@ -29,6 +29,8 @@ if(appTypeArray[2] == "Limited") {
 // Add fees for v360 new record
 if(!publicUser) {
 	var varSpecialFees = ""; 
+	var thisScope = getAppSpecific("Scope of Work");
+	var thisQty = 1;
 	var varSpecialFees = lookup(varLookupTable,getAppSpecific("Scope of Work")); 
 	var specFeeCodes = new Array();
 	specFeeCodes = varSpecialFees.split(",");
@@ -52,7 +54,14 @@ if(!publicUser) {
 		}
 		if(feeFlag == "FF|") {
 			feeName = varIsFee.substring(3); 
-			updateFee(feeName,"B_COM","FINAL",1,"N");
+			//IT Request# 2698 - Permanent Membrane Structure
+			//there's no 0919 under B_COM FS!
+			if(thisScope == "Permanent Membrane Structure" && matches(feeName,"0913")) {
+				thisQty = 2;
+			}
+			//End of IT Request # 2698
+
+			updateFee(feeName,"B_COM","FINAL",thisQty,"N");
 		}
 		if(fsFlag == "SP|" && AInfo["Type of Work"] == "New") {
 			landUse = varIsFeeSched.substring(3); 
@@ -78,11 +87,11 @@ if(!publicUser) {
 	if(AInfo["Third Party Review"] == "Yes") {
 		addFee("0113", "B_COM", "FINAL",1,"N"); removeFee("0102","FINAL");
 	}
-	//IT Request# 2698
-	if(AInfo["Scope of Work"] == "Permanent Membrane Structure"){
-		addFee("0913", "B_COM", "FINAL",2,"N");
-	}
-	//end of IT Request# 2698
+	// //IT Request# 2698
+	// if(AInfo["Scope of Work"] == "Permanent Membrane Structure"){
+	// 	addFee("0913", "B_COM", "FINAL",2,"N");
+	// }
+	// //end of IT Request# 2698
 
 	// Adding new TECH fee
 	if(matches(appTypeArray[2],"Full Review","Limited")){

@@ -34,11 +34,11 @@ if (publicUser) {
 				addAdHocTask("ADHOC", "ADU Review", "", "TLYKINS");
 		}
 	}
-	//IT Request# 2698
-	if (appTypeArray[3] == "Other" && AInfo["Scope of Work"] == "Permanent Membrane Structure") {
-		addFee("0913", "B_RES", "FINAL", 2, "N");
-	}
-	//end of IT Request# 2698
+	// //IT Request# 2698
+	// if (appTypeArray[3] == "Other" && AInfo["Scope of Work"] == "Permanent Membrane Structure") {
+	// 	addFee("0913", "B_RES", "FINAL", 2, "N");
+	// }
+	// //end of IT Request# 2698
 }
 //End of IT Request# 1865 & 1998
 
@@ -130,7 +130,13 @@ if(publicUser && !appMatch("Building/Residential/Limited/*")) {
 						// less than 750 sqft
 					}
 				}
-					
+
+				//IT Request# 2698 - Permanent Membrane Structure
+				if(thisScope == "Permanent Membrane Structure" && matches(feeName,"0913", "0919")) {
+					thisQty = 2;
+				}
+				//End of IT Request # 2698	
+							
 				if(addFeeFlag) {
 					updateFee(feeName,"B_RES","FINAL",thisQty,varAutoInvoiceFees);
 				}
