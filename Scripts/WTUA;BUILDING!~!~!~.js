@@ -100,6 +100,7 @@
 |         : TDunn 12/17/2025 added updating Plan Check Type ASI based on Building Plan Check TSI 'Plan Check Type Override' value
 |         : TDunn 12/18/2025 added new trigger to adding Sewer Permit Issuance on scope = SFD Production
 |         : TDunn 12/30/2025 added setting plan check expiration date for 'online' submittals at Submittal Acceptance
+|         : TDunn 01/08/2026 Moved EV Charging scripting to individual WTUA scripts for Residential and Commercial
 |
 /---------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 
