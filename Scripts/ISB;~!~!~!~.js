@@ -164,4 +164,19 @@ if(allowInsp100s || allowInsp200s || allowInsp300s){
 	//aa.sendMail("noreply@placer.ca.gov", "eaftahi@placer.ca.gov", ccEmailAddrAdmin, "ISB Debug Results", debug);
 }
 
-
+// List of inspection to block:  914 TRPA Final, Final Inspection to Close Permit, 601 Final-Building.  May want to include 602 Final-Electrical, 603 Final-Plumbing, 604 Final-Mechanical
+if(matches(capStatus,"Issued - Revision Pending"))
+{
+	var blockFinalArray = new Array();
+	var commentStr = "";
+	var lkUpValue = "blockFinalFull";
+	blockFinalArray = lookup("InspectionBlockListOnRevision",lkUpValue).split(",");
+	logDebug("final array: " + blockFinalArray);
+	if(exists(inspType,blockFinalArray))
+	{
+		commentStr = "The " + inspType + " inspection cannot be scheduled when the Building Permt status is " + capStatus;
+		showMessage = true;
+		customComment(commentStr);
+		cancel = true;
+	}
+}
