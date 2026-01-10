@@ -79,7 +79,7 @@ if(publicUser)
 		/* Get email addresses */
 		var conArray = new Array(); 
 		vContactType = "Applicant"; 
-		vFromEmail = "noreply@placer.ca.gov";
+		vFromEmail = defaultFrom;
 		conArray = getContactArrayWithPrimary(capId); 
 		for (thisCon in conArray)
 		{		
@@ -123,10 +123,10 @@ if(publicUser)
 	}
 	catch(err)
 	{
-		aa.sendMail("noreply@placer.ca.gov", "tdunn@truepointsolutions.com", "", "Try catch: " + "PreApp Submitted Notice", err.message);
+		aa.sendMail(defaultFrom, "tdunn@truepointsolutions.com", "", "Try catch: " + "PreApp Submitted Notice", err.message);
 	}
 	
-	aa.sendMail("noreply@placer.ca.gov", "tdunn@truepointsolutions.com", "", "DEBUG: "+ "PreApp Submitted Notice", debug);
+	//aa.sendMail(defaultFrom, "tdunn@truepointsolutions.com", "", "DEBUG: "+ "PreApp Submitted Notice", debug);
 }
 
-//aa.sendMail("noreply@placer.ca.gov", "eaftahi@placer.ca.gov", "", "CTRCA PREAPP Debug - IT Req# 2095", debug);
+//aa.sendMail(defaultFrom, "eaftahi@placer.ca.gov", "", "CTRCA PREAPP Debug - IT Req# 2095", debug);
