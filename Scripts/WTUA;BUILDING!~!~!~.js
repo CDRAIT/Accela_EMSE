@@ -2372,7 +2372,7 @@ if(wfProcess == "BLD_20230501_MAIN")
 	// Create Revision Child Record
 	// Notes: created REVISION INFORMATION subgroup with 'Revision' alias, 'Last Revision Number' field, and 'hideRev' field to support this segment
 	
-	if(wfTask == "Inspections")
+	if(wfTask == "Inspection")
 	{
 		if(wfStatus == "Revisions")
 		{
