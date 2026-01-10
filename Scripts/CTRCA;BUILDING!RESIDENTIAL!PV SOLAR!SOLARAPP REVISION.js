@@ -188,42 +188,5 @@ if (parentCapString)
 	logDebug("Back from CTRCA_BUILDINGRESIDENTIALPVSOLAR12");
 }	
 
-sendResult = aa.sendMail("noreply@placer.ca.gov","tdunn@truepointsolutions.com","","Test: revision created " + newAltID, debug);
+//sendResult = aa.sendMail("noreply@placer.ca.gov","tdunn@govPath.tech","","Test: revision created " + newAltID, debug);
 
-//Function will copy all owners from source CAP (sCapID) to target CAP (tCapId)
-
-function copyOwnerTPS(sCapID, tCapID)
-{
-	var ownrReq = aa.owner.getOwnerByCapId(sCapID);
-	if(ownrReq.getSuccess())
-	{
-		var ownrObj = ownrReq.getOutput();
-		for (xx in ownrObj)
-		{
-			ownrObj[xx].setCapID(tCapID);
-			aa.owner.createCapOwnerWithAPOAttribute(ownrObj[xx]);
-			logDebug("Copied Owner: " + ownrObj[xx].getOwnerFullName())
-		}
-	}
-	else
-		logDebug("Error Copying Owner : " + ownrObj.getErrorType() + " : " + ownrObj.getErrorMessage());
-}
-
-// Custom functions
-//===================
-function addCalcValuation(occType,unitType,unitAmt,vVersion,vCapId)
-{
-	bVal = aa.finance.createBCalcValuatnScriptModel();
-	logDebug("unitType: " + unitType + "; occType: " + occType + "; unitAmt: " + unitAmt);
-	bVal.setAuditID("ADMIN"); 
-	bVal.setCapID(vCapId); 
-	bVal.setConTyp(unitType); 
-	bVal.setUnitValue(parseFloat(unitAmt)); 
-	bVal.setUseTyp(occType); 
-	bVal.setVersion(vVersion);
-
-	r = aa.finance.createBCalcValuatn(bVal);
-	
-	logDebug("Calculated Value is "+bVal.getTotalValue()); 
-
-}
