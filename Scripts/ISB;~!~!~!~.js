@@ -11,10 +11,14 @@
 | Notes   : TDunn 12/03/2021 updated scripting for cancelled or rescheduled inspection.
 |         : TDunn 01/10/2022 updated script to generate rescheduled notice from ISB event.
 |         : Abe   06/25/2024 IT Request# 1485 - New Building Inspection Flags/Conditions
-|         : TDunn 08/15/2025 added cancel for when status is Issued - Revision Pending
-|                
-/------------------------------------------------------------------------------------------------------*/
+|         : TDunn 01/11/2026 Restored cancel for when status is Issued - Revision Pending based on inspection type        
+/------------------------------------------------------------------------------------------------------------------*/
 
+if (matches(currentUserID,"JMCKENZI","TDUNN","EAFTAHI")) 
+{
+	showDebug = 1;
+}
+	
 var	appTypeString = "";
 var	appTypeArray = new Array();
 if(capId != null){
@@ -43,7 +47,7 @@ if(vEventName == "InspectionScheduleBefore") {
 	}
 }
 if(varUseInspInspector) {
-	var senderEmailAddr = "noreply@placer.ca.gov";
+	var senderEmailAddr = defaultFrom;
 	var emailAddrAdmin = "tdunn@truepointsolutions.com";
 	var ccEmailAddrAdmin = "";
 	var emailText = inspType + "; " + inspInspector + "; scheduled = " + checkInspectionResult(inspType,"Scheduled");
@@ -162,7 +166,7 @@ if(allowInsp100s || allowInsp200s || allowInsp300s){
 	logDebug("allowInsp100s = " + allowInsp100s);
 	logDebug("allowInsp200s = " + allowInsp200s);
 	logDebug("allowInsp300s = " + allowInsp300s);
-	//aa.sendMail("noreply@placer.ca.gov", "eaftahi@placer.ca.gov", ccEmailAddrAdmin, "ISB Debug Results", debug);
+	//aa.sendMail(defaultFrom, "eaftahi@placer.ca.gov", ccEmailAddrAdmin, "ISB Debug Results", debug);
 }
 
 // List of inspection to block:  914 TRPA Final, Final Inspection to Close Permit, 601 Final-Building.  May want to include 602 Final-Electrical, 603 Final-Plumbing, 604 Final-Mechanical
