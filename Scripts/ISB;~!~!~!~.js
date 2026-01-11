@@ -11,6 +11,7 @@
 | Notes   : TDunn 12/03/2021 updated scripting for cancelled or rescheduled inspection.
 |         : TDunn 01/10/2022 updated script to generate rescheduled notice from ISB event.
 |         : Abe   06/25/2024 IT Request# 1485 - New Building Inspection Flags/Conditions
+|         : TDunn 08/15/2025 added cancel for when status is Issued - Revision Pending
 |                
 /------------------------------------------------------------------------------------------------------*/
 
