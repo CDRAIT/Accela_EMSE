@@ -11,7 +11,9 @@
 | Notes   : TDunn 12/03/2021 updated scripting for cancelled or rescheduled inspection.
 |         : TDunn 01/10/2022 updated script to generate rescheduled notice from ISB event.
 |         : Abe   06/25/2024 IT Request# 1485 - New Building Inspection Flags/Conditions
-|         : TDunn 01/11/2026 Restored cancel for when status is Issued - Revision Pending based on inspection type        
+|         : TDunn 01/11/2026 Restored cancel for when status is Issued - Revision Pending based on inspection type  
+|         : TDunn 01/11/2026 added cancel for scheduling attempt on Revisions and Deferred Submittals.  
+|     
 /------------------------------------------------------------------------------------------------------------------*/
 
 if (matches(currentUserID,"JMCKENZI","TDUNN","EAFTAHI")) 
@@ -184,4 +186,12 @@ if(matches(capStatus,"Issued - Revision Pending"))
 		customComment(commentStr);
 		cancel = true;
 	}
+}
+// Prohibit scheduling inspections on Revisons and Deferred Submittals
+if(matches(appTypeArray[1],"Revision","Deferred Submittal"))
+{
+	messageStr = "Scheduling an inspection  on a " + appTypeArray[1] + " is not allowed. Please schedule all inspections on the parent permit."
+	showMessage = true;
+	customComment(messageStr);
+	cancel = true;
 }
