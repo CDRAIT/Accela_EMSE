@@ -11,6 +11,7 @@
 | Notes   : TDunn 12/03/2021 updated scripting for cancelled or rescheduled inspection.
 |         : TDunn 01/10/2022 updated script to generate rescheduled notice from ISB event.
 |         : Abe   06/25/2024 IT Request# 1485 - New Building Inspection Flags/Conditions
+|         : TDunn 08/15/2025 added cancel for when status is Issued - Revision Pending
 |                
 /------------------------------------------------------------------------------------------------------*/
 
@@ -164,4 +165,19 @@ if(allowInsp100s || allowInsp200s || allowInsp300s){
 	//aa.sendMail("noreply@placer.ca.gov", "eaftahi@placer.ca.gov", ccEmailAddrAdmin, "ISB Debug Results", debug);
 }
 
-
+// List of inspection to block:  914 TRPA Final, Final Inspection to Close Permit, 601 Final-Building.  May want to include 602 Final-Electrical, 603 Final-Plumbing, 604 Final-Mechanical
+if(matches(capStatus,"Issued - Revision Pending"))
+{
+	var blockFinalArray = new Array();
+	var commentStr = "";
+	var lkUpValue = "blockFinalFull";
+	blockFinalArray = lookup("InspectionBlockListOnRevision",lkUpValue).split(",");
+	logDebug("final array: " + blockFinalArray);
+	if(exists(inspType,blockFinalArray))
+	{
+		commentStr = "The " + inspType + " inspection cannot be scheduled when the Building Permt status is " + capStatus;
+		showMessage = true;
+		customComment(commentStr);
+		cancel = true;
+	}
+}
