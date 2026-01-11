@@ -13,7 +13,8 @@
 |         : Abe   06/25/2024 IT Request# 1485 - New Building Inspection Flags/Conditions
 |         : TDunn 11/02/2024 converted main EMSE 2.0 ISB:Building and disabled standard choice
 |         : TDunn 11/02/2024 added DPW Inspection schedule stop conditions
-          : TDunn 01/11/2026 deployed to nonprod1
+|         : TDunn 01/11/2026 deployed to nonprod1
+|         : TDunn 01/11/2026 added logic to stop inspection scheduling on Revisions and Deferred Submittals		  
 |                
 /------------------------------------------------------------------------------------------------------*/
 
@@ -272,5 +273,13 @@ if(allowInsp100s || allowInsp200s || allowInsp300s){
 	logDebug("allowInsp100s = " + allowInsp100s);
 	logDebug("allowInsp200s = " + allowInsp200s);
 	logDebug("allowInsp300s = " + allowInsp300s);
-	aa.sendMail("noreply@placer.ca.gov", "eaftahi@placer.ca.gov", ccEmailAddrAdmin, "ISB Debug Results", debug);
+	//aa.sendMail("noreply@placer.ca.gov", "eaftahi@placer.ca.gov", ccEmailAddrAdmin, "ISB Debug Results", debug);
+}
+
+if(matches(appTypeArray[1],"Revision","Deferred Submittal"))
+{
+	messageStr = "Scheduling an inspection  on a " + appTypeArray[1] + " is not allowed. Please schedule all inspections on the parent permit."
+	showMessage = true;
+	customComment(messageStr);
+	cancel = true;
 }
