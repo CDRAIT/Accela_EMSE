@@ -215,7 +215,7 @@ if(matches(wfProcess,"BLD_20181201_DISTRIBUTION","BLD_20181201_MAIN","BLD_202305
 {
 	if(matches(wfTask,"Inspections","Inspection"))
 	{
-		if(wfStatus == "Revisions")
+		if(wfStatus == "Revisions" && matches(capStatus,"Issued"))
 		{
 			logDebug("Inside creating revision child record");
 			var recName = "Building Permit Revision for " + capIDString;
@@ -247,9 +247,11 @@ if(matches(wfProcess,"BLD_20181201_DISTRIBUTION","BLD_20181201_MAIN","BLD_202305
 			
 			copyOwnerTPS(pCapId,cCapId);
 			var assignedTo = getAssignedToStaff(pCapId); 
-			if(assignedTo != null && assignedTo != "") {
-				assignCap(assignedTo,cCapId);
-			}
+			// Auto assign and set due date for Submittal Review
+			capId = cCapId;			
+			assignTask("Submittal Review","CDRA_UNASSIGNED","BLD_20231116_REV");
+			editTaskDueDate("Submittal Review",dateAdd(null,2,"Y"),"BLD_20231116_REV");
+			capId = pCapId;
 			copyAddresses(pCapId,cCapId);
 			copyParcels(pCapId,cCapId);
 			updateAppStatus("Issued - Revision Pending", "Revision " + formatRevNumber(revNumber) + " created by staff. Updated by Script", capId)
@@ -312,8 +314,9 @@ if(matches(wfProcess,"BLD_20181201_DISTRIBUTION","BLD_20181201_MAIN","BLD_202305
 			}
 		}
 		// Inspections/Deferred Submittal: Create Deferred from parent record by Staff
-		if(wfStatus == "Deferred Submittal")
+		if(wfStatus == "Deferred Submittal" && matches(capStatus,"Issued","Issued - Revision Pending"))
 		{
+			
 			logDebug("Inside creating deferred submittal child record");
 			var recName = "Building Permit Deferred Submittal for " + capIDString;
 			var cCapId = createChild("Building","Deferred Submittal","NA","NA",recName); 
@@ -342,10 +345,11 @@ if(matches(wfProcess,"BLD_20181201_DISTRIBUTION","BLD_20181201_MAIN","BLD_202305
 			logDebug("Child AltID = " + newAltID);
 			
 			copyOwnerTPS(pCapId,cCapId);
-			var assignedTo = getAssignedToStaff(pCapId); 
-			if(assignedTo != null && assignedTo != "") {
-				assignCap(assignedTo,cCapId);
-			}
+			// Auto assign and set due date for Submittal Review
+			capId = cCapId;			
+			assignTask("Submittal Review","CDRA_UNASSIGNED","BLD_DEFERRED_20240710");
+			editTaskDueDate("Submittal Review",dateAdd(null,2,"Y"),"BLD_DEFERRED_20240710");
+			capId = pCapId;
 			copyAddresses(pCapId,cCapId);
 			copyParcels(pCapId,cCapId);	
 			editAppSpecific("Project Office",getAppSpecific("Project Office",pCapId),cCapId);
