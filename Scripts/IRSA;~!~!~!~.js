@@ -100,7 +100,8 @@ if(matches(vEventName,"InspectionResultModifyAfter"))
 		//IT Req# 2981
 		if (isTRPA) {
 			if (inspType == "914 TRPA Final" && (inspResult == "FINALPASS" || inspResult == "Final Pass" || inspResult == "PASS" || inspResult == "Pass"))
-				if (feeExistsbynotes('TTSECURITY', capIDString)) {
+				if (feeExists('TTSECURITY')) {
+					logDebug(feeExists('TTSECURITY'));
 					sendTRPARelease();
 				}
 		}
@@ -243,7 +244,8 @@ if(matches(vEventName,"InspectionResultSubmitAfter","V360InspectionResultSubmitA
 		//IT Req# 2981
 		if (isTRPA) {
 			if (inspType == "914 TRPA Final" && (inspResult == "FINALPASS" || inspResult == "Final Pass" || inspResult == "PASS" || inspResult == "Pass"))
-				if (feeExistsbynotes('TTSECURITY', capIDString)) {
+				if (feeExists('TTSECURITY')) {
+					logDebug(feeExists('TTSECURITY'));
 					sendTRPARelease();
 				}
 		}
@@ -553,4 +555,5 @@ function lookup(stdChoice,stdValue)
 		logDebug("lookup(" + stdChoice + "," + stdValue + ") does not exist");
 		}
 	return strControl;
+
 }
