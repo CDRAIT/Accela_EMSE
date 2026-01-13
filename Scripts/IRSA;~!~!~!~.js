@@ -34,6 +34,7 @@ if (matches(currentUserID,"JMCKENZI","TDUNN","EAFTAHI"))
 // Initialize appTypeArray for conditional branching
 var	appTypeString = "";
 var	appTypeArray = new Array();
+var capIDString = "";
 if(capId != null){
 	capIDString = capId.getCustomID();
 	cap = aa.cap.getCap(capId).getOutput();
