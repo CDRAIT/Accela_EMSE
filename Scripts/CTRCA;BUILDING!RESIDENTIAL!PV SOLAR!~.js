@@ -114,7 +114,7 @@ if(appTypeArray[3] == "Solar App")
 	logDebug("Back from CTRCA_BUILDINGRESIDENTIALPVSOLAR12");	
 
 }
-var sendResult = aa.sendMail(defaultFrom,"tdunn@truepointsolutions.com", "", "Testing CTRCA SolarApp script in Prod", debug);	
+//var sendResult = aa.sendMail(defaultFrom,"tdunn@truepointsolutions.com", "", "Testing CTRCA SolarApp script in Prod", debug);	
 
 
 function delay(ms) {
