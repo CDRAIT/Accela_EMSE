@@ -72,6 +72,7 @@ if(matches(wfProcess,"BLD_20181201_DISTRIBUTION","BLD_20181201_MAIN","BLD_202305
 {
 	if(matches(wfTask,"Inspections","Inspection"))
 	{
+		logDebug("Permit status is " + capStatus);
 		if(wfStatus == "Revisions" && capStatus == "Issued")
 		{
 			logDebug("Inside creating revision child record");
