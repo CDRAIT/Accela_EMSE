@@ -23,6 +23,7 @@
 |         : TDunn 08/29/2025 copied to Non-prod1
 |         : TDunn 08/29/2025 added two service request by Abe
 |         : TDunn 08/29/2025 deployed to Github
+|         : Abe   01/13/2026 Added TRPARelease to the Buildings with isTRPA= True (IT Req# 2981)
 | 
 /-----------------------------------------------------------------------------------------------------------------*/
 if (matches(currentUserID,"JMCKENZI","TDUNN","EAFTAHI")) 
@@ -94,6 +95,16 @@ if(matches(vEventName,"InspectionResultModifyAfter"))
 			sendElecUtilRelease();
 		}
 		//End of IT Req# 2504	
+
+		//IT Req# 2981
+		if (isTRPA) {
+			if (inspType == "914 TRPA Final" && (inspResult == "FINALPASS" || inspResult == "Final Pass" || inspResult == "PASS" || inspResult == "Pass"))
+				if (feeExists('TTSECURITY')) {
+					logDebug(feeExists('TTSECURITY'));
+					sendTRPARelease();
+				}
+		}
+		//End of IT req# 2981
 
 		if (inspResult != "") 
 		{
@@ -227,7 +238,18 @@ if(matches(vEventName,"InspectionResultSubmitAfter","V360InspectionResultSubmitA
 		{
 			sendElecUtilRelease();
 		}
-		//End of IT Req# 2504		
+		//End of IT Req# 2504	
+
+		//IT Req# 2981
+		if (isTRPA) {
+			if (inspType == "914 TRPA Final" && (inspResult == "FINALPASS" || inspResult == "Final Pass" || inspResult == "PASS" || inspResult == "Pass"))
+				if (feeExists('TTSECURITY')) {
+					logDebug(feeExists('TTSECURITY'));
+					sendTRPARelease();
+				}
+		}
+		//End of IT req# 2981
+		
 		if(isTRPA)
 		{
 			if(inspType == "911 TRPA Pre-Grade" && (inspResult == "Pass" || inspResult == "Final Pass"))
@@ -532,4 +554,5 @@ function lookup(stdChoice,stdValue)
 		logDebug("lookup(" + stdChoice + "," + stdValue + ") does not exist");
 		}
 	return strControl;
+
 }
