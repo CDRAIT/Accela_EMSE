@@ -2043,7 +2043,7 @@ if(matches(appTypeArray[1],"Revision") && wfProcess == "BLD_20231116_REV")
 			
 					if (docsToMove.length > 0) {
 						for (docItem = 0; docItem< docsToMove.length; docItem++) {
-							mvRslt = moveDoc(docsToMove[docItem], pCapId, newStatus, newDescription);
+							//mvRslt = moveDoc(docsToMove[docItem], pCapId, newStatus, newDescription);
 
 							if(mvRslt == 1) logDebug("<font color='blue'>" + docsToMove[docItem].getDocumentNo() + " Doc Moved to " + pCapId.getCustomID() + "</font>");
 					
