@@ -48,7 +48,8 @@
 |         : TDunn  10/02/2025 added new ESD Improvement plan notification
 |         : TDunn  10/23/2025 modified fees to parent wfStatus criteria to just 'Payment Requested'
 |         : TDunn 12/17/2025 added updating Plan Check Type ASI based on Building Plan Check TSI 'Plan Check Type Override' value
-||        : TDunn 12/18/2025 added new trigger to adding Sewer Permit Issuance on scope = SFD Production
+|         : TDunn 12/18/2025 added new trigger to adding Sewer Permit Issuance on scope = SFD Production
+|         : TDunn 01/14/2026 reenabled the moveDoc function after McKenzie restored it to Includes_Custom
 | 
 /---------------------------------------------------------------------------------------------------------------------------------*/
 
@@ -2043,7 +2044,7 @@ if(matches(appTypeArray[1],"Revision") && wfProcess == "BLD_20231116_REV")
 			
 					if (docsToMove.length > 0) {
 						for (docItem = 0; docItem< docsToMove.length; docItem++) {
-							//mvRslt = moveDoc(docsToMove[docItem], pCapId, newStatus, newDescription);
+							mvRslt = moveDoc(docsToMove[docItem], pCapId, newStatus, newDescription);
 
 							if(mvRslt == 1) logDebug("<font color='blue'>" + docsToMove[docItem].getDocumentNo() + " Doc Moved to " + pCapId.getCustomID() + "</font>");
 					
