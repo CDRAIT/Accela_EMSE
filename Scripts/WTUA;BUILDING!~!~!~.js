@@ -100,6 +100,8 @@
 |         : TDunn 12/17/2025 added updating Plan Check Type ASI based on Building Plan Check TSI 'Plan Check Type Override' value
 |         : TDunn 12/18/2025 added new trigger to adding Sewer Permit Issuance on scope = SFD Production
 |         : TDunn 12/30/2025 added setting plan check expiration date for 'online' submittals at Submittal Acceptance
+|         : TDunn 01/09/2026 simplified rules for Pre-check criteria for precheck distribution versus plan review Distribution
+|         : TDunn 01/10/2026 moved staff creation of Revisions and Deferred to WTUA:Building 'Residential' and 'Commercial scripts
 |
 /---------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 
@@ -2005,12 +2007,7 @@ if(wfProcess == "BLD_20230501_MAIN")
 			// createNotificationTPS2("SIG_REQUEST","Y","Applicant,Owner","N","","N","N","N","Y","N","N","");
 		
 	}
-	/*----------------------------------------------------------
-	|  Added Revision child process to WTUA:Building/ 10/28/2023
-	/-----------------------------------------------------------*/
-	// Inspections phase-Revisions
-	// Create Revision Child Record
-	// Notes: created REVISION INFORMATION subgroup with 'Revision' alias, 'Last Revision Number' field, and 'hideRev' field to support this segment
+
 	
 	if(wfTask == "Inspections")
 	{
