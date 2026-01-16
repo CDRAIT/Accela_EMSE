@@ -1347,7 +1347,7 @@ if(wfProcess == "BLD_20230501_MAIN")
 	}
 	
 	// Special Actions for individual review tasks
-	//==============================================
+	//==========================================================================
 	
 	// Stormwater and Floodplain Review actions --------------------------------
 	if(matches(wfTask,"Stormwater and Floodplain Review"))
@@ -1429,6 +1429,24 @@ if(wfProcess == "BLD_20230501_MAIN")
 			
 		}
 		useTaskSpecificGroupName = false;
+	}
+	
+	// Update Assigned To for all tasks with initial generic staff default assignment ----------------------
+	/*  Designated defaults to update: CDRA_UNASSIGED,APCD_UNASSIGNED,PLN_UNASSIGNED_COUNTER,PLN_UNASSIGNED_BACKOFFICE,DPW_UNASSIGNED,STORMWATER_UNASSIGNED  */
+	
+	logDebug("Action by is " + wfActionByUserID);
+	var currAssigned = getTaskAssignUser(wfTask,wfProcess);
+	logDebug("Assigned to: " + currAssigned)
+	var dAssignListArray = new Array();
+	dAssignList = lookup("SDL:DefaultAssignmentArray", "Building"); //List of default generic staff for auto-assignment
+	dAssignListArray = dAssignList.split(",");
+	for(dal in dAssignListArray)
+	{
+		dAssigned = dAssignListArray[dal];
+		if(dAssigned == currAssigned)
+		{
+			assignTask(wfTask,wfActionByUserID,wfProcess);
+		}
 	}
 	
 	// Rules for updating Dist Recon task when all Plan Review tasks are complete
