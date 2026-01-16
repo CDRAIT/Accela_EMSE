@@ -576,7 +576,7 @@ try {
 
 		if(appMatch("Building/Revision/*/*")) {
 			documentGroupforDPC = "BLD_PLANREVIEW_DPC";
-			//if(AInfo["Replacing Plan Sheets"] == "Yes") rDocTypes.push("Plans");			
+			if(matches(AInfo["Replacing Plan Sheets"],"Yes","Y","YES")) rDocTypes.push("Plans");			
 		}
 
 		if(appMatch("Building/Deferred Submittal/*/*")) {
