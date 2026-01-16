@@ -87,6 +87,7 @@ if(matches(appTypeArray[1],"Revision") && wfProcess == "BLD_20231116_REV")
 	var closureStaff = "CDRA_UNASSIGNED";
 	var pfiStaff = "CDRA_UNASSIGNED";
 	var defaultStaff = "";
+	var cdrEmail = "OnlineBLDPermits@placer.ca.gov";	
 	var stmTemplate = "TASK_REVIEW_STMWTR";
 	var apcdTemplate = "TASK_REVIEW_APCD";
 	var arpTemplate = "NOTICE_BLD_ADDITIONAL_PERMIT_REQUIRED"	
