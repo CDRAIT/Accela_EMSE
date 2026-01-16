@@ -49,7 +49,19 @@ logDebug("parentCapString= " + parentCapString);
 
 var saveCap = cap; 
 cap = aa.cap.getCap(parentCapString).getOutput();
-if (parentCapString) {
+if (parentCapString) 
+{
+	try
+	{
+		var capGroup = cap.getCapType().getGroup(); // Cap Type Group
+		var capPerType = cap.getCapType().getType(); // Cap Per Type Group
+		var capSubType = cap.getCapType().getSubType(); //
+		logDebug("Group: " + capGroup + "; Type: " + capPerType + "; SubType: " + capSubType);
+		editAppSpecific("Parent Record Type",capPerType);
+	}
+	catch (err) {
+		logDebug("A JavaScript Error occured retrieving parent type: " + err.message + " at line " + err.lineNumber + " stack: " + err.stack);
+	}	
 	pCapIdSplit = String(parentCapString).split("-"); 
 	pCapId = aa.cap.getCapID(pCapIdSplit[0],pCapIdSplit[1],pCapIdSplit[2]).getOutput(); 
 	pCapIDString = pCapId.getCustomID(); 
@@ -147,7 +159,6 @@ if(publicUser) {
 	editAppSpecific("RequiredDocumentTypes","");
 }
 
+sendResult = aa.sendMail("noreply@placer.ca.gov","tdunn@govPath.tech","","Test: revision created " + newAltID, debug);
 
-sendResult = aa.sendMail("noreply@placer.ca.gov","tdunn@truepointsolutions.com","","Test: revision created " + newAltID, debug);
-
-aa.sendMail("noreply@placer.ca.gov","mckenzie@truepointsolutions.com", "", "PLACERCO CTRCA Revisions ", debug);	
+//aa.sendMail("noreply@placer.ca.gov","mckenzie@truepointsolutions.com", "", "PLACERCO CTRCA Revisions ", debug);	
