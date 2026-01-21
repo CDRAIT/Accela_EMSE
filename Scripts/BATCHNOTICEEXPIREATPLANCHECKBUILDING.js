@@ -19,6 +19,7 @@
 | 
 | Updates: TDunn 12/27/2023 Updated record status action.  Added app category variables
 |          TDunn 02/01/2024 revised rules for Prime LP, not limited to Contractors and no LP email if no prime
+|          Abe   01/21/2026 added new status to the  paramsAppStatusArray, DPC-related statuses 
 |
 /------------------------------------------------------------------------------------------------------*/
 /*------------------------------------------------------------------------------------------------------/
@@ -96,7 +97,7 @@ var paramsAppGroup = "Building";
 var paramsAppPerTypeArray = new Array("Residential","Commercial");
 var paramsAppSubTypeArray = new Array("Full Review", "Limited");
 var paramsAppCategoryArray = new Array("Not Used");
-var paramsAppStatusArray = new Array("Expired", "Construction Complete", "Void", "Withdrawn", "DONE", "CANC", "Issued");
+var paramsAppStatusArray = new Array("Expired", "Construction Complete", "Void", "Withdrawn", "DONE", "CANC", "Issued", "Issued - Awaiting Signature", "Issued - Revision Pending");
 // Parameter variables data
 var paramsAppSubGroupName = "EXTENSIONS AND EXPIRATION";                     	// Application Spec Info Subgroup Name that the ASI field is associated to.
 var paramsAppSpecInfoLabel = "Plan Check Expiration";                           // ASI field name that the batch script is to search.

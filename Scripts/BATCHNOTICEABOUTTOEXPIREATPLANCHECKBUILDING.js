@@ -20,6 +20,7 @@
 | Updates: TDunn 12/27/2023 
 |          TDunn 01/23/2024 updated call for Prime LP
 |          TDunn 02/01/2024 updated LP email rules, added numDays loop to run batch twice against multiple expiration dates
+|          Abe   01/21/2026 added new status to the  paramsAppStatusArray, DPC-related statuses 
 |
 /------------------------------------------------------------------------------------------------------*/
 /*------------------------------------------------------------------------------------------------------/
@@ -97,7 +98,7 @@ var paramsAppGroup = "Building";
 var paramsAppPerTypeArray = new Array("Residential","Commercial");
 var paramsAppSubTypeArray = new Array("Full Review", "Limited");
 var paramsAppCategoryArray = new Array("Not Used");
-var paramsAppStatusArray = new Array("Expired", "Construction Complete", "Void", "Withdrawn", "DONE", "CANC", "Issued");
+var paramsAppStatusArray = new Array("Expired", "Construction Complete", "Void", "Withdrawn", "DONE", "CANC", "Issued", "Issued - Awaiting Signature", "Issued - Revision Pending");
 // Parameter variables data
 var startDate = 60;
 var endDate = 60;
