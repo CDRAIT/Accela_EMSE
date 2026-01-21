@@ -20,7 +20,8 @@
 | Updates: TDunn 12/27/2023 
 |          TDunn 01/23/2024 updated call for Prime LP
 |          TDunn 02/01/2024 updated LP email rules, added numDays loop to run batch twice against multiple expiration dates
-|          Abe   01/21/2026 added new status to the  paramsAppStatusArray, DPC-related statuses 
+|          Abe   01/21/2026 added new status to the  paramsAppStatusArray, DPC-related statuses
+|          Abe   01/21/2026 added  INCLUDES_CUSTOM_GLOBALS and "defaultFrom" global variable
 |
 /------------------------------------------------------------------------------------------------------*/
 /*------------------------------------------------------------------------------------------------------/
@@ -33,6 +34,7 @@ var documentOnly = false;
 eval(getScriptText("INCLUDES_ACCELA_FUNCTIONS", "PLACERCO", useCustomScriptFile));
 eval(getScriptText("INCLUDES_ACCELA_GLOBALS", "PLACERCO", useCustomScriptFile));
 eval(getScriptText("INCLUDES_CUSTOM", "PLACERCO", useCustomScriptFile));
+eval(getScriptText("INCLUDES_CUSTOM_GLOBALS", "PLACERCO", useCustomScriptFile));
 
 if (documentOnly) {
     doStandardChoiceActions(controlString, false, 0);
@@ -80,7 +82,7 @@ var capId;
 // Variable used to hold the Cap Id value.
 
 // email parameters for batch results, must be added to batch job.  
-var senderEmailAddr = "noreply@placer.ca.gov";                                  // Email address of the sender
+var senderEmailAddr = defaultFrom;                                              // Email address of the sender
 //var emailAddrAdmin = getParam("emailAddrAdmin");                              // This must be added to batch job parameters. 
 //var ccEmailAddrAdmin = getParam("ccEmailAddrAdmin");                          // This must be added to batch job parameters. 
 //var emailAddrAdmin = "tdunn@truepointsolutions.com";
@@ -201,7 +203,7 @@ function aboutToExpirePermit() {
         if (capGroup == paramsAppGroup && exists(capPerType, paramsAppPerTypeArray) && !exists(capStatus, paramsAppStatusArray)) 
 		{
 			aa.print("Category type: " + capPerCategory + ", record number = " + capIDString + ". Expiration date: " + permitExpireDate + ". Cap status: " + capStatus);
-			var vFromEmail = "noreply@placer.ca.gov";
+			var vFromEmail = defaultFrom;
 			var vToEmail = "";
 			var vCcEmail = "";
 			var cTypeArray = new Array();
