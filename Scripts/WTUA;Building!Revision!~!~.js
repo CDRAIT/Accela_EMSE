@@ -50,6 +50,7 @@
 |         : TDunn 12/17/2025 added updating Plan Check Type ASI based on Building Plan Check TSI 'Plan Check Type Override' value
 |         : TDunn 12/18/2025 added new trigger to adding Sewer Permit Issuance on scope = SFD Production
 |         : TDunn 01/14/2026 reenabled the moveDoc function after McKenzie restored it to Includes_Custom
+|         : TDunn 01/22/2026 added test for null for FIREINSP parcel attribut 
 | 
 /---------------------------------------------------------------------------------------------------------------------------------*/
 
@@ -146,7 +147,7 @@ if(matches(appTypeArray[1],"Revision") && wfProcess == "BLD_20231116_REV")
 	var doStormFloodNotice = false;	
 	var stmfldFlag = "NA";
 	var isPlacerFire = false;
-	var fDistrict = "";
+	var fDistrict = "NA";
 	var comFire = false;
 	var isDriveway = false;								   												  
 	if(matches(AInfo["Project Office"],"Auburn")) { tahoeFlag = true; }
@@ -154,8 +155,8 @@ if(matches(appTypeArray[1],"Revision") && wfProcess == "BLD_20231116_REV")
 
 	if(!matches(AInfo["ParcelAttribute.TRPA"],null,undefined,false)) { trpaFlag = AInfo["ParcelAttribute.TRPA"]; }
 	if(!matches(AInfo['ParcelAttribute.STRFLOODPLAIN'],null,undefined,false)) { stmfldFlag = AInfo['ParcelAttribute.STRFLOODPLAIN']; }
+	if(!matches(AInfo["ParcelAttribute.FIREINSP"],null,undefined,false,"")) { fDistrict = AInfo["ParcelAttribute.FIREINSP"]; }			
 	logDebug("TRPA flag = " + trpaFlag + "; Real Estate flag = " + reFlag + "; Storm/Floodplain flag = " + stmfldFlag);
-	fDistrict = AInfo["ParcelAttribute.FIREINSP"];
 	logDebug("Fire District = " + fDistrict);
 	if(fDistrict.indexOf("Placer County Fire") > -1)
 	{
