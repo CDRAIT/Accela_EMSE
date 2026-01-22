@@ -102,6 +102,7 @@
 |         : TDunn 12/30/2025 added setting plan check expiration date for 'online' submittals at Submittal Acceptance
 |         : TDunn 01/09/2026 simplified rules for Pre-check criteria for precheck distribution versus plan review Distribution
 |         : TDunn 01/10/2026 moved staff creation of Revisions and Deferred to WTUA:Building 'Residential' and 'Commercial scripts
+|         : TDunn 01/22/2026 added test for null for the FIREINSP parcel attribute
 |
 /---------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 
@@ -229,7 +230,7 @@ if(wfProcess == "BLD_20230501_MAIN")
 	var sentStormNotice = false;
 	var stmfldFlag = "NA";
 	var isPlacerFire = false;
-	var fDistrict = "";
+	var fDistrict = "NA";
 	var comFire = false;
 	var isDriveway = false;
 	var dwSlope = getAppSpecific("Slope of Driveway");
@@ -239,8 +240,8 @@ if(wfProcess == "BLD_20230501_MAIN")
 	if(!matches(AInfo["ParcelAttribute.COUNTYPROP"],null,undefined,false)) { reFlag = AInfo["ParcelAttribute.COUNTYPROP"]; }	
 	if(!matches(AInfo["ParcelAttribute.TRPA"],null,undefined,false)) { trpaFlag = AInfo["ParcelAttribute.TRPA"]; }
 	if(!matches(AInfo['ParcelAttribute.STRFLOODPLAIN'],null,undefined,false)) { stmfldFlag = AInfo['ParcelAttribute.STRFLOODPLAIN']; }
+	if(!matches(AInfo["ParcelAttribute.FIREINSP"],null,undefined,false,"")) { fDistrict = AInfo["ParcelAttribute.FIREINSP"]; }		
 	logDebug("TRPA flag = " + trpaFlag + "; Real Estate flag = " + reFlag + "; Storm/Floodplain flag = " + stmfldFlag);
-	fDistrict = AInfo["ParcelAttribute.FIREINSP"];
 	logDebug("Fire District = " + fDistrict);
 	if(fDistrict.indexOf("Placer County Fire") > -1)
 	{
