@@ -70,7 +70,7 @@ if (appTypeArray[2] == "Limited")
 
 if(matches(wfProcess,"BLD_20181201_DISTRIBUTION","BLD_20181201_MAIN","BLD_20230501_MAIN"))
 {
-	if(matches(wfTask,"Inspections","Inspection") && !matches(appTypeArray[2],"Master < 3000","Master > 3000"))
+	if(matches(wfTask,"Inspections","Inspection") && !matches(appTypeArray[3],"Master < 3000","Master > 3000"))
 	{
 		if(wfStatus == "Revisions")
 		{
@@ -261,7 +261,7 @@ if(matches(wfProcess,"BLD_20181201_DISTRIBUTION","BLD_20181201_MAIN","BLD_202305
 			}
 		}
 	}
-	if(matches(appTypeArray[2],"Master < 3000","Master > 3000"))
+	if(matches(appTypeArray[3],"Master < 3000","Master > 3000"))
 	{
 		if(wfTask == "Inspections" && wfStatus == "Revisions" && appTypeArray[3] != "Revision")
 		{
