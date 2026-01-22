@@ -1,4 +1,4 @@
-/*------------------------------------------------------------------------------------------------------/
+/*--------------------------------------------------------------------------------------------------------------------------------------------------/
 | Program : WTUA;Building!Residential!~!~
 | Event   : WorkflowTaskUpdateAfter
 |
@@ -12,6 +12,7 @@
 |         : TDunn 12/30/2025 updated criteria for setting Plan Check Expiration
 |         : TDunn 01/07/2026 added additional 20181201 processes to criteria for running code
 |         : TDunn 01/10/2026 moved Revision and Deferred submittal creation from parent from WTUA:Building here
+|         : TDunn 01/22/2026 updated Revisions to use the new 'Master/Revision' for the legacy Master < 3000 and > 3000 plan check only record types.
 |
 /---------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 
@@ -70,7 +71,7 @@ if (appTypeArray[2] == "Limited")
 
 if(matches(wfProcess,"BLD_20181201_DISTRIBUTION","BLD_20181201_MAIN","BLD_20230501_MAIN"))
 {
-	if(matches(wfTask,"Inspections","Inspection"))
+	if(matches(wfTask,"Inspections","Inspection") && !matches(appTypeArray[3],"Master < 3000","Master > 3000"))
 	{
 		logDebug("Permit status is " + capStatus);
 		if(wfStatus == "Revisions" && capStatus == "Issued")
@@ -266,5 +267,97 @@ if(matches(wfProcess,"BLD_20181201_DISTRIBUTION","BLD_20181201_MAIN","BLD_202305
 			}
 		}
 	}
+	if(matches(appTypeArray[3],"Master < 3000","Master > 3000"))
+	{
+		if(wfTask == "Inspections" && wfStatus == "Revisions" && capStatus == "Issued" && appTypeArray[3] != "Revision")
+		{
+			logDebug("Inside creating revision child record");
+			var recName = "Master Plan Revision for " + capIDString;
+			var cCapId = createChild("Building","Residential","Master","Revision",recName); 
+			var pCapId = capId;
+			var newAltID = "";
+			var childExt = "-REV";
+			var NewSn = getShortNotes(pCapId);
+			var pWorkDesc = workDescGet(pCapId);
+			// Initialize Last Rev number if null
+			if(matches(AInfo["Last Revision Number"],null,"")) 
+			{
+				editAppSpecific("Last Revision Number",0);
+				AInfo["Last Revision Number"] = 0;
+			}
+			var revNumber = 1 * AInfo["Last Revision Number"];
+
+			logDebug("Child Type is :"+ childExt);
+			revNumber = revNumber + 1;
+			logDebug("Rev Number is " + revNumber);
+			editAppSpecific("Last Revision Number",revNumber);
+			var parentID = capIDString;
+			logDebug("Current Record Number is " + parentID);
+			// newAltID = capIDString + childExt + String(revNumber);
+			newAltID = capIDString + childExt + formatRevNumber(revNumber);
+			
+			aa.cap.updateCapAltID(cCapId, newAltID);	
+			logDebug("Child AltID = " + newAltID);
+			
+			// copyOwnerTPS(pCapId,cCapId);
+			var assignedTo = getAssignedToStaff(pCapId); 
+			if(assignedTo != null && assignedTo != "") {
+				assignCap(assignedTo,cCapId);
+			}
+			// copyAddresses(pCapId,cCapId);
+			// copyParcels(pCapId,cCapId);
+			updateAppStatus("Approved - Revision Pending", "Revision " + formatRevNumber(revNumber) + " created by staff. Updated by Script", capId);
+			
+			editAppSpecific("Project Office",getAppSpecific("Project Office",pCapId),cCapId);
+			editAppSpecific("Type of Work",getAppSpecific("Type of Work",pCapId),cCapId);
+			editAppSpecific("Scope of Work",getAppSpecific("Scope of Work",pCapId),cCapId);	
+			editAppSpecific("Plan Check Type",getAppSpecific("Plan Check Type",pCapId),cCapId);
+			copyContacts(pCapId,cCapId);
+
+			// Create notification to applicant for new Revision record created
+			var vEmailTemplate = "ONLINE_PERMIT_AMENDMENT_SUBMITTED";
+			var vEmailSent = false;
+			var vFromEmail = "";
+			var vToEmail = "";
+			var vCcEmail = "";
+			var pCapIDString = capIDString;
+			var emailParameters = aa.util.newHashtable();
+
+			// Load parameters for notification
+			addParameter(emailParameters,"$$parentAltId$$",pCapIDString);
+			addParameter(emailParameters,"$$childaltID$$",newAltID);
+			addParameter(emailParameters,"$$recNameParam$$",recName);
+			addParameter(emailParameters,"$$amendType$$","Revision");
+			addParameter(emailParameters,"$$projectoffice$$", getAppSpecific("Project Office", pCapId));
+			addParameter(emailParameters,"$$scopeOfWork$$",getAppSpecific("Scope of Work",pCapId));
+
+			// Parameters returned by getRecordParameters4Notification: $$altID$$; $$capName$$; $$capStatus$$; $$fileDate$$; $$workDesc$$; $$balanceDue$$; $$capTypeAlias$$
+			getRecordParams4Notification(emailParameters); 
+			// getPrimaryAddressLineParam4Notification(emailParameters); /* returns $$addressLine$$ parameter */
+			addParameter(emailParameters,"$$addressLine$$","plan Check Only, no associated address");
+			/* Get To email contact types */
+			var cTypeArray = ["Applicant","Owner"];
+
+			/* Get To emails for contacts */
+			var conArray = new Array();
+			conArray = getContactArrayWithPrimary(capId); 
+			for (thisCon in conArray) {
+				if (exists(conArray[thisCon]["contactType"],cTypeArray)) {
+					logDebug(conArray[thisCon]["contactType"]) ;
+					getContactParams4Notification(emailParameters, conArray[thisCon]);
+					if(!matches(emailParameters.get("$$contactEmail$$"),"",null,undefined,false))
+					{
+						vToEmail = vToEmail + emailParameters.get("$$contactEmail$$") + "; ";
+					}
+				}
+			}
+			logDebug("vFromEmail= " + vFromEmail + "; vToEmail= " + vToEmail + "; vCcEmail = " + vCcEmail + "; emailTemplate= " + vEmailTemplate + "; emailParameters= " + emailParameters);
+			vEmailSent = sendNotification(vFromEmail,vToEmail,vCcEmail,vEmailTemplate,emailParameters, null);
+			logDebug("Email was sent: " + vEmailSent);			
+
+			showMessage = true;
+			comment("<font size = 4 color=ff000><b>Revision record created. Record number " + newAltID + ".</b></font><br><br>You can navigate to the new record using the Related Records tab.<br>");
+		}		
+	}	
 }
 
