@@ -365,7 +365,7 @@ if(matches(appTypeArray[1],"Revision") && wfProcess == "BLD_20231116_REV")
 			if(trpaFlag.indexOf("Tahoe Regional") > -1)
 			{
 				editTaskSpecific("Distribution","TRPA Review","Y");
-				editTaskSpecific("Distribution","TRPA Completeness Review","Y");
+				// editTaskSpecific("Distribution","TRPA Completeness Review","Y");
 				triageThree = true;	
 			}
 			if(stmfldFlag != "NA")
