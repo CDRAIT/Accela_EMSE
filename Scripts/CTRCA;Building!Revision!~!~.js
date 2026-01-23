@@ -18,6 +18,7 @@
 |         : TDunn 03/26/2025 added setting Submittal Review due date and staff assignment
 |         : TDunn 08/29/2025 copied to Non-prod1
 |         : TDunn 08/30/2025 Deployed to GitHub
+|         : TDunn 01/16/2026 added updating parent record type: Residential or Commercial
 |           
 /---------------------------------------------------------------------------------------------------------------------*/
 
