@@ -12,6 +12,7 @@
 |         : TDunn 12/30/2025 updated criteria for setting Plan Check Expiration
 |         : TDunn 01/07/2026 added additional 20181201 processes to criteria for running code
 |         : TDunn 01/10/2026 moved Revision and Deferred submittal creation from parent from WTUA:Building here
+|         : TDunn 01/23/2026 added updating Revisions and Deferred with Parent record type (Res or Com)
 |
 /---------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 
@@ -115,7 +116,7 @@ if(matches(wfProcess,"BLD_20181201_DISTRIBUTION","BLD_20181201_MAIN","BLD_202305
 			editAppSpecific("Type of Work",getAppSpecific("Type of Work",pCapId),cCapId);
 			editAppSpecific("Scope of Work",getAppSpecific("Scope of Work",pCapId),cCapId);	
 			editAppSpecific("Plan Check Type",getAppSpecific("Plan Check Type",pCapId),cCapId);
-			editAppSpecific("Parent Record Type",appTypeArray[1]);
+			editAppSpecific("Parent Record Type",appTypeArray[1],cCapId);
 			copyContacts(pCapId,cCapId);
 
 			// Create notification to applicant for new Revision record created
@@ -210,7 +211,7 @@ if(matches(wfProcess,"BLD_20181201_DISTRIBUTION","BLD_20181201_MAIN","BLD_202305
 			editAppSpecific("Type of Work",getAppSpecific("Type of Work",pCapId),cCapId);
 			editAppSpecific("Scope of Work",getAppSpecific("Scope of Work",pCapId),cCapId);	
 			editAppSpecific("Plan Check Type",getAppSpecific("Plan Check Type",pCapId),cCapId);
-			editAppSpecific("Parent Record Type",appTypeArray[1]);
+			editAppSpecific("Parent Record Type",appTypeArray[1],cCapId);
 			
 			// Generate email notice to parent applicant for new Deferred Submittal application createDocumentFragment
 			var vEmailTemplate = "ONLINE_PERMIT_AMENDMENT_SUBMITTED";
