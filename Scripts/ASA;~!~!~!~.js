@@ -16,11 +16,9 @@
 logDebug("Running ASA:*/*/*/* ...");
 
 if (!publicUser) {
-    //IT Request# 2584
-    var arrayParcelConditions = new Array();
-    arrayParcelConditions = getParcelConditions("PCCP - Prevent Final / Completion", "Applied", "PCCP Application Required", "Notice");
+    //IT Request# 2584    
 
-    if (arrayParcelConditions.length > 0) {
+    if (getConditions("PCCP - Prevent Final / Completion", "Applied", "PCCP Application Required", null).length > 0) {
 
         var emailTemplate = "PCCP_APPLICATION_REQUIRED_NOTICE";
         var emailTo = "";
