@@ -18,7 +18,7 @@ logDebug("Running CTRCA:*/*/*/* ...");
 if (publicUser) {
     //IT Request# 2584
     
-    if (getConditions("PCCP - Prevent Final / Completion", "Applied", "PCCP Application Required", null).length > 0) {
+    if (getConditions("PCCP - Prevent Issuance / Approval", "Applied", "PCCP Application Required", null).length > 0) {
 
         var emailTemplate = "PCCP_APPLICATION_REQUIRED_NOTICE";
         var emailTo = "";

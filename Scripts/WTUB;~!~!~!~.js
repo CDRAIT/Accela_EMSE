@@ -21,7 +21,7 @@ logDebug("Running WTUB:*/*/*/* ...");
 //IT Request# 2584
 var hasPCCPHold = 0;
 var isIssuanceTask = false;
-hasPCCPHold = getConditions("PCCP - Prevent Final / Completion", "Applied", "PCCP Application Required", null).length;
+hasPCCPHold = getConditions("PCCP - Prevent Issuance / Approval", "Applied", "PCCP Application Required", null).length;
 
 if(hasPCCPHold){  //check if issuance
 
@@ -51,7 +51,7 @@ if(hasPCCPHold){  //check if issuance
         isIssuanceTask = true;
     }
 }
-
+logDebug( "Cancel = " + hasPCCPHold && isIssuanceTask);
 if (hasPCCPHold && isIssuanceTask) {
     //stop issuance, completion, approval, etc. of all record types
     showMessage = true;
