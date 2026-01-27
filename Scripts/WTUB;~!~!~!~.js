@@ -26,7 +26,7 @@ hasPCCPHold = getConditions("PCCP - Prevent Final / Completion", "Applied", "PCC
 if(hasPCCPHold){  //check if issuance
 
  if (   //Building
-		(matches(wfProcess, "BLD_20230501_MAIN", "BLD_20181201_MAIN", "BLD_DEFERRED_20240710","BLD_PLNCHK_20241222", "BLD_20231116_REV") && wfTask == "Process for Issuance" && matches(wfStatus, "Issued", "Issued - Awaiting Signature", "Approved")) ||
+		(matches(wfProcess, "BLD_20230501_MAIN", "BLD_20181201_MAIN", "BLD_DEFERRED_20240710","BLD_PLNCHK_20241222", "BLD_20231116_REV") && wfTask == "Process for Issuance" && matches(wfStatus, "Issued", "Signature Requested", "Approved")) ||
 		(matches(wfProcess, "B_OTC", "B_Master") && wfTask == "Plan Check" && matches(wfStatus, "Issued","Complete")) ||
 		//EnV Health
         (wfProcess == "EH_STD" && wfTask == "Review Closure" && wfStatus == "Complete")  ||        
