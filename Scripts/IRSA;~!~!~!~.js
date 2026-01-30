@@ -184,7 +184,7 @@ if(matches(vEventName,"InspectionResultSubmitAfter","V360InspectionResultSubmitA
 		logDebug("Running Inspection result rules for Building");
 		if (inspResult == "Final Pass") {
 			closeTask("Inspections","Construction Complete","Building Granted a Final Pass"," ","BLD_20181201_MAIN");
-			closeTask("Inspections","Construction Complete","Building Granted a Final Pass"," ","BLD_20230501_MAIN");
+			closeTask("Inspection","Construction Complete","Building Granted a Final Pass"," ","BLD_20230501_MAIN");
 			//aa.sendMail(defaultFrom, "eaftahi@placer.ca.gov", "", "IRSA:TRACT Homes - IT Request # 2083 ", debug);
 			//Abe 04/08/2025: IT Req# 2340
 			if (appTypeArray[3] == "Solar App")
