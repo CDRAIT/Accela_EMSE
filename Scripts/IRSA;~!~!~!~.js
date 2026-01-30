@@ -59,8 +59,10 @@ if(trpaFlag.indexOf("Tahoe Regional") > -1)
 if(matches(vEventName,"InspectionResultModifyAfter"))
 {
 	// Controls for Building
-	if(appTypeArray[0] == "Building")
-	{		
+	if (appTypeArray[0] == "Building") {
+		if (matches(capStatus, "Issued", "Issued - Awaiting Signature") && inspResult == "Final Pass")
+			closeTask("Inspection", "Construction Complete", "Building Granted a Final Pass", " ", "BLD_20230501_MAIN");
+
 		if (lookup("Group Inspection Lookup",inspType) != null) 
 		{
 			varInspList = lookup("Group Inspection Lookup",inspType);
