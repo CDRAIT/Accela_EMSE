@@ -107,4 +107,5 @@
 |   05/22/2025 Abe   >> Replaced all instances of "noreply@placer.ca.gov" email address with INCLUDES_CUSTOM_GLOBALS variable "defaultFrom" 
 |   07/30/2025 Abe   >> updated formatStaffPhone() to clear any format before processing the phone number     
 |   09/18/2025 RMoore >> removed functions, main function copytoxics, copies toxics table from record to another
+|   02/05/2025 Abe   >> added exploreObject function to print objects' info 
 /---------------------------------------------------------------------------------------------------------------------------------------------------------*/
