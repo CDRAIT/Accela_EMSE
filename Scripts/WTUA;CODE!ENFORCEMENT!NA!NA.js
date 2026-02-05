@@ -10,7 +10,7 @@
 |
 | Notes   : eaftahi 11/22/2024 created script - Converted from StdChoice, WTUA:Code/~/~/~ branch
 |           EAFTAHI 10/01/2025 Added IT Request# 1675 - New Code Compliance WF
-|
+|           EAFTAHI 02/05/2026 Added Fisrt Revision outputs to the script
 |
 /--------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 
@@ -28,9 +28,6 @@ var varAInfo = new Array();
 //To append wf process code.wftask. to TSI field label
 useTaskSpecificGroupName = true;
 loadTaskSpecific(varAInfo);
-
-
-
 
 if (wfProcess == "CODE_ENF") { //New Workflow
 
@@ -85,14 +82,17 @@ if (wfProcess == "CODE_ENF") { //New Workflow
             agencies.forEach(function (item) {
                 emailTo += lookup(refAgenciesStdChoice, item) + ';';
             });
-            if (varAInfo[wfProcess + "." + wfTask + "." + "Other"] == "CHECKED")
+            if (varAInfo[wfProcess + "." + wfTask + "." + "Other"] == "CHECKED"){
+                logDebug("Other Agency Email: " + varAInfo[wfProcess + "." + wfTask + "." + "Other Email"]);
                 emailTo += varAInfo[wfProcess + "." + wfTask + "." + "Other Email"] + ";";
+            }
             var sendResult = sendNotification(emailFrom, emailTo, emailCc, emailTemplate, emailParams, null);
 
             //(2) Send Referral Letter to Applicant Only (3)
             emailTo = emailParams.get("$$compEmail$$");
             reportName = "Complaint Referral Letter";
             addParameter(emailParams, "$$emailSubject$$", "COMPLAINT REFERRAL");
+            addParameter(reportParams, "wfTask", wfTask);
             reportFile = generateReportTPS_CustomFileName(reportName, reportParams, reportModule, "Complaint_Referral_Case# " + capIDString + ".pdf");
             if (!isBlank(emailTo))
                 if (emailTo.indexOf('@') != -1)
@@ -108,19 +108,26 @@ if (wfProcess == "CODE_ENF") { //New Workflow
 
     if (wfTask == "Investigation") { 
         if (wfStatus == "Referred & Closed" || wfStatus == "Referred & Violation") {
+            var agencies = getCodeReferralAgencyArray();
             //send Referral Email to Agencies (4)
-                        emailTemplate = "CE_REFERRAL_AGENCIES_NOTIFICTION";
+            emailTemplate = "CE_REFERRAL_AGENCIES_NOTIFICTION";
             agencies.forEach(function (item) {
                 emailTo += lookup(refAgenciesStdChoice, item) + ';';
             });
             if (varAInfo[wfProcess + "." + wfTask + "." + "Other"] == "CHECKED")
                 emailTo += varAInfo[wfProcess + "." + wfTask + "." + "Other Email"] + ";";
             var sendResult = sendNotification(emailFrom, emailTo, emailCc, emailTemplate, emailParams, null);
-            
         }
-        if (wfStatus == "Referred & Violation") {
-            //TBD....
-
+        if (wfStatus == "Referred & Closed") {
+            // Send Referral Letter to Applicant Only (3) - added after 1st Revision
+            emailTo = emailParams.get("$$compEmail$$");
+            reportName = "Complaint Referral Letter";
+            addParameter(emailParams, "$$emailSubject$$", "COMPLAINT REFERRAL");
+            addParameter(reportParams, "wfTask", wfTask);
+            reportFile = generateReportTPS_CustomFileName(reportName, reportParams, reportModule, "Complaint_Referral_Case# " + capIDString + ".pdf");
+            if (!isBlank(emailTo))
+                if (emailTo.indexOf('@') != -1)
+                    var sendResult = sendNotification(emailFrom, emailTo, emailCc, generalEmailTemplate, emailParams, new Array(reportFile));
         }
     }
 
@@ -161,12 +168,20 @@ if (wfProcess == "CODE_ENF") { //New Workflow
             addParameter(emailParams, "$$emailSubject$$", seqString + "CITATION LETTER");
             sendNotice2Recipients(seqString + "Citation_Letter");
         }
+
+        //First Revision updates
+        if (wfStatus == "Notice of Nuisance") {
+            //Create Nuisance Letter (11)
+            reportName = "Notice of Nuisance";
+            addParameter(emailParams, "$$emailSubject$$", "NOTICE OF NUISANCE");
+            sendNotice2Recipients("Nuisance_Notice");
+        }
     }
 
     if (wfTask == "Appeal") {
         if (wfStatus == "No Appeal") {
             //Create the fork manually
-            activateTask("Citation");
+            activateTask("Citation", "CODE_ENF");
         }
     }
 
@@ -225,28 +240,15 @@ if (wfProcess == "CODE_ENF") { //New Workflow
         }
     }
 
-    if ((wfTask == "Citation" && wfStatus == "Complied") ||
-        (wfTask == "Abatement Processing" && wfStatus == "Abatement Complete") ||
-        (wfTask == "Administrative Hearing" && matches(wfStatus, "Complied", "Citation Upheld")) ||
-        (wfTask == "Appeal" && wfStatus == "No Appeal")) {
-        //Send Process Fine email to Staff (15)
-        emailTemplate = "CE_STAFF_PROCESS_FINE_NOTIFICATION";
-        emailTo = (getAppSpecific("Project Office")= "Auburn")? "CodeEnforce@placer.ca.gov": "CodeEnforceTahoe@placer.ca.gov" +";";        
-        emailTo += getUserEmail(getAssignedToStaff()); 
-         if (!isBlank(emailTo))
-                if (emailTo.indexOf('@') != -1)
-                    var sendResult = sendNotification(emailFrom, emailTo, emailCc, emailTemplate, emailParams, null);
-    }
-
     if (wfTask == "Fine Processing") {
-        if (wfStatus == "Request for Payment") {
+        if (wfStatus == "First Payment Request") {
             //Create Invoice Cover Letter (16)
             reportName = "Invoice Cover Letter";
             addParameter(emailParams, "$$emailSubject$$", "INVOICE INVOICE LETTER");
             sendNotice2Recipients("Invoice_Cover_Letter");
             //Eamil Fines Due to Staff (17) - Batchjob
         }
-        if (wfStatus == "Subsequent Request") {
+        if (wfStatus == "Subsequent Payment Request") {
             //Invoice Cover Letter, 2nd (18)
             reportName = "Second Invoice Cover Letter";
             addParameter(emailParams, "$$emailSubject$$", "SECOND INVOICE INVOICE LETTER");
@@ -255,6 +257,63 @@ if (wfProcess == "CODE_ENF") { //New Workflow
             //Eamil Fines Due to Staff (17) - batchjob
         }
     }
+}
+
+
+/** Fisrt Revision Updates
+ * 
+ * Record Status should only reflect 'Fine Processing'
+ * if that is the only task remaining active.
+ */
+if ((wfTask == "Citation" && wfStatus == "Complied") ||
+    (wfTask == "Appeal" && wfStatus == "No Appeal") ||
+    (wfTask == "Administrative Hearing" && matches(wfStatus, "Citation Upheld", "Complied")) ||
+    (wfTask == "Abatement Processing" && wfStatus == "Abatement Complete")
+) {
+    if (!activeTasksCheckExcept("Fine Processing")) {
+        updateAppStatus("Fine Processing", "Updated by WTUA EMSE Event");
+    }
+    //Send Process Fine email to Staff (15)
+    emailTemplate = "CE_STAFF_NOTIFICATION";
+    emailCc = (getAppSpecific("Project Office") = "Auburn") ? "CodeEnforce@placer.ca.gov" : "CodeEnforceTahoe@placer.ca.gov";
+    emailTo = getUserEmail(getAssignedToStaff());
+    var emailContentStr = "The above referenced case is ready for fee processing. Please generate and send the invoice to request payment.";
+    addParameter($$emailSubject$$, "PROCESS INVOICE");
+    addParameter($$contentString$$, emailContentStr);
+
+    if (!isBlank(emailTo))
+        if (emailTo.indexOf('@') != -1)
+            var sendResult = sendNotification(emailFrom, emailTo, emailCc, emailTemplate, emailParams, null);
+}
+
+/********************************* 
+ Local Functions used here only
+*********************************/
+
+/**
+ * 
+ * Returns True if finds an active task, ignores 'wfstr' task
+ * @param {*} wfstr String; Exception task Name
+ * @returns Boolean
+ */
+function activeTasksCheckExcept(wfstr) {
+    var workflowResult = aa.workflow.getTasks(capId);
+    if (workflowResult.getSuccess())
+        wfObj = workflowResult.getOutput();
+    else {
+        logDebug("**ERROR: Failed to get workflow object: " + workflowResult.getErrorMessage());
+        return false;
+    }
+
+    for (i in wfObj) {
+        fTask = wfObj[i];
+        if (Task.getTaskDescription().toUpperCase().equals(wfstr.toUpperCase()))
+            continue;
+        else (fTask.getActiveFlag().equals("Y"))
+        return true;
+    }
+
+    return false;
 }
 
 function getCodeReferralAgencyArray() {

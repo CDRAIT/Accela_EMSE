@@ -1,4 +1,5 @@
-function sendAcknowledgementLtr2Applicant() { //Designed for code and HazVeg modules - their new workflow
+//Designed for code and HazVeg modules -  New Workflows
+function sendAcknowledgementLtr2Applicant() { 
 	var reportName = "";
 	var reportModule = "";
 	var reportFile = null;
@@ -15,7 +16,11 @@ function sendAcknowledgementLtr2Applicant() { //Designed for code and HazVeg mod
 
 	if (appTypeArray[0] == "Code") {
 		if (appTypeArray[1] == "Enforcement") {
-			//TBD
+			reportName = "Complaint Acknowledgement Letter";
+			reportModule = "Code";
+			emailTemp = "CE_GENERAL_EMAIL_TEMPLATE";
+			addParameter(emailParams, "$$emailSubject$$", "ACKNOWLEDGMENT OF BUILDING VIOLATION COMPLAINT");
+			emailTo = getAppSpecific("Complaintant Email");
 		}
 		else if (appTypeArray[1] == "Vehicle Abatement") {
 			reportName = "Vehicle Acknowledgement Letter";
