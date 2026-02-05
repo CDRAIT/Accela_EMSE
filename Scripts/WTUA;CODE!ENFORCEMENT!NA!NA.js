@@ -245,7 +245,7 @@ if (wfProcess == "CODE_ENF") { //New Workflow
         if (wfStatus == "First Payment Request") {
             //Create Invoice Cover Letter (16)
             reportName = "Invoice Cover Letter";
-            addParameter(emailParams, "$$emailSubject$$", "INVOICE INVOICE LETTER");
+            addParameter(emailParams, "$$emailSubject$$", "INVOICE LETTER");
             sendNotice2Recipients("Invoice_Cover_Letter");
             //Eamil Fines Due to Staff (17) - Batchjob
         }
@@ -267,7 +267,7 @@ if (wfProcess == "CODE_ENF") { //New Workflow
  * if that is the only task remaining active.
  */
 if ((wfTask == "Citation" && wfStatus == "Complied") ||
-    (wfTask == "Appeal" && wfStatus == "No Appeal") ||
+    //(wfTask == "Appeal" && wfStatus == "No Appeal") || It activates a parallel task
     (wfTask == "Administrative Hearing" && matches(wfStatus, "Citation Upheld", "Complied")) ||
     (wfTask == "Abatement Processing" && wfStatus == "Abatement Complete")
 ) {
@@ -363,6 +363,12 @@ function getCodeReferralAgencyArray() {
     return checkedAgencies;
 }
 
+
+/**
+ * Gets the checked recepients and send email with attached report
+ * @param {string} fileName:   file name for the attached report
+ * 
+ */
 function sendNotice2Recipients(fileName) {
     //Get checked Contacts from TSI
     var recipients = new Array("Agent", "Business", "Owner", "PMC", "Responsible Party", "Tenant"); //Property Management Company
@@ -371,24 +377,29 @@ function sendNotice2Recipients(fileName) {
         if (varAInfo[wfProcess + "." + wfTask + "." + recipients[each]] == "CHECKED")
             checkedRecipients.push(recipients[each]);
     }
-    //Get email for checked TSI
+    logDebug("Checked Recipients Array : " + checkedRecipients);
+    //Get email for checked TSI and 
     if (checkedRecipients.length > 0)
         for (each in checkedRecipients) {
             addParameter(reportParams, "conatctType", checkedRecipients[each]);
             reportFile = generateReportTPS_CustomFileName(reportName, reportParams, reportModule, fileName + "_Case# " + capIDString + "_" + checkedRecipients[each] + ".pdf");
+            //logDebug("reportFile: " + reportFile);
             if (checkedRecipients[each] == "Owner") {
                 emailTo = emailParams.get("$$ownerEmail$$");
+                //logDebug("OwnerEmail: " + emailTo);
             }
-            if (checkedRecipients[each] == "PMC") {
+            else if (checkedRecipients[each] == "PMC") {
                 emailTo = getContactEmailByContactType("Property Management Company", capId);
             }
             else {
                 emailTo = getContactEmailByContactType(checkedRecipients[each], capId);
+                //logDebug("Within the Else ...");
             }
             if (!isBlank(emailTo))
                 if (emailTo.indexOf('@') != -1) {
                     //send email with report attached
                     var sendResult = sendNotification(emailFrom, emailTo, emailCc, generalEmailTemplate, emailParams, new Array(reportFile));
-                }   
+                    //logDebug(sendResult);
+                }
         }
 }
