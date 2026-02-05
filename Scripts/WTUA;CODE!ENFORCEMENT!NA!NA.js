@@ -181,7 +181,7 @@ if (wfProcess == "CODE_ENF") { //New Workflow
     if (wfTask == "Appeal") {
         if (wfStatus == "No Appeal") {
             //Create the fork manually
-            activateTask("Citation", "CODE_ENF");
+            activateTask("Citation");
         }
     }
 
@@ -273,9 +273,9 @@ if ((wfTask == "Citation" && wfStatus == "Complied") ||
     if (!activeTasksCheckExcept("Fine Processing")) {
         updateAppStatus("Fine Processing", "Updated by WTUA EMSE Event");
     }
-    //Send Process Fine email to Staff (15)
+    //Send Process Fine email to Staff (15)    
     emailTemplate = "CE_STAFF_NOTIFICATION";
-    emailCc = (getAppSpecific("Project Office") = "Auburn") ? "CodeEnforce@placer.ca.gov" : "CodeEnforceTahoe@placer.ca.gov";
+    emailCc = (getAppSpecific("Project Office") == "Auburn") ? "CodeEnforce@placer.ca.gov" : "CodeEnforceTahoe@placer.ca.gov";
     emailTo = getUserEmail(getAssignedToStaff());
     var emailContentStr = "The above referenced case is ready for fee processing. Please generate and send the invoice to request payment.";
     addParameter($$emailSubject$$, "PROCESS INVOICE");
@@ -289,14 +289,12 @@ if ((wfTask == "Citation" && wfStatus == "Complied") ||
 //Close cap after "Complied" on some tasks- Bcoz there r some exceptions!
 if(matches(wfTask,"Nuisance Outcome", "Abatement Hearing", "Reinspection Outcome", "Abatement Processing") && wfStatus == "Complied"){
     closeCap(currentUserID);
-}
-    
+}   
 
 
 /********************************* 
  Local Functions used here only
 *********************************/
-
 /**
  * 
  * Returns True if finds an active task, ignores 'wfstr' task
@@ -314,7 +312,7 @@ function activeTasksCheckExcept(wfstr) {
 
     for (i in wfObj) {
         fTask = wfObj[i];
-        if (Task.getTaskDescription().toUpperCase().equals(wfstr.toUpperCase()))
+        if (fTask.getTaskDescription().toUpperCase().equals(wfstr.toUpperCase()))
             continue;
         else (fTask.getActiveFlag().equals("Y"))
         return true;
