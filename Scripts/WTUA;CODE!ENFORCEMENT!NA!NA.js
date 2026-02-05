@@ -278,8 +278,8 @@ if ((wfTask == "Citation" && wfStatus == "Complied") ||
     emailCc = (getAppSpecific("Project Office") == "Auburn") ? "CodeEnforce@placer.ca.gov" : "CodeEnforceTahoe@placer.ca.gov";
     emailTo = getUserEmail(getAssignedToStaff());
     var emailContentStr = "The above referenced case is ready for fee processing. Please generate and send the invoice to request payment.";
-    addParameter($$emailSubject$$, "PROCESS INVOICE");
-    addParameter($$contentString$$, emailContentStr);
+    addParameter("$$emailSubject$$", "PROCESS INVOICE");
+    addParameter("$$contentString$$", emailContentStr);
 
     if (!isBlank(emailTo))
         if (emailTo.indexOf('@') != -1)
@@ -295,6 +295,7 @@ if(matches(wfTask,"Nuisance Outcome", "Abatement Hearing", "Reinspection Outcome
 /********************************* 
  Local Functions used here only
 *********************************/
+
 /**
  * 
  * Returns True if finds an active task, ignores 'wfstr' task
