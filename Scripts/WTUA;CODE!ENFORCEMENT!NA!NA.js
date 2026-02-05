@@ -286,6 +286,13 @@ if ((wfTask == "Citation" && wfStatus == "Complied") ||
             var sendResult = sendNotification(emailFrom, emailTo, emailCc, emailTemplate, emailParams, null);
 }
 
+//Close cap after "Complied" on some tasks- Bcoz there r some exceptions!
+if(matches(wfTask,"Nuisance Outcome", "Abatement Hearing", "Reinspection Outcome", "Abatement Processing") && wfStatus == "Complied"){
+    closeCap(currentUserID);
+}
+    
+
+
 /********************************* 
  Local Functions used here only
 *********************************/
