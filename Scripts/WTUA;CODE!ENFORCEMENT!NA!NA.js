@@ -182,6 +182,7 @@ if (wfProcess == "CODE_ENF") { //New Workflow
         if (wfStatus == "No Appeal") {
             //Create the fork manually
             activateTask("Citation");
+            updateAppStatus("Citation", "Updated by WTUA EMSE Event");
         }
     }
 
