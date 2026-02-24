@@ -41,7 +41,7 @@ var servProvCode = "PLACERCO";
 var expDate =  "03/31/" + appdate1.getYear();
 var facilitiesUpdated = 0;   // FAC count
 var processesUpdated  = 0;   // PROCESS count
-var BATCH_SIZE = 25;          // facilities per run
+var BATCH_SIZE = 100;          // facilities per run
 var SCRIPT_NAME = "AQ_ABOUT_TO_EXPIRE";
 var DEBUG_LEVEL = 1;          // 0=quiet 1=normal 2=verbose
 var TEST_MODE = false;
@@ -112,7 +112,13 @@ function aboutExpLics() {
         var thrucheck = getAppSpecific("Throughput Sent", facCapId);
         if (thrucheck != "CHECKED") {
             logDebug("Creating reference contacts...");
-            createRefContactsFromCapContactsAndLink( facCapId,null,null,null,true,null );
+			var throughputEmail = getThroughputEmail(facCapId);
+
+logDebug("Using throughput email: " + throughputEmail);
+
+// create/update reference contacts
+createRefContactsFromCapContactsAndLink( facCapId, null, null, null, true, null);
+			
         // BUILD OPTIMIZED CHILD CACHE (ONE CALL ONLY)
         buildChildCache(facCapId);
         var permits = getChildPermits(facCapId);
@@ -564,6 +570,8 @@ function createPublicUserFromContact(capId,contactType,refContactNum)   {
 		// activate for agency
 		var userPinBiz = aa.proxyInvoker.newInstance("com.accela.pa.pin.UserPINBusiness").getOutput()
 			userPinBiz.updateActiveStatusAndLicenseIssueDate4PublicUser(servProvCode,userSeqNum,"ADMIN");
+  	        
+			
 			// reset password
 			var resetPasswordResult = aa.publicUser.resetPassword(contact.getEmail());
 			if (resetPasswordResult.getSuccess()) {
@@ -961,5 +969,42 @@ function toScriptDate(dateValue) {
     catch (err) {
         logDebug("Date conversion failed: " + dateValue);
         return null;
+    }
+}
+function getThroughputEmail(facCapId) {
+    var DEFAULT_EMAIL = "RMOORE@PLACER.CA.GOV";
+    try {
+        var capContactResult = aa.people.getCapContactByCapID(facCapId);
+        if (!capContactResult.getSuccess()) {
+            logDebug("No contacts found — using default email");
+            return DEFAULT_EMAIL;
+        }
+        var contacts = capContactResult.getOutput();
+        if (!contacts || contacts.length === 0) {
+            logDebug("Facility has no contacts — using default email");
+            return DEFAULT_EMAIL;
+        }
+        for (var i = 0; i < contacts.length; i++) {
+            var capContact = contacts[i];
+            var people = capContact.getPeople();
+            var contactType = capContact.getCapContactModel().getContactType();
+            // ----- MATCH THROUGHPUT CONTACT -----
+            if (contactType &&
+                contactType.toUpperCase() == "THROUGHPUT") {
+                var email = people.getEmail();
+                if (email && email != "") {
+                    logDebug("Throughput email found: " + email);
+                    return email;
+                }
+                logDebug("Throughput contact has no email.");
+                return DEFAULT_EMAIL;
+            }
+        }
+        logDebug("No Throughput contact found.");
+        return DEFAULT_EMAIL;
+    }
+    catch (err) {
+        logDebug("getThroughputEmail ERROR: " + err);
+        return DEFAULT_EMAIL;
     }
 }
