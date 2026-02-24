@@ -41,6 +41,10 @@ var servProvCode = "PLACERCO";
 var expDate =  "03/31/" + appdate1.getYear();
 var facilitiesUpdated = 0;   // FAC count
 var processesUpdated  = 0;   // PROCESS count
+var BATCH_SIZE = 25;          // facilities per run
+var SCRIPT_NAME = "AQ_ABOUT_TO_EXPIRE";
+var DEBUG_LEVEL = 1;          // 0=quiet 1=normal 2=verbose
+var TEST_MODE = false;
 
 
 if (paramsOK) {
@@ -56,79 +60,102 @@ if (emailAddress.length)
 
 var allPermitsCache = [];
 var allProcessesCache = [];
+var facilityHierarchyCache = null;
 
 function aboutExpLics() {
-    var capCount = 0;
-    // ===============================
-    // TEST FACILITY SETUP
-    // ===============================
-    var runTestOnly = true;
-    var testFacCapId = aa.cap.getCapID("19AQR", "00000", "00062").getOutput();
-    if (!testFacCapId) {
-        logDebug("Test facility CAP not found: FAC-TEST");
-        return 0;
+    logDebug("START aboutExpLics batch");
+    var facilities = [];
+    if (TEST_MODE) {
+        var testCapId =            aa.cap.getCapID("19AQR","00000","00062").getOutput();
+        if (!testCapId) {
+            logDebug("Test facility not found.");
+            return 0;
+        }
+        facilities.push({ getCapID: function () { return testCapId; }        });
+        logDebug("TEST MODE — Facility: " + testCapId.getCustomID()); }
+    else {
+        var result = aa.cap.getByAppType( "AirQuality", "Stationary Source", "Facility", "NA" );
+        facilities = result.getOutput();
+        logDebug("Total facilities loaded: " + facilities.length);
     }
-    logDebug("Test facility CAP found: " + testFacCapId.getCustomID());
-    // ===============================
-    // FACILITY LIST
-    // ===============================
-    var allFacilities = runTestOnly
-        ? [{ getCapID: function () { return testFacCapId; } }]
-        : [];
 
-    // ===============================
+    // =====================================================
+    // COUNTERS
+    // =====================================================
+    var facilityCount = 0;   // facilities updated
+    var processCount  = 0;   // processes updated
+
+    // =====================================================
     // PROCESS FACILITIES
-    // ===============================
-    for (var f = 0; f < allFacilities.length; f++) {
-        var facCapId = allFacilities[f].getCapID();
-        var facAlt = facCapId.getCustomID();
-		logDebug("facCapId:" + facCapId);
-		logDebug("Processing Facility: " + facAlt);
-		var cap = aa.cap.getCap(facCapId).getOutput();
-		capName = cap.getSpecialText();
-		capStatus = cap.getCapStatus();
-		logDebug("Name: "  + capName);
-		logDebug("Status: "  + capStatus);
-		var thrucheck = getAppSpecific("Throughput Sent",facCapId);
-		if(capStatus != "Closed" && thrucheck != "CHECKED"){
-		createRefContactsFromCapContactsAndLink(facCapId,null,null,null,true,null);
-		buildChildCache(facCapId);
-        // GET ACTIVE PERMITS
+    // =====================================================
+    for (var f = 0; f < facilities.length; f++) {
+        var facCapId = facilities[f].getCapID();
+        var facAlt   = facCapId.getCustomID();
+        logDebug("------------------------------------------------");
+        logDebug("Processing Facility: " + facAlt);
+        var cap = aa.cap.getCap(facCapId).getOutput();
+        var capStatus = cap.getCapStatus();
+		var	capName = cap.getSpecialText();
+        if (capStatus == "Closed") {
+            logDebug("Skipping closed facility");
+            continue;
+        }
+
+        // --------------------------------------------
+        // Throughput check
+        // --------------------------------------------
+        var thrucheck = getAppSpecific("Throughput Sent", facCapId);
+        if (thrucheck != "CHECKED") {
+            logDebug("Creating reference contacts...");
+            createRefContactsFromCapContactsAndLink( facCapId,null,null,null,true,null );
+        // BUILD OPTIMIZED CHILD CACHE (ONE CALL ONLY)
+        buildChildCache(facCapId);
         var permits = getChildPermits(facCapId);
-        logDebug("Found " + permits.length + " Active Permit(s)");
+        logDebug("Active permits found: " + permits.length);
+        var facilityUpdated = false;
         // LOOP PERMITS
         for (var p = 0; p < permits.length; p++) {
             var permitCapId = permits[p];
-            var permitAlt = permitCapId.getCustomID();
+            var permitAlt   = permitCapId.getCustomID();
             logDebug("Processing Permit: " + permitAlt);
-            // ---------------------------------
+            // GET PERMIT EXPIRATION
+            var expResult = aa.expiration.getLicensesByCapID(permitCapId);
+            if (!expResult.getSuccess()) {
+                logDebug("No expiration object");
+                continue;
+            }
             // GET CHILD PROCESSES (NOT CLOSED)
-            // ---------------------------------
             var processes = getChildProcesses(permitCapId);
-            logDebug("Found " + processes.length +" process(es) under " + permitAlt );
-            // ===============================
+            logDebug("Processes found: " + processes.length);
             // LOOP PROCESSES
-            // ===============================
             for (var c = 0; c < processes.length; c++) {
                 var procCapId = processes[c];
-                var procAlt = procCapId.getCustomID();
+                var procAlt   = procCapId.getCustomID();
                 logDebug("Updating Process: " + procAlt);
                 var updated = updateProcessExpiration(procCapId, expDate);
                 if (updated) {
-                    capCount++;
-                    logDebug("Updated expiration on " + procAlt);
-                } else {
-                    logDebug("Failed updating " + procAlt);
+                    processCount++;
+                    facilityUpdated = true;
+                    logDebug("Updated: " + procAlt);
+                }
+                else {
+                    logDebug("Failed updating: " + procAlt);
                 }
             }
         }
-		editAppSpecific("Throughput Sent", "CHECKED", facCapId);
+        // MARK FACILITY COMPLETE (ONCE)
+        if (facilityUpdated) {
+            editAppSpecific( "Throughput Sent", "CHECKED", facCapId );
+            facilityCount++;
+        }
         logDebug("Finished Facility: " + facAlt);
-		}
-	} 
- return capCount;
+    }
+        }
+    // FINAL COUNTS
+    logDebug("Total Facilities Updated: " + facilityCount);
+    logDebug("Total Process Records Updated: " + processCount);
+    return processCount;
 }
-
 function runAboutToExpireContacts(facCapId) {
     logDebug("Running AboutToExpire contact sync for facility");
     var throughputTypes = [
@@ -219,19 +246,19 @@ function getPermitExpiration(capId) {
         return exp.getExpDate();
     return null;
 }
-function updateProcessExpiration(procCapId,expDate){
-var b1ExpResult = aa.expiration.getLicensesByCapID(procCapId)
-   		if (b1ExpResult.getSuccess())
-   			{
-   			this.b1Exp = b1ExpResult.getOutput();
+// function updateProcessExpiration(procCapId,expDate){
+// var b1ExpResult = aa.expiration.getLicensesByCapID(procCapId)
+   		// if (b1ExpResult.getSuccess())
+   			// {
+   			// this.b1Exp = b1ExpResult.getOutput();
 
-			var expAADate = aa.date.parseDate(expDate);
-			this.b1Exp.setExpDate(expAADate);
-			aa.expiration.editB1Expiration(this.b1Exp.getB1Expiration())
+			// var expAADate = aa.date.parseDate(expDate);
+			// this.b1Exp.setExpDate(expAADate);
+			// aa.expiration.editB1Expiration(this.b1Exp.getB1Expiration())
 			
-			}
+			// }
 			
-}	
+// }	
 function elapsed() {
     var thisDate = new Date();
     var thisTime = thisDate.getTime();
@@ -264,6 +291,11 @@ function logDebug(edesc) {
         aa.print("DEBUG : " + edesc);
         emailText += "DEBUG : " + edesc + " <br />";
     }
+}
+function logDebug1(msg, level) {
+    if (!level) level = 1;
+    if (DEBUG_LEVEL >= level)
+        aa.print("DEBUG : " + msg);
 }
 function dateAdd(td,amt)	{
 	var useWorking = false;
@@ -409,6 +441,10 @@ function createRefContactsFromCapContactsAndLink(pCapId, contactTypeArray, ignor
 			else
 				logDebug("Successfully refreshed ref contact #" + refContactNum + " with CAP contact data");
 			    fileNames = [];
+			        var cap = aa.cap.getCap(pCapId).getOutput();
+					capName = cap.getSpecialText();
+				
+				
 				emailParameters = aa.util.newHashtable();
 				addParameter(emailParameters,"$$FACILITY_NAME$$",capName);
 				addParameter(emailParameters,"$$USERNAME$$",con.getEmail());
@@ -862,5 +898,67 @@ function buildChildCache(facCapId) {
         procCount += processIndex[k].length;
     logDebug("Processes cached (non-closed): " + procCount);
 }
+function buildFacilityHierarchy(facCapId) {
+    var cache = {};
+    var res = aa.cap.getChildByMasterID(facCapId);
+    if (!res.getSuccess()) return cache;
+    var children = res.getOutput();
+    for (var i in children) {
+        var model = children[i];
+        var capId = model.getCapID();
+        var type = model.getCapType().toString();
+        var status = model.getCapStatus();
+        var alt = capId.getCustomID();
+        if (status == "Closed") continue;
+        if (type.indexOf("Permit to Operate") >= 0) {
+            cache[alt] = {
+                permitCapId: capId,
+                expiration: getPermitExpiration(capId),
+                processes: []
+            };
+        }
+    }
+    // attach processes
+    for (var j in children) {
+        var model2 = children[j];
+        var capId2 = model2.getCapID();
+        var type2 = model2.getCapType().toString();
+        if (type2.indexOf("/Process/") >= 0) {
+            var procAlt = capId2.getCustomID();
+            var permitAlt =
+                procAlt.substring(0, procAlt.lastIndexOf("-"));
+            if (cache[permitAlt])
+                cache[permitAlt].processes.push(capId2);
+        }
+    }
+    return cache;
+}
+function getBatchPosition() {
+    var val = aa.env.getValue("BatchPosition");
+    if (!val) return 0;
+    return parseInt(val);
+}
+function setBatchPosition(pos) {
+    aa.env.setValue("BatchPosition", pos);
+}
+function updateProcessExpiration(procCapId, expDate) {
+    try {
+        var res = aa.expiration.getLicensesByCapID(procCapId);
+        if (!res.getSuccess()) return false;
+        var exp = res.getOutput();
+        if (!exp) return false;
+        exp.setExpDate(expDate);
+        aa.expiration.editB1Expiration(exp);
+        var diff = dateDiff(expDate, new Date());
+        var status =
+            diff < 0 ? "Expired" :
+            diff <= 60 ? "About to Expire" :
+            "Active";
 
-
+        aa.expiration.updateExpirationStatus( procCapId, status, "AQ Batch" );
+        return true;
+    } catch (err) {
+        logDebug( "Process update failed: " + procCapId.getCustomID() );
+        return false;
+    }
+}
