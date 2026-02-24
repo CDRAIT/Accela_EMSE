@@ -388,7 +388,18 @@ if (wfTask == "Fine Processing") {
 
 
 }
-//End of IT Request # 1986 - HazVeg Workflow Revise     
+//End of IT Request # 1986 - HazVeg Workflow Revise
+
+
+//supporting old wf critical step
+if (wfProcess == "H_MAIN") {
+	if (wfTask == "Close out" && wfStatus == "Close Out") {
+		cType = "Hazardous Vegetation";
+		cDesc = "Case Active Hazardous Vegetation Case";
+		parcelNum = emailParams.get("$$parcelNumber$$");
+		removeParcelCondition(parcelNum,cType,cDesc);
+	}
+}
 
 /* *
  * * ============================================   
