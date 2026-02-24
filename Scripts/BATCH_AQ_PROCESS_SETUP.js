@@ -66,7 +66,12 @@ function aboutExpLics() {
     logDebug("START aboutExpLics batch");
     var facilities = [];
     if (TEST_MODE) {
-        var testCapId =            aa.cap.getCapID("19AQR","00000","00062").getOutput();
+        var testCapId =            aa.cap.getCapID("19AQR","00000","00062").getOutput();  	//FAC-TEST
+//        var testCapId =            aa.cap.getCapID("18HST","00000","000EQ").getOutput();		//FAC-VWAA
+//       var testCapId =            aa.cap.getCapID("19AQR","00000","00062").getOutput();
+
+
+
         if (!testCapId) {
             logDebug("Test facility not found.");
             return 0;
@@ -117,22 +122,23 @@ function aboutExpLics() {
         for (var p = 0; p < permits.length; p++) {
             var permitCapId = permits[p];
             var permitAlt   = permitCapId.getCustomID();
-            logDebug("Processing Permit: " + permitAlt);
+           // logDebug("Processing Permit: " + permitAlt);
             // GET PERMIT EXPIRATION
-            var expResult = aa.expiration.getLicensesByCapID(permitCapId);
-            if (!expResult.getSuccess()) {
-                logDebug("No expiration object");
-                continue;
-            }
+            // var expResult = aa.expiration.getLicensesByCapID(permitCapId);
+            // if (!expResult.getSuccess()) {
+                // logDebug("No expiration object");
+                // continue;
+            // }
             // GET CHILD PROCESSES (NOT CLOSED)
             var processes = getChildProcesses(permitCapId);
-            logDebug("Processes found: " + processes.length);
+          //  logDebug("Processes found: " + processes.length);
             // LOOP PROCESSES
             for (var c = 0; c < processes.length; c++) {
                 var procCapId = processes[c];
                 var procAlt   = procCapId.getCustomID();
-                logDebug("Updating Process: " + procAlt);
-                var updated = updateProcessExpiration(procCapId, expDate);
+         //       logDebug("Updating Process: " + procAlt);
+				var expDate =  "03/31/" + appdate1.getYear();
+                var updated = updateProcessExpiration(expDate, procCapId, "About to Expire");
                 if (updated) {
                     processCount++;
                     facilityUpdated = true;
@@ -210,8 +216,7 @@ function getChildProcesses(permitCapId) {
     var results = [];
     var childResult = aa.cap.getChildByMasterID(permitCapId);
     if (!childResult.getSuccess()) {
-        logDebug("ERROR getting processes for permit: "
-            + permitCapId.getCustomID());
+        logDebug("ERROR getting processes for permit: " + permitCapId.getCustomID());
         return results;
     }
     var children = childResult.getOutput();
@@ -221,14 +226,7 @@ function getChildProcesses(permitCapId) {
         var childCapId = children[i].getCapID();
         var capType = children[i].getCapType().toString();
         var status = children[i].getCapStatus();
-        // DEBUG (optional)
-        // logDebug("Process candidate: "
-        //     + childCapId.getCustomID()
-        //     + " | " + capType
-        //     + " | " + status);
-        // ONLY PROCESS RECORDS
         if (capType.indexOf("Process") > -1) {
-
             // EVERYTHING EXCEPT CLOSED
             if (!status || status != "Closed") {
                 results.push(childCapId);
@@ -246,19 +244,6 @@ function getPermitExpiration(capId) {
         return exp.getExpDate();
     return null;
 }
-// function updateProcessExpiration(procCapId,expDate){
-// var b1ExpResult = aa.expiration.getLicensesByCapID(procCapId)
-   		// if (b1ExpResult.getSuccess())
-   			// {
-   			// this.b1Exp = b1ExpResult.getOutput();
-
-			// var expAADate = aa.date.parseDate(expDate);
-			// this.b1Exp.setExpDate(expAADate);
-			// aa.expiration.editB1Expiration(this.b1Exp.getB1Expiration())
-			
-			// }
-			
-// }	
 function elapsed() {
     var thisDate = new Date();
     var thisTime = thisDate.getTime();
@@ -769,25 +754,42 @@ function getAddress(capId){
 	}
 	return capAddresses;
 }
-function updateExpirationDateandstatus(expDate, capid, expStatus) {
-    var b1ExpResult = aa.expiration.getLicensesByCapID(capid);
-    if (b1ExpResult.getSuccess()) {
-        var b1ExpArray = b1ExpResult.getOutput(); // array of B1ExpirationScriptModels
-        if (b1ExpArray && b1ExpArray.length > 0) {
-            var expAADate = aa.date.parseDate(expDate);
-            for (var i = 0; i < b1ExpArray.length; i++) {
-                var b1Exp = b1ExpArray[i];
-                if (b1Exp && b1Exp.getB1Expiration()) {
-                    b1Exp.getB1Expiration().setExpDate(expAADate);
-                    b1Exp.getB1Expiration().setExpStatus(expStatus);
-                    aa.expiration.editB1Expiration(b1Exp.getB1Expiration());
-                }
-            }
-        } else {
-            logDebug("No B1Expiration records found for CAP: " + capid);
+function updateProcessExpiration(expDate, procCapId, statusText) {
+
+    try {
+        var scriptDate = toScriptDate(expDate);
+        if (!scriptDate) {
+            logDebug("Invalid expiration date for " + procCapId.getCustomID());
+            return false;
         }
-    } else {
-        logDebug("Failed to get B1Expiration for CAP: " + capid + " - " + b1ExpResult.getErrorMessage());
+        // GET EXPIRATION OBJECT
+        var expResult = aa.expiration.getLicensesByCapID(procCapId);
+        if (!expResult.getSuccess()) {
+            logDebug("Expiration lookup failed: " + procCapId.getCustomID());
+            return false;
+        }
+        var expObj = expResult.getOutput();
+        if (!expObj) {
+            logDebug("No expiration object on process: " + procCapId.getCustomID());
+            return false;
+        }
+        // SET DATE + STATUS
+        expObj.setExpDate(scriptDate);
+        expObj.setExpStatus(statusText);  
+        // SAVE
+        var editResult = aa.expiration.editB1Expiration( expObj.getB1Expiration() );
+        if (!editResult.getSuccess()) {
+            logDebug("Expiration edit failed: " + editResult.getErrorMessage());
+            return false;
+        }
+
+
+	  updateAppStatus("Active","Updated by batch",procCapId,procCapId.getCustomID());
+				
+        return true;
+    } catch (err) {
+        logDebug("updateProcessExpiration ERROR: " + err);
+        return false;
     }
 }
 function editAppSpecific(itemName,itemValue,capId)  {
@@ -798,14 +800,10 @@ function editAppSpecific(itemName,itemValue,capId)  {
 	{
 		if (itemName.indexOf(".") < 0)
 			{ logDebug("**WARNING: editAppSpecific requires group name prefix when useAppSpecificGroupName is true") ; return false }
-		
-		
 		itemGroup = itemName.substr(0,itemName.indexOf("."));
 		itemName = itemName.substr(itemName.indexOf(".")+1);
 	}
-   	
    	var appSpecInfoResult = aa.appSpecificInfo.editSingleAppSpecific(itemCap,itemName,itemValue,itemGroup);
-
 	if (appSpecInfoResult.getSuccess())
 	 {
 	 	if(arguments.length < 3) //If no capId passed update the ASI Array
@@ -941,24 +939,21 @@ function getBatchPosition() {
 function setBatchPosition(pos) {
     aa.env.setValue("BatchPosition", pos);
 }
-function updateProcessExpiration(procCapId, expDate) {
+function toScriptDate(dateValue) {
+    if (!dateValue)
+        return null;
+    // Already ScriptDateTime
+    if (dateValue.getClass &&
+        String(dateValue.getClass())
+            .indexOf("ScriptDateTime") > -1) {
+        return dateValue;
+    }
     try {
-        var res = aa.expiration.getLicensesByCapID(procCapId);
-        if (!res.getSuccess()) return false;
-        var exp = res.getOutput();
-        if (!exp) return false;
-        exp.setExpDate(expDate);
-        aa.expiration.editB1Expiration(exp);
-        var diff = dateDiff(expDate, new Date());
-        var status =
-            diff < 0 ? "Expired" :
-            diff <= 60 ? "About to Expire" :
-            "Active";
-
-        aa.expiration.updateExpirationStatus( procCapId, status, "AQ Batch" );
-        return true;
-    } catch (err) {
-        logDebug( "Process update failed: " + procCapId.getCustomID() );
-        return false;
+        // parseDate RETURNS ScriptDateTime directly
+        return aa.date.parseDate(dateValue);
+    }
+    catch (err) {
+        logDebug("Date conversion failed: " + dateValue);
+        return null;
     }
 }
