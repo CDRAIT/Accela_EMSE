@@ -103,6 +103,8 @@
 |         : TDunn 01/08/2026 Moved EV Charging scripting to individual WTUA scripts for Residential and Commercial
 |         : TDunn 01/10/2026 Moved Staff generated Revisions and Deferred Submittals from parent record to WTUA scripts for Residential and Commercial
 |         : TDunn 01/22/2026 added test for null for FIREINSP parcel attribute.
+|         : TDunn 02/05/2026 fixed issue with Fire Review - Partner Agency not activating.
+|         : TDunn 02/06/2026 added rules for activating Fire Review - Partner Agency when Fire Review TSI is checked but not Placer Fire District.
 |
 /---------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 
@@ -1007,7 +1009,7 @@ if(wfProcess == "BLD_20230501_MAIN")
 				updateTask("Placer County Fire Fee Review","Completion Pending","","(Preissuance Requirement)",wfProcess);
 				assignPreissue("Placer County Fire Fee Review",wfProcess);
 			}
-			if(matches(AInfo["Fire Review - Partner Agency"],"Y","Yes") && !isTaskStatus("Fire Review - Partner Agency","Complete"))
+			if((matches(AInfo["Fire Review - Partner Agency"],"Y","Yes") || matches(AInfo["Fire review - Partner Agency"],"Y","Yes")) && !isTaskStatus("Fire Review - Partner Agency","Complete"))
 			{
 				activateTask("Fire Review - Partner Agency",wfProcess);
 				updateTask("Fire Review - Partner Agency","Completion Pending","","(Preissuance Requirement)",wfProcess);
@@ -1349,7 +1351,7 @@ if(wfProcess == "BLD_20230501_MAIN")
 			updateTask("Placer County Fire Fee Review","Completion Pending","","(Preissuance Requirement)",wfProcess);
 			assignPreissue("Placer County Fire Fee Review",wfProcess);
 		}
-		if(matches(AInfo["Fire Review - Partner Agency"],"Y","Yes") && !isTaskStatus("Fire Review - Partner Agency","Complete"))
+		if((matches(AInfo["Fire Review - Partner Agency"],"Y","Yes") || matches(AInfo["Fire review - Partner Agency"],"Y","Yes")) && !isTaskStatus("Fire Review - Partner Agency","Complete"))
 		{
 			activateTask("Fire Review - Partner Agency",wfProcess);
 			updateTask("Fire Review - Partner Agency","Completion Pending","","(Preissuance Requirement)",wfProcess);
