@@ -427,7 +427,8 @@ function createRefContactsFromCapContactsAndLink(pCapId, contactTypeArray, ignor
 				logDebug("Successfully refreshed ref contact #" + refContactNum + " with CAP contact data");
 			    fileNames = [];
 			        var cap = aa.cap.getCap(pCapId).getOutput();
-					capName = cap.getSpecialText();
+				var	capName = cap.getSpecialText();
+				//	capName = cap.getSpecialText();
 				
 				
 				emailParameters = aa.util.newHashtable();
@@ -574,6 +575,11 @@ function createPublicUserFromContact(capId,contactType,refContactNum)   {
 			}
 				fileNames = [];
 				emailParameters = aa.util.newHashtable();
+
+					var cap = aa.cap.getCap(capId).getOutput();
+					var	capName = cap.getSpecialText();
+				
+				
 				addParameter(emailParameters,"$$FACILITY_NAME$$",capName);
 				addParameter(emailParameters,"$$USERNAME$$",contact.getEmail());
 				addParameter(emailParameters,"$$TP_YEAR$$",String(appdate1.getYear()-1));
