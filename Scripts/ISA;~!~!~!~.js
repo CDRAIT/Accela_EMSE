@@ -16,7 +16,7 @@
 
 if(matches(currentUserID,"JMCKENZI", "EAFTAHI","TDUNN"))
 {
-	showDebug = 1;
+	showDebug = 3;
 }
 
 logDebug("Inside ISA:*/*/*/* ...");
@@ -27,7 +27,7 @@ if (matches(appTypeArray[0], "Building", "TRPA")) {
 }
 
 //The following code should be run for Building and TRPA only.
-if (isBuildingOrTRPA) {
+//if (isBuildingOrTRPA) {
 
 /*
     Inspection #0
