@@ -569,7 +569,8 @@ function createPublicUserFromContact(capId,contactType,refContactNum)   {
 		aa.publicUser.createPublicUserForAgency(userModel);
 		// activate for agency
 		var userPinBiz = aa.proxyInvoker.newInstance("com.accela.pa.pin.UserPINBusiness").getOutput()
-			userPinBiz.updateActiveStatusAndLicenseIssueDate4PublicUser(servProvCode,userSeqNum,"ADMIN");
+		logDebug("UserSeqNum: " + userSeqNum);
+			userPinBiz.updateActiveStatusAndLicenseIssueDate4PublicUser(servProvCode, userSeqNum, "ADMIN");
   	        
 			
 			// reset password
