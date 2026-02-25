@@ -13,7 +13,7 @@
 | START: USER CONFIGURABLE PARAMETERS
 /------------------------------------------------------------------------------------------------------*/
 var showDebug = true; 				// Set to true to see debug messages in event log and email confirmation
-var maxSeconds = 15 * 60; 			// number of seconds allowed for batch processing, usually < 5*60
+var maxSeconds = 25 * 60; 			// number of seconds allowed for batch processing, usually < 5*60
 var documentOnly = false; 			// Document Only -- displays hierarchy of std choice steps
 /*------------------------------------------------------------------------------------------------------/
 | END: USER CONFIGURABLE PARAMETERS
@@ -31,14 +31,14 @@ var batchStartTime = batchStartDate.getTime();                                  
 var timeExpired = false;                                                                // Variable to identify if batch script has timed out. Defaulted to "false".
 var systemUserObj = aa.person.getUser("ADMIN").getOutput();
 var useAppSpecificGroupName = false;                                                    // Use Group name when populating App Specific Info Values
-var senderEmailAddr = "pcapcd@placer.ca.gov";                                          // Email address of the sender
+var senderEmailAddr = "placercounty_noreply@accela.com";                                          // Email address of the sender
 var emailAddress = "rmoore@placer.ca.gov";                                      // Email address of the person who will receive the batch script log information
 var emailAddress2 = "rmoore@placer.ca.gov";                                             // CC email address of the person who will receive the batch script log information
 var emailText = "";                                                                     // Email body
 //Parameter variables
 var paramsOK = true;
-//var TPvalue="TP23";
-var TPvalue = aa.env.getValue("Throughput");
+var TPvalue="TP24";
+//var TPvalue = aa.env.getValue("Throughput");
 var currentUserID = "ADMIN";
 var ratingCO = 0;
 var ratingNOx = 0;
@@ -84,743 +84,606 @@ function aboutExpLics()
 {
     var capCount = 0;
 
-              var thru = getThroughputrecords(TPvalue);
- /*var thru = [];
 var thru = [];
-
-thru.push("TP23-ADCC-10-01-01");
-thru.push("TP23-ADCC-10-02-01");
-thru.push("TP23-ACEB-30-01-01");
-thru.push("TP23-ACEB-30-01-02");
-thru.push("TP23-COFE-14-01-01");
-thru.push("TP23-AACO-10-01-01");
-thru.push("TP23-AACO-51-01-01");
-thru.push("TP23-LBEM-03-01-01");
-thru.push("TP23-LBEM-16-01-01");
-thru.push("TP23-LBEM-16-01-02");
-thru.push("TP23-FHIL-01-01-01");
-thru.push("TP23-ATTA-01-01-01");
-thru.push("TP23-MDAX-07-02-01");
-thru.push("TP23-SESC-41-01-01");
-thru.push("TP23-COOK-30-01-01");
-thru.push("TP23-COOK-30-01-02");
-thru.push("TP23-COOK-30-01-03");
-thru.push("TP23-BRAG-50-01-01");
-thru.push("TP23-BRAG-50-02-01");
-thru.push("TP23-CALM-52-01-01");
-thru.push("TP23-CALM-52-02-02");
-thru.push("TP23-GRNS-54-03-02");
-thru.push("TP23-GRNS-54-04-02");
-thru.push("TP23-GRNS-54-05-02");
-thru.push("TP23-BEST-66-01-01");
-thru.push("TP23-AICA-12-01-01");
-thru.push("TP23-AUJR-35-01-01");
-thru.push("TP23-CVES-61-01-01");
-thru.push("TP23-CL5S-01-01-01");
-thru.push("TP23-CL5S-60-01-01");
-
-
-*/
-
+              var thru = getThroughputrecords(TPvalue);
                 for (x in thru)
                 {
-                                var capIDString = thru[x];
-                                var thrucapId = aa.cap.getCapID(thru[x]).getOutput();
-                                var pcap = aa.cap.getCap(thrucapId).getOutput();
-                                var pcapType = pcap.getCapType().toString();
-                                var arrEmission = []; 
-                                appType = pcapType.split("/");
-                                var process = aa.cap.getProjectByChildCapID(thrucapId,null, null).getOutput();
-                                var permit = getParentPlacer(process[0].getProjectID());
+			var capIDString = thru[x];
+			var thrucapId = aa.cap.getCapID(thru[x]).getOutput();
+			var pcap = aa.cap.getCap(thrucapId).getOutput();
+			var pcapresult = aa.cap.getCap(thrucapId);
+			var pcapType = pcap.getCapType().toString();
+			var arrEmission = []; 
+			appType = pcapType.split("/");
+			logDebug(thrucapId);
+			var process = aa.cap.getProjectByChildCapID(thrucapId,null, null).getOutput();
+			logDebug("Working on process " + process[0].getProjectID());
+			var permit = getParentPlacer(process[0].getProjectID());
+			logDebug("Working on Permit " + permit);
+			logDebug("Working on Throughput " + capIDString);
+			if(matches(appType[3],"Boiler"))
+			{              
+			var CPE = loadASITable("CRITERIA POLLUTANT EMISSION",thrucapId);
+			var MHIR = getAppSpecific("Max Heat Input Rating (MMBtu/hr)",thrucapId);
+			var AMHI = calcAMHI(thrucapId);
+			var overwrite = false;
+			if(CPE.length > 0)
+			{              
+				removeASITable("CRITERIA POLLUTANT EMISSION",thrucapId);
+				for (x in CPE)
+				{
+					emisrow = CPE[x]; 
+					var Pollutant = emisrow["Pollutant"].toString();
+					var EF1G = emisrow["EF1 (lb/MMBtu)"].toString();
+					var EF1H = emisrow["EF1 Hourly Rate (lbs/hr)"].toString();
+					var EFORG = emisrow["EF Origin Code"].toString();
+					var HARP = emisrow["HARP EF"].toString();
+					var CE = emisrow["Control Efficiency"].toString();
+					var EFNOTE = emisrow["EF Note/Memo"].toString();
+					var AELBS = emisrow["Annual Emissions (lbs)"].toString();
+					var AEOLB = emisrow["Annual Emissions Override (lbs)"].toString();
+					var AETONS = emisrow["Annual Emissions (tons)"].toString();
+					var CALC = emisrow["Calculation Method"].toString();
+					var EMISLIM = emisrow["Emissions Limit"].toString();
+					var LASTUPDATE = emisrow["Last Update"];
+					var TRANSACTIONDATE = emisrow["Transaction Date"];
+					if(MHIR != null && MHIR != "" && EF1G != null && EF1G != "")
+					{
+						EF1H = String(Number(MHIR * EF1G).toFixed(4));
+						HARP = String(Number(EF1G).toFixed(4));
+					}
+					
+					if(AEOLB != null && AEOLB != "" && AEOLB != " ")
+					{
+						overwrite = true;
+					}
+					if(!overwrite)
+					{
+						AELBS = String(Number(EF1G * AMHI).toFixed(4));
+						AETONS = String(Number(AELBS / 2000).toFixed(10));
+					}
+					if(overwrite)
+					{
+						AETONS = String(Number(AEOLB / 2000).toFixed(10));
+					}
+				arrEmission["Pollutant"] = String(Pollutant);
+				arrEmission["EF1 (lb/MMBtu)"] = String(EF1G);
+				arrEmission["EF1 Hourly Rate (lbs/hr)"] = String(EF1H);
+				arrEmission["EF Origin Code"] = String(EFORG);
+				arrEmission["HARP EF"] = String(HARP);
+				if(CE == null || CE == "")
+				{
+					arrEmission["Control Efficiency"] = " ";
+				}
+				else
+				{
+					arrEmission["Control Efficiency"] = String(CE);
+				}	
+				if(EFNOTE == null || EFNOTE == "")
+				{
+					arrEmission["EF Note/Memo"] = " ";
+				}
+				else
+				{
+					arrEmission["EF Note/Memo"] = String(EFNOTE);
+				}
+				if(AEOLB == null || AEOLB == "")
+				{
+					arrEmission["Annual Emissions Override (lbs)"] = " ";
+				}
+				else
+				{
+					arrEmission["Annual Emissions Override (lbs)"] = String(AEOLB);
+				}
+				arrEmission["Annual Emissions (lbs)"] = String(AELBS);
+				arrEmission["Annual Emissions (tons)"] = String(AETONS);
+				arrEmission["Calculation Method"] = String(CALC);
+				if(EMISLIM == null || EMISLIM == "")
+				{
+					arrEmission["Emissions Limit"] = " ";
+				}
+				else
+				{
+					arrEmission["Emissions Limit"] = String(EMISLIM);
+				}
+				arrEmission["Last Update"] = LASTUPDATE;
+				arrEmission["Transaction Date"] = TRANSACTIONDATE;  
+				addToASITable("CRITERIA POLLUTANT EMISSION",arrEmission,thrucapId)												
 
-                                logDebug("Working on Throughput " + capIDString);
-                                if(matches(appType[3],"Boiler"))
-                                {              
-                                var CPE = loadASITable("CRITERIA POLLUTANT EMISSION",thrucapId);
-                                var MHIR = getAppSpecific("Max Heat Input Rating (MMBtu/hr)",thrucapId);
-                                var AMHI = calcAMHI(thrucapId);
-                                var overwrite = false;
-
-                                if(CPE.length > 0)
-                                {              removeASITable("CRITERIA POLLUTANT EMISSION",thrucapId);
-                                                for (x in CPE)
-                                                {
-                                                                emisrow = CPE[x]; 
-                                                                var Pollutant = emisrow["Pollutant"].toString();
-                                                                var EF1G = emisrow["EF1 (lb/MMBtu)"].toString();
-                                                                var EF1H = emisrow["EF1 Hourly Rate (lbs/hr)"].toString();
-                                                                var EFORG = emisrow["EF Origin Code"].toString();
-                                                                var HARP = emisrow["HARP EF"].toString();
-                                                                var CE = emisrow["Control Efficiency"].toString();
-                                                                var EFNOTE = emisrow["EF Note/Memo"].toString();
-                                                                var AELBS = emisrow["Annual Emissions (lbs)"].toString();
-                                                                var AEOLB = emisrow["Annual Emissions Override (lbs)"].toString();
-                                                                var AETONS = emisrow["Annual Emissions (tons)"].toString();
-                                                                var CALC = emisrow["Calculation Method"].toString();
-                                                                var EMISLIM = emisrow["Emissions Limit"].toString();
-                                                                var LASTUPDATE = emisrow["Last Update"];
-                                                                var TRANSACTIONDATE = emisrow["Transaction Date"];
-
-
-                                                                if(MHIR != null && MHIR != "" && EF1G != null && EF1G != "")
-                                                                {
-                                                                                EF1H = String(Number(MHIR * EF1G).toFixed(4));
-                                                                                HARP = String(Number(EF1G).toFixed(4));
-                                                                }
-                                                                
-                                                                if(AEOLB != null && AEOLB != "" && AEOLB != " ")
-                                                                {
-                                                                                overwrite = true;
-                                                                }
-
-                                                                if(!overwrite)
-                                                                {
-
-                                                                                AELBS = String(Number(EF1G * AMHI).toFixed(4));
-                                                                                AETONS = String(Number(AELBS / 2000).toFixed(10));
-                                                                }
-                                                                if(overwrite)
-                                                                {
-                                                                                AETONS = String(Number(AEOLB / 2000).toFixed(10));
-                                                                }
-                                                                
-
-                                                                
-                                                                
-                                                arrEmission["Pollutant"] = String(Pollutant);
-                                                arrEmission["EF1 (lb/MMBtu)"] = String(EF1G);
-                                                arrEmission["EF1 Hourly Rate (lbs/hr)"] = String(EF1H);
-                                                arrEmission["EF Origin Code"] = String(EFORG);
-                                                arrEmission["HARP EF"] = String(HARP);
-												if(CE == null || CE == "")
-												{
-													arrEmission["Control Efficiency"] = " ";
-												}
-												else
-												{
-													arrEmission["Control Efficiency"] = String(CE);
-												}	
-                                                if(EFNOTE == null || EFNOTE == "")
-												{
-													arrEmission["EF Note/Memo"] = " ";
-												}
-												else
-												{
-													arrEmission["EF Note/Memo"] = String(EFNOTE);
-												}
-                                                if(AEOLB == null || AEOLB == "")
-												{
-													arrEmission["Annual Emissions Override (lbs)"] = " ";
-												}
-												else
-												{
-													arrEmission["Annual Emissions Override (lbs)"] = String(AEOLB);
-												}
-                                                arrEmission["Annual Emissions (lbs)"] = String(AELBS);
-                                                arrEmission["Annual Emissions (tons)"] = String(AETONS);
-                                                arrEmission["Calculation Method"] = String(CALC);
-												if(EMISLIM == null || EMISLIM == "")
-												{
-													arrEmission["Emissions Limit"] = " ";
-												}
-												else
-												{
-													arrEmission["Emissions Limit"] = String(EMISLIM);
-												}
-                                                arrEmission["Last Update"] = LASTUPDATE;
-                                                arrEmission["Transaction Date"] = TRANSACTIONDATE;  
-												addToASITable("CRITERIA POLLUTANT EMISSION",arrEmission,thrucapId)												
-
-                                }//end of Table loop
-                                                capCount++
-                                                
-                                }//end of table if statement
-                                
-                                if (CPE.length == 0 || typeof(CPE.length) == "undefined")
-                                {
-                                                
-                                                logDebug("Throughput Record " + capIDString + " has no rows in CRITERIA POLLUTANT EMISSION");
-                                }
-
-                                                logDebug("Stop Working on Throughput " + capIDString);
-                                
-                                }//end of throughput records loop
-                                
-if(matches(appType[3],"Engine","Prime Engine","Flex Emergency Engine","Flex Prime Engine"))
-                                {              
-								var arrEmissionENG = [];
-                                var CPEENG = loadASITable("CRITERIA POLLUTANT EMISSION",thrucapId);
-                                var MHIRENG = getAppSpecific("Max Heat Input Rating (MMBtu/hr)",thrucapId);
-                                var MRHENG = getAppSpecific("Max Rated Horsepower (bhp)",thrucapId);
-
-//								logDebug("MHIRENG = " + MHIRENG )
-//								logDebug("MRHENG = " + MRHENG )
-
-                                if(matches(appType[3],"Engine","Prime Engine"))
-                                {
-                                var cal_tot = calccalendartotal(thrucapId);
-                                }
-                                if(matches(appType[3],"Flex Emergency Engine","Flex Prime Engine"))
-                                {
-                                var cal_tot = calccalendartotalFlex(thrucapId);
-                                }
-//                                logDebug("calctotal = " + cal_tot);
-                                var overwrite = false
-                                
-                                if(CPEENG.length > 0)
-                                {      removeASITable("CRITERIA POLLUTANT EMISSION",thrucapId);        
-                                                for (x in CPEENG)
-                                                {
-                                                                emisrow = CPEENG[x]; 
-                                                                var PollutantENG = emisrow["Pollutant"].toString();
-                                                                var EF1GENG = emisrow["EF1 (g/bhp-hr)"].toString();
-                                                                var EF1HENG = emisrow["EF1 Hourly Rate (lbs/hr)"].toString();
-                                                                var EF2GENG = emisrow["EF2 (lb/MMBtu)"].toString();
-                                                                var EF2HENG = emisrow["EF2 Hourly Rate (lbs/hr)"].toString();
-                                                                var EFORGENG = emisrow["EF Origin Code"].toString();
-                                                                var HARPENG = emisrow["HARP EF"].toString();
-                                                                var CEENG = emisrow["Control Efficiency"].toString();
-                                                                var EFNOTEENG = emisrow["EF Note/Memo"].toString();
-                                                                var AELBSENG = emisrow["Annual Emissions (lbs)"].toString();
-                                                                var AEOLBENG = emisrow["Annual Emissions Override (lbs)"].toString();
-                                                                var AETONSENG = emisrow["Annual Emissions (tons)"].toString();
-                                                                var CALCENG = emisrow["Calculation Method"].toString();
-                                                                var EMISLIMENG = emisrow["Emissions Limit"].toString();
-                                                                var LASTUPDATEENG = emisrow["Last Update"];
-                                                                var TRANSACTIONDATEENG = emisrow["Transaction Date"];
-                                                                
-//                                                                logDebug("ef1geng = " + EF1GENG)
-                                                                if(EF1GENG != null && EF1GENG != "")
-                                                                {
-																EF1HENG = String(Number((MRHENG * EF1GENG)/453.59).toFixed(5));
-                                                                }
-                                                                if(EF2GENG != null && EF2GENG != "" && EF2GENG != " ")
-                                                                {
-                                                                EF2HENG = String(Number(MHIRENG * EF2GENG).toFixed(5))
-                                                                }
-//                                                              logDebug("EF1HENG  = " + EF1HENG )
-                                                                if(Number(EF1HENG) > Number(EF2HENG) && matches(appType[3],"Engine","Prime Engine"))
-                                                                {
-                                                                                AELBSENG = String(Number(EF1HENG * cal_tot).toFixed(5));
-                                                                                HARPENG = String(Number(EF1HENG * cal_tot).toFixed(5));
-
-                                                                }
-                                                                if(Number(EF2HENG) > Number(EF1HENG) && matches(appType[3],"Engine","Prime Engine"))
-                                                                {
-                                                                                AELBSENG = String(Number(EF2HENG * cal_tot).toFixed(5));
-                                                                                HARPENG = String(Number(EF2HENG * cal_tot).toFixed(5));
-                                                                }
-                                                                if(Number(EF1HENG) > Number(EF2HENG) && matches(appType[3],"Flex Emergency Engine","Flex Prime Engine"))
-                                                                {
-                                                                                AELBSENG = String(Number(EF1HENG * cal_tot).toFixed(5));
-                                                                                HARPENG = String(Number(EF1HENG).toFixed(5));
-
-                                                                }
-                                                                if(Number(EF2HENG) > Number(EF1HENG) && matches(appType[3],"Flex Emergency Engine","Flex Prime Engine"))
-                                                                {
-                                                                                AELBSENG = String(Number(EF2HENG * cal_tot).toFixed(5));
-                                                                                HARPENG = String(Number(EF2HENG).toFixed(5));
-                                                                }
-//                                                                logDebug("AELBSENG " + AEOLBENG );
-                                                
-                                                                if(AEOLBENG != null && AEOLBENG != "" && AEOLBENG != " " )
-                                                                {
-                                                                                overwrite = true;
-                                                                }
-                                                                if(!overwrite)
-                                                                {
-                                                                
-                                                                                AETONS = String(Number(AELBSENG / 2000).toFixed(10));
-                                                                }
-                                                                if(overwrite)
-                                                                {
-                                                                                AETONS = String(Number(AEOLBENG / 2000).toFixed(10));
-                                                                }
-                                
-//                                                logDebug("AETONS "+ AETONS );
-//                                                logDebug("overwrite "+ overwrite);
-                                                
-                                                arrEmissionENG["Pollutant"] = String(PollutantENG);
-                                                arrEmissionENG["EF1 (g/bhp-hr)"] = String(EF1GENG);
-                                                arrEmissionENG["EF1 Hourly Rate (lbs/hr)"] = String(EF1HENG);
-                                                if(EF2GENG != null && EF2GENG != "")
-                                                {
-                                                arrEmissionENG["EF2 (lb/MMBtu)"] = String(EF2GENG);
-                                                }
-                                                else
-                                                {
-                                                arrEmissionENG["EF2 (lb/MMBtu)"] = String(" ");              
-                                                }
-                                                arrEmissionENG["EF2 Hourly Rate (lbs/hr)"] = String(EF2HENG);
-                                                arrEmissionENG["EF Origin Code"] = String(EFORGENG);
-                                                arrEmissionENG["HARP EF"] = String(HARPENG);
-                                                if(CEENG != null && CEENG != "")
-                                                {
-                                                arrEmissionENG["Control Efficiency"] = String(CEENG);
-                                                }
-                                                else
-                                                {
-                                                arrEmissionENG["Control Efficiency"] = String(" ");            
-                                                }
-                                                if(EFNOTEENG != null && EFNOTEENG != "")
-                                                {
-                                                arrEmissionENG["EF Note/Memo"] = String(EFNOTEENG);
-                                                }
-                                                else
-                                                {
-                                                arrEmissionENG["EF Note/Memo"] = String(" "); 
-                                                }
-                                                arrEmissionENG["Annual Emissions (lbs)"] = String(AELBSENG);
-                                                if(AEOLBENG != null && AEOLBENG != "" && AEOLBENG != " ")
-                                                {
-                                                arrEmissionENG["Annual Emissions Override (lbs)"] = String(AEOLBENG);
-                                                }
-                                                else
-                                                {
-                                                arrEmissionENG["Annual Emissions Override (lbs)"] = String(" ");                
-                                                }
-//												logDebug("annual emissions (tons) = " + AETONS)
-                                                arrEmissionENG["Annual Emissions (tons)"] = String(AETONS);
-                                                arrEmissionENG["Calculation Method"] = String(CALCENG);
-                                                if(EMISLIMENG != null && EMISLIMENG != "")
-                                                {
-                                                arrEmissionENG["Emissions Limit"] = String(EMISLIMENG);
-                                                }
-                                                else
-                                                {
-                                                arrEmissionENG["Emissions Limit"] = String(" "); 
-                                                }
-                                                arrEmissionENG["Last Update"] = LASTUPDATEENG;
-                                                arrEmissionENG["Transaction Date"] = TRANSACTIONDATEENG;    
-											addToASITable("CRITERIA POLLUTANT EMISSION",arrEmissionENG,thrucapId);												
-
-                                }//end of Table loop
-                                                capCount++
-                                                 
-                                }//end of table if statement
-                                
-                                
-                                
-                                if (CPEENG.length == 0 || typeof(CPEENG.length) == "undefined")
-                                {
-                                                
-                                                logDebug("Throughput Record " + capIDString + " has no rows in CRITERIA POLLUTANT EMISSION");
-                                }
-
-                                                logDebug("Stop Working on Throughput " + capIDString);
-                                
-                                
+			}//end of Table loop
+							capCount++
+							
+			}//end of table if statement
+			
+			if (CPE.length == 0 || typeof(CPE.length) == "undefined")
+			{
+							logDebug("Throughput Record " + capIDString + " has no rows in CRITERIA POLLUTANT EMISSION");
+			}
+							logDebug("Stop Working on Throughput " + capIDString);
+			}//end of throughput records loop
+			if(matches(appType[3],"Engine","Prime Engine"))    {              
+			var arrEmissionENG = [];
+			var CPEENG = loadASITable("CRITERIA POLLUTANT EMISSION",thrucapId);
+			var MHIRENG = getAppSpecific("Max Heat Input Rating (MMBtu/hr)",thrucapId);
+			var MRHENG = getAppSpecific("Max Rated Horsepower (bhp)",thrucapId);
+			if(matches(appType[3],"Engine","Prime Engine"))
+			{
+			var cal_tot = calccalendartotal(thrucapId);
+			}
+			var overwrite = false
+			
+			if(CPEENG.length > 0)
+			{      
+				removeASITable("CRITERIA POLLUTANT EMISSION",thrucapId);        
+					for (x in CPEENG)
+					{
+						emisrow = CPEENG[x]; 
+						var PollutantENG = emisrow["Pollutant"].toString();
+						var EF1GENG = emisrow["EF1 (g/bhp-hr)"].toString();
+						var EF1HENG = emisrow["EF1 Hourly Rate (lbs/hr)"].toString();
+						var EF2GENG = emisrow["EF2 (lb/MMBtu)"].toString();
+						var EF2HENG = emisrow["EF2 Hourly Rate (lbs/hr)"].toString();
+						var EFORGENG = emisrow["EF Origin Code"].toString();
+						var HARPENG = emisrow["HARP EF"].toString();
+						var CEENG = emisrow["Control Efficiency"].toString();
+						var EFNOTEENG = emisrow["EF Note/Memo"].toString();
+						var AELBSENG = emisrow["Annual Emissions (lbs)"].toString();
+						var AEOLBENG = emisrow["Annual Emissions Override (lbs)"].toString();
+						var AETONSENG = emisrow["Annual Emissions (tons)"].toString();
+						var CALCENG = emisrow["Calculation Method"].toString();
+						var EMISLIMENG = emisrow["Emissions Limit"].toString();
+						var LASTUPDATEENG = emisrow["Last Update"];
+						var TRANSACTIONDATEENG = emisrow["Transaction Date"];
+						if(EF1GENG != null && EF1GENG != "")
+						{
+						EF1HENG = String(Number((MRHENG * EF1GENG)/453.59).toFixed(5));
+						}
+						if(EF2GENG != null && EF2GENG != "" && EF2GENG != " ")
+						{
+						EF2HENG = String(Number(MHIRENG * EF2GENG).toFixed(5))
+						}
+						if(Number(EF1HENG) > Number(EF2HENG) && matches(appType[3],"Engine","Prime Engine"))
+						{
+							AELBSENG = String(Number(EF1HENG * cal_tot).toFixed(5));
+							HARPENG = String(Number(EF1HENG * cal_tot).toFixed(5));
+						}
+						if(Number(EF2HENG) > Number(EF1HENG) && matches(appType[3],"Engine","Prime Engine"))
+						{
+							AELBSENG = String(Number(EF2HENG * cal_tot).toFixed(5));
+							HARPENG = String(Number(EF2HENG * cal_tot).toFixed(5));
+						}
+						if(Number(EF1HENG) > Number(EF2HENG) && matches(appType[3],"Flex Emergency Engine","Flex Prime Engine"))
+						{
+							AELBSENG = String(Number(EF1HENG * cal_tot).toFixed(5));
+							HARPENG = String(Number(EF1HENG).toFixed(5));
+						}
+						if(Number(EF2HENG) > Number(EF1HENG) && matches(appType[3],"Flex Emergency Engine","Flex Prime Engine"))
+						{
+							AELBSENG = String(Number(EF2HENG * cal_tot).toFixed(5));
+							HARPENG = String(Number(EF2HENG).toFixed(5));
+						}
+						if(AEOLBENG != null && AEOLBENG != "" && AEOLBENG != " " )
+						{
+							overwrite = true;
+						}
+						if(!overwrite)
+						{
+							AETONS = String(Number(AELBSENG / 2000).toFixed(10));
+						}
+						if(overwrite)
+						{
+							AETONS = String(Number(AEOLBENG / 2000).toFixed(10));
+						}
+		arrEmissionENG["Pollutant"] = String(PollutantENG);
+		arrEmissionENG["EF1 (g/bhp-hr)"] = String(EF1GENG);
+		arrEmissionENG["EF1 Hourly Rate (lbs/hr)"] = String(EF1HENG);
+		if(EF2GENG != null && EF2GENG != "")
+		{
+		arrEmissionENG["EF2 (lb/MMBtu)"] = String(EF2GENG);
+		}
+		else
+		{
+		arrEmissionENG["EF2 (lb/MMBtu)"] = String(" ");              
+		}
+		arrEmissionENG["EF2 Hourly Rate (lbs/hr)"] = String(EF2HENG);
+		arrEmissionENG["EF Origin Code"] = String(EFORGENG);
+		arrEmissionENG["HARP EF"] = String(HARPENG);
+		if(CEENG != null && CEENG != "")
+		{
+		arrEmissionENG["Control Efficiency"] = String(CEENG);
+		}
+		else
+		{
+		arrEmissionENG["Control Efficiency"] = String(" ");            
+		}
+		if(EFNOTEENG != null && EFNOTEENG != "")
+		{
+		arrEmissionENG["EF Note/Memo"] = String(EFNOTEENG);
+		}
+		else
+		{
+		arrEmissionENG["EF Note/Memo"] = String(" "); 
+		}
+		arrEmissionENG["Annual Emissions (lbs)"] = String(AELBSENG);
+		if(AEOLBENG != null && AEOLBENG != "" && AEOLBENG != " ")
+		{
+		arrEmissionENG["Annual Emissions Override (lbs)"] = String(AEOLBENG);
+		}
+		else
+		{
+		arrEmissionENG["Annual Emissions Override (lbs)"] = String(" ");                
+		}
+		arrEmissionENG["Annual Emissions (tons)"] = String(AETONS);
+		arrEmissionENG["Calculation Method"] = String(CALCENG);
+		if(EMISLIMENG != null && EMISLIMENG != "")
+		{
+		arrEmissionENG["Emissions Limit"] = String(EMISLIMENG);
+		}
+		else
+		{
+		arrEmissionENG["Emissions Limit"] = String(" "); 
+		}
+		arrEmissionENG["Last Update"] = LASTUPDATEENG;
+		arrEmissionENG["Transaction Date"] = TRANSACTIONDATEENG;    
+		addToASITable("CRITERIA POLLUTANT EMISSION",arrEmissionENG,thrucapId);												
+	}//end of Table loop
+					capCount++
+					 
+	}//end of table if statement
+	if (CPEENG.length == 0 || typeof(CPEENG.length) == "undefined")
+	{
+		logDebug("Throughput Record " + capIDString + " has no rows in CRITERIA POLLUTANT EMISSION");
+	}
+		logDebug("Stop Working on Throughput " + capIDString);
 }//End of Engine If statement
-                                
-if(matches(appType[3],"GDF"))
-                {
-								var arrEmissionGDF = [];
-                                calc_total = String(getAppSpecific("Total amount of gasoline dispensed in calendar year (gallons)",thrucapId));
-                                CEF = CombinedEmissionFactor(thrucapId);
-                                var CPEGDF = loadASITable("CRITERIA POLLUTANT EMISSION",thrucapId);
-                                if(CPEGDF.length > 0)
-                                {              removeASITable("CRITERIA POLLUTANT EMISSION",thrucapId); 
-                                                for (x in CPEGDF)
-                                                {
-                                                                emisrowGDF = CPEGDF[x]; 
-                                                                var PollutantGDF = emisrowGDF["Pollutant"].toString();
-                                                                var EF1GGDF = emisrowGDF["EF1 (lb/1,000 gallons)"].toString();
-                                                                var EF1HGDF = emisrowGDF["EF1 Hourly Rate (lbs/hr)"].toString();
-                                                                var EFORGGDF = emisrowGDF["EF Origin Code"].toString();
-                                                                var HARPGDF = emisrowGDF["HARP EF"].toString();
-                                                                var CEGDF = emisrowGDF["Control Efficiency"].toString();
-                                                                var EFNOTEGDF = emisrowGDF["EF Note/Memo"].toString();
-                                                                var AELBSGDF = emisrowGDF["Annual Emissions (lbs)"].toString();
-                                                                var AEOLBGDF = emisrowGDF["Annual Emissions Override (lbs)"].toString();
-                                                                var AETONSGDF = emisrowGDF["Annual Emissions (tons)"].toString();
-                                                                var CALCGDF = emisrowGDF["Calculation Method"].toString();
-                                                                //var EMISLIM = emisrowGDF["Emissions Limit"].toString();
-                                                                //var LASTUPDATE = emisrowGDF["Last Update"];
-                                                                //var TRANSACTIONDATE = emisrowGDF ["Transaction Date"];
-                                                                
-                                                                if(PollutantGDF == "Volatile Organic Compounds (VOC)")
-                                                                {
-                                                                                EF1GGDF = String(Number(CEF).toFixed(7));
-                                                                                HARPGDF = String(Number(CEF).toFixed(7));
-                                                                                EF1HGDF = String(Number(String((CEF * calc_total.replace(",","").replace(",",""))/8760000)).toFixed(7));
-                                                                                AELBSGDF = String(Number(String((CEF * calc_total.replace(",","").replace(",",""))/1000)).toFixed(7));
-                                                                                AETONSGDF = String(Number(String((CEF * calc_total.replace(",","").replace(",",""))/1000)/2000).toFixed(10));
-                                                                }
+			if(matches(appType[3],"GDF"))             		   {
+			var arrEmissionGDF = [];
+			calc_total = String(getAppSpecific("Total amount of gasoline dispensed in calendar year (gallons)",thrucapId));
+			CEF = CombinedEmissionFactor(thrucapId);
+			var CPEGDF = loadASITable("CRITERIA POLLUTANT EMISSION",thrucapId);
+			if(CPEGDF.length > 0)
+			{              
+				removeASITable("CRITERIA POLLUTANT EMISSION",thrucapId); 
+				for (x in CPEGDF)
+				{
+					emisrowGDF = CPEGDF[x]; 
+					var PollutantGDF = emisrowGDF["Pollutant"].toString();
+					var EF1GGDF = emisrowGDF["EF1 (lb/1,000 gallons)"].toString();
+					var EF1HGDF = emisrowGDF["EF1 Hourly Rate (lbs/hr)"].toString();
+					var EFORGGDF = emisrowGDF["EF Origin Code"].toString();
+					var HARPGDF = emisrowGDF["HARP EF"].toString();
+					var CEGDF = emisrowGDF["Control Efficiency"].toString();
+					var EFNOTEGDF = emisrowGDF["EF Note/Memo"].toString();
+					var AELBSGDF = emisrowGDF["Annual Emissions (lbs)"].toString();
+					var AEOLBGDF = emisrowGDF["Annual Emissions Override (lbs)"].toString();
+					var AETONSGDF = emisrowGDF["Annual Emissions (tons)"].toString();
+					var CALCGDF = emisrowGDF["Calculation Method"].toString();
+					if(PollutantGDF == "Volatile Organic Compounds (VOC)")
+					{
+						EF1GGDF = String(Number(CEF).toFixed(7));
+						HARPGDF = String(Number(CEF).toFixed(7));
+						EF1HGDF = String(Number(String((CEF * calc_total.replace(",","").replace(",",""))/8760000)).toFixed(7));
+						AELBSGDF = String(Number(String((CEF * calc_total.replace(",","").replace(",",""))/1000)).toFixed(7));
+						AETONSGDF = String(Number(String((CEF * calc_total.replace(",","").replace(",",""))/1000)/2000).toFixed(10));
+					}
+					if(AEOLBGDF != null & AEOLBGDF != "" & AEOLBGDF != " ")
+					{
+						AETONSGDF = String(Number(AEOLBGDF / 2000).toFixed(10));
+					}
+				arrEmissionGDF ["Pollutant"] = String(PollutantGDF);
+				arrEmissionGDF ["EF1 (lb/1,000 gallons)"] = String(EF1GGDF);
+				arrEmissionGDF ["EF1 Hourly Rate (lbs/hr)"] = String(EF1HGDF);
+				arrEmissionGDF ["EF Origin Code"] = String(EFORGGDF);
+				arrEmissionGDF ["HARP EF"] = String(HARPGDF);
+				if(CEGDF != null && CEGDF != "")
+				{
+				arrEmissionGDF ["Control Efficiency"] = String(CEGDF);
+				}
+				else
+				{
+				arrEmissionGDF ["Control Efficiency"] = String(" ");   
+				}
+				if(EFNOTEGDF != null && EFNOTEGDF != "")
+				{
+				arrEmissionGDF ["EF Note/Memo"] = String(EFNOTEGDF);
+				}
+				else
+				{
+				arrEmissionGDF ["EF Note/Memo"] = String(" ");       
+				}
+				arrEmissionGDF ["Annual Emissions (lbs)"] = String(AELBSGDF);
+				if(AEOLBGDF != null && AEOLBGDF != "" && AEOLBGDF != " ")
+				{
+				arrEmissionGDF ["Annual Emissions Override (lbs)"] = String(AEOLBGDF);
+				}
+				else
+				{
+				arrEmissionGDF ["Annual Emissions Override (lbs)"] = String(" ");       
+				}
+				arrEmissionGDF ["Annual Emissions (tons)"] = String(Number(String(AETONSGDF)).toFixed(10)); // Phil change - reduced number of sigfigs
+				arrEmissionGDF ["Calculation Method"] = String(CALCGDF);
+				addToASITable("CRITERIA POLLUTANT EMISSION",arrEmissionGDF ,thrucapId);            
+}//end of Table loop
+				capCount++
+}//end of table if statement
+if (CPEGDF.length == 0 || typeof(CPEGDF.length) == "undefined")
+{
+				logDebug("Throughput Record " + capIDString + " has no rows in CRITERIA POLLUTANT EMISSION");
+}
+				logDebug("Stop Working on Throughput " + capIDString);
+//THRU_GDF_CPE_EF1
+}//End of GDF If statement
+			if(matches(appType[3],"Coatings","Solvents")) 	   {
+				var arrEmissionCOAT = [];
+				calc_total_VOC = CalcTotalHours1(thrucapId);
+				calc_total_GAL = CalcTotalHours(thrucapId);
+				var CPECOAT = loadASITable("CRITERIA POLLUTANT EMISSION",thrucapId);
+				if(CPECOAT.length > 0)
+				{              
+					removeASITable("CRITERIA POLLUTANT EMISSION",thrucapId);
+					for (x in CPECOAT)
+					{
+					emisrowCOAT = CPECOAT[x]; 
+					var PollutantCOAT = emisrowCOAT["Pollutant"].toString();
+					var EF1GCOAT = emisrowCOAT["EF (lbs/gal)"].toString();
+					//var EF1HCOAT = emisrowCOAT["EF1 Hourly Rate (lbs/hr)"].toString();
+					var EFORGCOAT = emisrowCOAT["EF Origin Code"].toString();
+					var HARPCOAT = emisrowCOAT["HARP EF"].toString();
+					var CECOAT = emisrowCOAT["Control Efficiency"].toString();
+					var EFNOTECOAT = emisrowCOAT["EF Note/Memo"].toString();
+					var AELBSCOAT = emisrowCOAT["Annual Emissions (lbs)"].toString();
+					var AEOLBCOAT = emisrowCOAT["Annual Emissions Override (lbs)"].toString();
+					var AETONSCOAT = emisrowCOAT["Annual Emissions (tons)"].toString();
+					var CALCCOAT = emisrowCOAT["Calculation Method"].toString();
+					var EMISLIMCOAT = emisrowCOAT["Emissions Limit"].toString();
+					//var LASTUPDATE = emisrowCOAT["Last Update"];
+					//var TRANSACTIONDATE = emisrowCOAT ["Transaction Date"];
+					if(Number(calc_total_GAL) == 0)
+					{
+						HARPCOAT = "0";
+						EF1GCOAT = "0";
+					}
+					else
+					{
+						HARPCOAT = String(Number(calc_total_VOC / calc_total_GAL).toFixed(4));
+						EF1GCOAT = String(Number(calc_total_VOC / calc_total_GAL).toFixed(4));
+					}
+						AETONSCOAT = String(Number(calc_total_VOC / 2000).toFixed(10));
+						AELBSCOAT = String(Number(calc_total_VOC).toFixed(4));
+					if(AEOLBCOAT != null && AEOLBCOAT != "" && AEOLBCOAT != " ")
+					{
+						AETONSCOAT = String(Number(AEOLBCOAT / 2000).toFixed(10));
+					}
+				arrEmissionCOAT["Pollutant"] = String(PollutantCOAT);
+				arrEmissionCOAT["EF (lbs/gal)"] = String(EF1GCOAT);
+				//arrEmissionCOAT["EF1 Hourly Rate (lbs/hr)"] = String(EF1HCOAT);
+				arrEmissionCOAT["EF Origin Code"] = String(EFORGCOAT);
+				arrEmissionCOAT["HARP EF"] = String(HARPCOAT);
+				if(CECOAT != null && CECOAT != "")
+				{
+				arrEmissionCOAT["Control Efficiency"] = String(CECOAT);
+				}
+				else
+				{
+				arrEmissionCOAT["Control Efficiency"] = String(" "); 
+				}
+				if(EFNOTECOAT != null && EFNOTECOAT != "")
+				{
+				arrEmissionCOAT["EF Note/Memo"] = String(EFNOTECOAT);
+				}
+				else
+				{
+				arrEmissionCOAT["EF Note/Memo"] = String(" ");     
+				}
+				arrEmissionCOAT["Annual Emissions (lbs)"] = String(AELBSCOAT);
+				if(AEOLBCOAT != null && AEOLBCOAT != "" && AEOLBCOAT != " ")
+				{
+				arrEmissionCOAT["Annual Emissions Override (lbs)"] = String(AEOLBCOAT);
+				}
+				else
+				{
+				arrEmissionCOAT["Annual Emissions Override (lbs)"] = String(" ");     
+				}
+				arrEmissionCOAT["Annual Emissions (tons)"] = String(AETONSCOAT);
+				arrEmissionCOAT["Calculation Method"] = String(CALCCOAT);
+				addToASITable("CRITERIA POLLUTANT EMISSION",arrEmissionCOAT,thrucapId);   
+				}//end of Table loop
+				}//end of table if statement
+				if (CPECOAT.length == 0 || typeof(CPECOAT.length) == "undefined")
+				{
+					logDebug("Throughput Record " + capIDString + " has no rows in CRITERIA POLLUTANT EMISSION");
+				}
+					logDebug("Stop Working on Throughput " + capIDString);
+				capCount++
+}//End of COAT If statement
+			if(matches(appType[3],"Coffee Roasting")) 		   {
+											var arrEmissionCOFF = [];					
+											var LBCOFF= getAppSpecific("The total pounds of coffee",thrucapId);
+											var NGU= getAppSpecific("Natural Gas Units",thrucapId);
+											var calc_total = CalcTotalHours(thrucapId);
+											var CPECOFF = loadASITable("CRITERIA POLLUTANT EMISSION",thrucapId);
+											if(CPECOFF.length > 0)
+											{              
+											  removeASITable("CRITERIA POLLUTANT EMISSION",thrucapId);
+												for (x in CPECOFF)
+												{
+													emisrowCOFF = CPECOFF[x]; 
+													var PollutantCOFF = emisrowCOFF["Pollutant"].toString();
+													var EF1GCOFF = emisrowCOFF["EF (lbs/ton)"].toString();
+													var EF1HCOFF = emisrowCOFF["EF Hourly Rate (lbs/hr)"].toString();
+													var EFORGCOFF = emisrowCOFF["EF Origin Code"].toString();
+													var HARPCOFF = emisrowCOFF["HARP EF"].toString();
+													var CECOFF = emisrowCOFF["Control Efficiency"].toString();
+													var EFNOTECOFF = emisrowCOFF["EF Note/Memo"].toString();
+													var AELBSCOFF = emisrowCOFF["Annual Emissions (lbs)"].toString();
+													var AEOLBCOFF = emisrowCOFF["Annual Emissions Override (lbs)"].toString();
+													var AETONSCOFF = emisrowCOFF["Annual Emissions (tons)"].toString();
+													var CALCCOFF = emisrowCOFF["Calculation Method"].toString();
+													var EMISLIMCOFF = emisrowCOFF["Emissions Limit"].toString();
+													//var LASTUPDATE = emisrowCOFF["Last Update"];
+													//var TRANSACTIONDATE = emisrowCOAT ["Transaction Date"];
+													if(CECOFF != "" && CECOFF != null && CECOFF != " " )
+													{
+																	EF1HCOFF = Number(String((EF1GCOFF * LBCOFF/2000)*((100 - CECOFF)/100) /calc_total)).toFixed(5).toString();
+													}
+													else
+													{
+																	EF1HCOFF = Number((EF1GCOFF * LBCOFF/2000)/calc_total).toFixed(5).toString();
+													}
+													if(Number(calc_total) != 0) 
+													{
+																	AELBSCOFF = String(Number(Number(EF1HCOFF) * Number(calc_total)).toFixed(5));
+													}
+																	AETONSCOFF = Number(String(AELBSCOFF / 2000)).toFixed(10).toString(); 
+													if(AEOLBCOFF != null && AEOLBCOFF != "" && AEOLBCOFF != " ")
+													{
+																	AETONSCOFF = Number(String(AEOLBCOFF / 2000)).toFixed(10).toString();
+													}
+													arrEmissionCOFF["Pollutant"] = String(PollutantCOFF);
+													arrEmissionCOFF["EF (lbs/gal)"] = String(EF1GCOFF);
+													arrEmissionCOFF["EF Hourly Rate (lbs/hr)"] = String(EF1HCOFF);
+													arrEmissionCOFF["EF Origin Code"] = String(EFORGCOFF);
+													arrEmissionCOFF["HARP EF"] = String(HARPCOFF);
+													if(CECOFF != null && CECOFF != "")
+													{
+													arrEmissionCOFF["Control Efficiency"] = String(CECOFF);
+													}
+													else
+													{
+													arrEmissionCOFF["Control Efficiency"] = String(" ");  
+													}
+													if(EFNOTECOFF != null && EFNOTECOFF != "")
+													{
+													arrEmissionCOFF["EF Note/Memo"] = String(EFNOTECOFF);
+													}
+													else
+													{
+													arrEmissionCOFF["EF Note/Memo"] = String(" ");      
+													}
+													arrEmissionCOFF["Annual Emissions (lbs)"] = String(AELBSCOFF);
+													if(AEOLBCOFF != null && AEOLBCOFF != "" && AEOLBCOFF != " ")
+													{
+													arrEmissionCOFF["Annual Emissions Override (lbs)"] = String(AEOLBCOFF);
+													}
+													else
+													{
+													arrEmissionCOFF["Annual Emissions Override (lbs)"] = String(" ");     
+													}
+													arrEmissionCOFF["Annual Emissions (tons)"] = String(AETONSCOFF);
+													arrEmissionCOFF["Calculation Method"] = String(CALCCOFF);
+													addToASITable("CRITERIA POLLUTANT EMISSION",arrEmissionCOFF,thrucapId);            
+											}//end of Table loop
+											}//end of table if statement
+											if (CPECOFF.length == 0 || typeof(CPECOFF.length) == "undefined")
+											{
+												logDebug("Throughput Record " + capIDString + " has no rows in CRITERIA POLLUTANT EMISSION");
+											}
+												logDebug("Stop Working on Throughput " + capIDString);
+											capCount++
 
-                                                                if(AEOLBGDF != null & AEOLBGDF != "" & AEOLBGDF != " ")
-                                                                {
-                                                                                AETONSGDF = String(Number(AEOLBGDF / 2000).toFixed(10));
-                                                                }
-
-                                                                
-                                                arrEmissionGDF ["Pollutant"] = String(PollutantGDF);
-                                                arrEmissionGDF ["EF1 (lb/1,000 gallons)"] = String(EF1GGDF);
-                                                arrEmissionGDF ["EF1 Hourly Rate (lbs/hr)"] = String(EF1HGDF);
-                                                arrEmissionGDF ["EF Origin Code"] = String(EFORGGDF);
-                                                arrEmissionGDF ["HARP EF"] = String(HARPGDF);
-                                                if(CEGDF != null && CEGDF != "")
-                                                {
-                                                arrEmissionGDF ["Control Efficiency"] = String(CEGDF);
-                                                }
-                                                else
-                                                {
-                                                arrEmissionGDF ["Control Efficiency"] = String(" ");   
-                                                }
-                                                if(EFNOTEGDF != null && EFNOTEGDF != "")
-                                                {
-                                                arrEmissionGDF ["EF Note/Memo"] = String(EFNOTEGDF);
-                                                }
-                                                else
-                                                {
-                                                arrEmissionGDF ["EF Note/Memo"] = String(" ");       
-                                                }
-                                                arrEmissionGDF ["Annual Emissions (lbs)"] = String(AELBSGDF);
-                                                if(AEOLBGDF != null && AEOLBGDF != "" && AEOLBGDF != " ")
-                                                {
-                                                arrEmissionGDF ["Annual Emissions Override (lbs)"] = String(AEOLBGDF);
-                                                }
-                                                else
-                                                {
-                                                arrEmissionGDF ["Annual Emissions Override (lbs)"] = String(" ");       
-                                                }
-                                                arrEmissionGDF ["Annual Emissions (tons)"] = String(Number(String(AETONSGDF)).toFixed(10)); // Phil change - reduced number of sigfigs
-                                                arrEmissionGDF ["Calculation Method"] = String(CALCGDF);
-
-                                                 addToASITable("CRITERIA POLLUTANT EMISSION",arrEmissionGDF ,thrucapId);            
-                                                                
-                                }//end of Table loop
-                                                capCount++
-                                                
-                                }//end of table if statement
-                                
-                                
-                                
-                                if (CPEGDF.length == 0 || typeof(CPEGDF.length) == "undefined")
-                                {
-                                                
-                                                logDebug("Throughput Record " + capIDString + " has no rows in CRITERIA POLLUTANT EMISSION");
-                                }
-
-                                                logDebug("Stop Working on Throughput " + capIDString);
-                                
-                                //THRU_GDF_CPE_EF1
-                                                                
-                
-                                
-                                
-                
-                                
-                }//End of GDF If statement
-
-if(matches(appType[3],"Coatings","Solvents"))
-                {
-								var arrEmissionCOAT = [];
-                                calc_total_VOC = CalcTotalHours1(thrucapId);
-                                calc_total_GAL = CalcTotalHours(thrucapId);
-
-                                var CPECOAT = loadASITable("CRITERIA POLLUTANT EMISSION",thrucapId);
-                                if(CPECOAT.length > 0)
-                                {              
-                                                removeASITable("CRITERIA POLLUTANT EMISSION",thrucapId);
-                                                for (x in CPECOAT)
-                                                {
-                                                                emisrowCOAT = CPECOAT[x]; 
-                                                                var PollutantCOAT = emisrowCOAT["Pollutant"].toString();
-                                                                var EF1GCOAT = emisrowCOAT["EF (lbs/gal)"].toString();
-                                                                //var EF1HCOAT = emisrowCOAT["EF1 Hourly Rate (lbs/hr)"].toString();
-                                                                var EFORGCOAT = emisrowCOAT["EF Origin Code"].toString();
-                                                                var HARPCOAT = emisrowCOAT["HARP EF"].toString();
-                                                                var CECOAT = emisrowCOAT["Control Efficiency"].toString();
-                                                                var EFNOTECOAT = emisrowCOAT["EF Note/Memo"].toString();
-                                                                var AELBSCOAT = emisrowCOAT["Annual Emissions (lbs)"].toString();
-                                                                var AEOLBCOAT = emisrowCOAT["Annual Emissions Override (lbs)"].toString();
-                                                                var AETONSCOAT = emisrowCOAT["Annual Emissions (tons)"].toString();
-                                                                var CALCCOAT = emisrowCOAT["Calculation Method"].toString();
-                                                                var EMISLIMCOAT = emisrowCOAT["Emissions Limit"].toString();
-                                                                //var LASTUPDATE = emisrowCOAT["Last Update"];
-                                                                //var TRANSACTIONDATE = emisrowCOAT ["Transaction Date"];
-                                                                if(Number(calc_total_GAL) == 0)
-                                                                {
-                                                                                HARPCOAT = "0";
-                                                                                EF1GCOAT = "0";
-                                                                }
-                                                                else
-                                                                {
-                                                                                HARPCOAT = String(Number(calc_total_VOC / calc_total_GAL).toFixed(4));
-                                                                                EF1GCOAT = String(Number(calc_total_VOC / calc_total_GAL).toFixed(4));
-                                                                }
-                                                                
-                                                                AETONSCOAT = String(Number(calc_total_VOC / 2000).toFixed(10));
-                                                                AELBSCOAT = String(Number(calc_total_VOC).toFixed(4));
-                                                                
-                                                                if(AEOLBCOAT != null && AEOLBCOAT != "" && AEOLBCOAT != " ")
-                                                                {
-                                                                                AETONSCOAT = String(Number(AEOLBCOAT / 2000).toFixed(10));
-                                                                }
-                                                                
-
-                                                                
-                                                arrEmissionCOAT["Pollutant"] = String(PollutantCOAT);
-                                                arrEmissionCOAT["EF (lbs/gal)"] = String(EF1GCOAT);
-                                                //arrEmissionCOAT["EF1 Hourly Rate (lbs/hr)"] = String(EF1HCOAT);
-                                                arrEmissionCOAT["EF Origin Code"] = String(EFORGCOAT);
-                                                arrEmissionCOAT["HARP EF"] = String(HARPCOAT);
-                                                if(CECOAT != null && CECOAT != "")
-                                                {
-                                                arrEmissionCOAT["Control Efficiency"] = String(CECOAT);
-                                                }
-                                                else
-                                                {
-                                                arrEmissionCOAT["Control Efficiency"] = String(" "); 
-                                                }
-                                                if(EFNOTECOAT != null && EFNOTECOAT != "")
-                                                {
-                                                arrEmissionCOAT["EF Note/Memo"] = String(EFNOTECOAT);
-                                                }
-                                                else
-                                                {
-                                                arrEmissionCOAT["EF Note/Memo"] = String(" ");     
-                                                }
-                                                arrEmissionCOAT["Annual Emissions (lbs)"] = String(AELBSCOAT);
-                                                if(AEOLBCOAT != null && AEOLBCOAT != "" && AEOLBCOAT != " ")
-                                                {
-                                                arrEmissionCOAT["Annual Emissions Override (lbs)"] = String(AEOLBCOAT);
-                                                }
-                                                else
-                                                {
-                                                arrEmissionCOAT["Annual Emissions Override (lbs)"] = String(" ");     
-                                                }
-                                                arrEmissionCOAT["Annual Emissions (tons)"] = String(AETONSCOAT);
-                                                arrEmissionCOAT["Calculation Method"] = String(CALCCOAT);
-
-                                                addToASITable("CRITERIA POLLUTANT EMISSION",arrEmissionCOAT,thrucapId);   
-                                                                
-                                }//end of Table loop
-                                                 
-                                }//end of table if statement
-                                
-                                
-                                
-                                if (CPECOAT.length == 0 || typeof(CPECOAT.length) == "undefined")
-                                {
-                                                
-                                                logDebug("Throughput Record " + capIDString + " has no rows in CRITERIA POLLUTANT EMISSION");
-                                }
-
-                                                logDebug("Stop Working on Throughput " + capIDString);
-                                capCount++
-
-                                                                
-                
-                                
-                                
-                
-                                
-                }//End of COAT If statement
-
-if(matches(appType[3],"Coffee Roasting"))
-                {
-								var arrEmissionCOFF = [];					
-                                var LBCOFF= getAppSpecific("The total pounds of coffee",thrucapId);
-                                var NGU= getAppSpecific("Natural Gas Units",thrucapId);
-                                var calc_total = CalcTotalHours(thrucapId);
-                                var CPECOFF = loadASITable("CRITERIA POLLUTANT EMISSION",thrucapId);
-                                if(CPECOFF.length > 0)
-                                {              
-                                  removeASITable("CRITERIA POLLUTANT EMISSION",thrucapId);
-                                                for (x in CPECOFF)
-                                                {
-                                                                emisrowCOFF = CPECOFF[x]; 
-                                                                var PollutantCOFF = emisrowCOFF["Pollutant"].toString();
-                                                                var EF1GCOFF = emisrowCOFF["EF (lbs/ton)"].toString();
-                                                                var EF1HCOFF = emisrowCOFF["EF Hourly Rate (lbs/hr)"].toString();
-                                                                var EFORGCOFF = emisrowCOFF["EF Origin Code"].toString();
-                                                                var HARPCOFF = emisrowCOFF["HARP EF"].toString();
-                                                                var CECOFF = emisrowCOFF["Control Efficiency"].toString();
-                                                                var EFNOTECOFF = emisrowCOFF["EF Note/Memo"].toString();
-                                                                var AELBSCOFF = emisrowCOFF["Annual Emissions (lbs)"].toString();
-                                                                var AEOLBCOFF = emisrowCOFF["Annual Emissions Override (lbs)"].toString();
-                                                                var AETONSCOFF = emisrowCOFF["Annual Emissions (tons)"].toString();
-                                                                var CALCCOFF = emisrowCOFF["Calculation Method"].toString();
-                                                                var EMISLIMCOFF = emisrowCOFF["Emissions Limit"].toString();
-                                                                //var LASTUPDATE = emisrowCOFF["Last Update"];
-                                                                //var TRANSACTIONDATE = emisrowCOAT ["Transaction Date"];
-                                                                if(CECOFF != "" && CECOFF != null && CECOFF != " " )
-                                                                {
-                                                                                
-                                                                                EF1HCOFF = Number(String((EF1GCOFF * LBCOFF/2000)*((100 - CECOFF)/100) /calc_total)).toFixed(5).toString();
-                                                                }
-                                                                else
-                                                                {
-                                                                                
-                                                                                EF1HCOFF = Number((EF1GCOFF * LBCOFF/2000)/calc_total).toFixed(5).toString();
-                                                                }
-                                                                
-                                                                if(Number(calc_total) != 0) 
-                                                                {
-                                                                                
-                                                                                AELBSCOFF = String(Number(Number(EF1HCOFF) * Number(calc_total)).toFixed(5));
-                                                                }
-
-                                                                                AETONSCOFF = Number(String(AELBSCOFF / 2000)).toFixed(10).toString(); 
-
-                                                                if(AEOLBCOFF != null && AEOLBCOFF != "" && AEOLBCOFF != " ")
-                                                                {
-                                                                                AETONSCOFF = Number(String(AEOLBCOFF / 2000)).toFixed(10).toString();
-                                                                }
-                                                                
-
-                                                                
-                                                arrEmissionCOFF["Pollutant"] = String(PollutantCOFF);
-                                                arrEmissionCOFF["EF (lbs/gal)"] = String(EF1GCOFF);
-                                                arrEmissionCOFF["EF Hourly Rate (lbs/hr)"] = String(EF1HCOFF);
-                                                arrEmissionCOFF["EF Origin Code"] = String(EFORGCOFF);
-                                                arrEmissionCOFF["HARP EF"] = String(HARPCOFF);
-                                                if(CECOFF != null && CECOFF != "")
-                                                {
-                                                arrEmissionCOFF["Control Efficiency"] = String(CECOFF);
-                                                }
-                                                else
-                                                {
-                                                arrEmissionCOFF["Control Efficiency"] = String(" ");  
-                                                }
-                                                if(EFNOTECOFF != null && EFNOTECOFF != "")
-                                                {
-                                                arrEmissionCOFF["EF Note/Memo"] = String(EFNOTECOFF);
-                                                }
-                                                else
-                                                {
-                                                arrEmissionCOFF["EF Note/Memo"] = String(" ");      
-                                                }
-                                                arrEmissionCOFF["Annual Emissions (lbs)"] = String(AELBSCOFF);
-                                                if(AEOLBCOFF != null && AEOLBCOFF != "" && AEOLBCOFF != " ")
-                                                {
-                                                arrEmissionCOFF["Annual Emissions Override (lbs)"] = String(AEOLBCOFF);
-                                                }
-                                                else
-                                                {
-                                                arrEmissionCOFF["Annual Emissions Override (lbs)"] = String(" ");     
-                                                }
-                                                arrEmissionCOFF["Annual Emissions (tons)"] = String(AETONSCOFF);
-                                                arrEmissionCOFF["Calculation Method"] = String(CALCCOFF);
-
-                                                addToASITable("CRITERIA POLLUTANT EMISSION",arrEmissionCOFF,thrucapId);            
-                                                                
-                                }//end of Table loop
-                                                 
-                                }//end of table if statement
-                                
-                                
-                                
-                                if (CPECOFF.length == 0 || typeof(CPECOFF.length) == "undefined")
-                                {
-                                                
-                                                logDebug("Throughput Record " + capIDString + " has no rows in CRITERIA POLLUTANT EMISSION");
-                                }
-
-                                                logDebug("Stop Working on Throughput " + capIDString);
-                                capCount++
-
-                                                                
-                
-                                
-                                
-                
-                                
-                }//End of COFF If statement         
-                                
-if(matches(appType[3],"Concrete"))
-                {
+																			
+							
+											
+											
+							
+											
+							}//End of COFF If statement         
+			if(matches(appType[3],"Concrete"))             	   {
 								var arrEmissionCONC = [];
                                 var TCB = String(getAppSpecific("Total Concrete batched",thrucapId)).replace(",","");
                                 var Units = getAppSpecific("Units",thrucapId);
+								 var capModel = pcapresult.getOutput().getCapModel();
+								logDebug("Units " + Units);
+								editAppSpecific("Process Rate Units", "YD3", thrucapId);
+								editAppSpecific("Process Rate Unit Code", "69", thrucapId);
+								var ProcessRate = getAppSpecific("Process Rate",thrucapId); 
+								logDebug("ProcessRateUnits " + getAppSpecific("Process Rate Units",thrucapId));
                                 var calc_total_CONC = CalcTotalHours(thrucapId);
-
-                                
                                 var CPECONC = loadASITable("CRITERIA POLLUTANT EMISSION",thrucapId);
                                 if(CPECONC.length > 0)
                                 {          
-                                                removeASITable("CRITERIA POLLUTANT EMISSION",thrucapId);     
-                                                for (x in CPECONC)
-                                                {
-                                                                emisrowCONC = CPECONC[x]; 
-                                                                var PollutantCONC = emisrowCONC["Pollutant"].toString();
-                                                                var EF1GCONC = emisrowCONC["EF (lb/CY)"].toString();
-                                                                var EF1HCONC = emisrowCONC["EF Hourly Rate (lb/hr)"].toString();
-                                                                var EFORGCONC = emisrowCONC["EF Origin Code"].toString();
-                                                                var HARPCONC = emisrowCONC["HARP EF"].toString();
-                                                                var CECONC = emisrowCONC["Control Efficiency"].toString();
-                                                                var EFNOTECONC = emisrowCONC["EF Note/Memo"].toString();
-                                                                var AELBSCONC = emisrowCONC["Annual Emissions (lbs)"].toString();
-                                                                var AEOLBCONC = emisrowCONC["Annual Emissions Override (lbs)"].toString();
-                                                                var AETONSCONC = emisrowCONC["Annual Emissions (tons)"].toString();
-                                                                var CALCCONC = emisrowCONC["Calculation Method"].toString();
-                                                                var EMISLIMCONC = emisrowCONC["Emissions Limit"].toString();
-                                                                //var LASTUPDATE = emisrowCOFF["Last Update"];
-                                                                //var TRANSACTIONDATE = emisrowCOAT ["Transaction Date"];
-
-                                                                if(Units == "Cubic Yards" && calc_total_CONC != 0.00) 
-                                                                {
-                                                                                EF1HCONC = Number(String((EF1GCONC * TCB) /calc_total_CONC)).toFixed(5).toString();
-                                                                }
-                                                                if(Units == "Tons"&& calc_total_CONC !=0.00) 
-                                                                {
-                                                                                EF1HCONC = Number(String((EF1GCONC / 2.04  * TCB) /calc_total_CONC)).toFixed(5).toString();
-                                                                                
-                                                                }
-                                                                if(calc_total_CONC != 0.00) 
-                                                                {
-                                                                                AELBSCONC = Number(EF1HCONC * calc_total_CONC).toFixed(5).toString();
-                                                                }
-                                                                if(AEOLBCONC != null && AEOLBCONC != "" && AEOLBCONC != " ")
-                                                                {
-                                                                                AETONSCONC = Number(String(AEOLBCONC / 2000)).toFixed(10).toString();
-                                                                }
-                                                                else
-                                                                {
-                                                                                AETONSCONC = Number(String(AELBSCONC / 2000)).toFixed(10).toString();
-                                                                }
-                                                                
-                                                arrEmissionCONC["Pollutant"] = String(PollutantCONC);
-                                                arrEmissionCONC["EF (lb/CY)"] = String(EF1GCONC);
-                                                arrEmissionCONC["EF Hourly Rate (lb/hr)"] = String(EF1HCONC);
-                                                arrEmissionCONC["EF Origin Code"] = String(EFORGCONC);
-                                                arrEmissionCONC["HARP EF"] = String(HARPCONC);
-                                                if(CECONC != null && CECONC != "")
-                                                {
-                                                arrEmissionCONC["Control Efficiency"] = String(CECONC);
-                                                }
-                                                else
-                                                {
-                                                arrEmissionCONC["Control Efficiency"] = String(" "); 
-                                                }
-                                                if(EFNOTECONC != null && EFNOTECONC != "")
-                                                {
-                                                arrEmissionCONC["EF Note/Memo"] = String(EFNOTECONC);
-                                                }
-                                                else
-                                                {
-                                                arrEmissionCONC["EF Note/Memo"] = String(" ");    
-                                                }
-                                                arrEmissionCONC["Annual Emissions (lbs)"] = String(AELBSCONC);
-                                                if(AEOLBCONC != null && AEOLBCONC != "" && AEOLBCONC != " ")
-                                                {
-                                                arrEmissionCONC["Annual Emissions Override (lbs)"] = String(AEOLBCONC);
-                                                }
-                                                else
-                                                {
-                                                arrEmissionCONC["Annual Emissions Override (lbs)"] = String(" ");    
-                                                }
-                                                arrEmissionCONC["Annual Emissions (tons)"] = String(AETONSCONC);
-                                                arrEmissionCONC["Calculation Method"] = String(CALCCONC);
-
-                                                addToASITable("CRITERIA POLLUTANT EMISSION",arrEmissionCONC,thrucapId);         
-                                                                
-                                }//end of Table loop
-                                                
-                                }//end of table if statement
-                                
-                                
+								removeASITable("CRITERIA POLLUTANT EMISSION",thrucapId);     
+								for (x in CPECONC)
+								{
+									emisrowCONC = CPECONC[x]; 
+									var PollutantCONC = emisrowCONC["Pollutant"].toString();
+									var EF1GCONC = emisrowCONC["EF (lb/CY)"].toString();
+									var EF1HCONC = emisrowCONC["EF Hourly Rate (lb/hr)"].toString();
+									var EFORGCONC = emisrowCONC["EF Origin Code"].toString();
+									var HARPCONC = emisrowCONC["HARP EF"].toString();
+									var CECONC = emisrowCONC["Control Efficiency"].toString();
+									var EFNOTECONC = emisrowCONC["EF Note/Memo"].toString();
+									var AELBSCONC = emisrowCONC["Annual Emissions (lbs)"].toString();
+									var AEOLBCONC = emisrowCONC["Annual Emissions Override (lbs)"].toString();
+									var AETONSCONC = emisrowCONC["Annual Emissions (tons)"].toString();
+									var CALCCONC = emisrowCONC["Calculation Method"].toString();
+									var EMISLIMCONC = emisrowCONC["Emissions Limit"].toString();
+									if(Units == "Cubic Yards" && calc_total_CONC != 0.00) 
+									{
+										EF1HCONC = Number(String((EF1GCONC * TCB) /calc_total_CONC)).toFixed(5).toString();
+										editAppSpecific("Process Rate", TCB,thrucapId);
+									}
+									if(Units == "Tons"&& calc_total_CONC !=0.00) 
+									{
+										EF1HCONC = Number(String((EF1GCONC / 2.04  * TCB) /calc_total_CONC)).toFixed(5).toString();
+										editAppSpecific("Process Rate", Number(TCB/1.96).toFixed(2),thrucapId);
+									}
+									if(calc_total_CONC != 0.00) 
+									{
+										AELBSCONC = Number(EF1HCONC * calc_total_CONC).toFixed(5).toString();
+									}
+									if(AEOLBCONC != null && AEOLBCONC != "" && AEOLBCONC != " ")
+									{
+										AETONSCONC = Number(String(AEOLBCONC / 2000)).toFixed(10).toString();
+									}
+									else
+									{
+										AETONSCONC = Number(String(AELBSCONC / 2000)).toFixed(10).toString();
+									}
+									arrEmissionCONC["Pollutant"] = String(PollutantCONC);
+									arrEmissionCONC["EF (lb/CY)"] = String(EF1GCONC);
+									arrEmissionCONC["EF Hourly Rate (lb/hr)"] = String(EF1HCONC);
+									arrEmissionCONC["EF Origin Code"] = String(EFORGCONC);
+									arrEmissionCONC["HARP EF"] = String(HARPCONC);
+									logDebug("HarpEF " + String(HARPCONC));
+									if(CECONC != null && CECONC != "")
+									{
+									arrEmissionCONC["Control Efficiency"] = String(CECONC);
+									}
+									else
+									{
+									arrEmissionCONC["Control Efficiency"] = String(" "); 
+									}
+									if(EFNOTECONC != null && EFNOTECONC != "")
+									{
+									arrEmissionCONC["EF Note/Memo"] = String(EFNOTECONC);
+									}
+									else
+									{
+									arrEmissionCONC["EF Note/Memo"] = String(" ");    
+									}
+									arrEmissionCONC["Annual Emissions (lbs)"] = String(AELBSCONC);
+									if(AEOLBCONC != null && AEOLBCONC != "" && AEOLBCONC != " ")
+									{
+									arrEmissionCONC["Annual Emissions Override (lbs)"] = String(AEOLBCONC);
+									}
+									else
+									{
+									arrEmissionCONC["Annual Emissions Override (lbs)"] = String(" ");    
+									}
+									arrEmissionCONC["Annual Emissions (tons)"] = String(AETONSCONC);
+									arrEmissionCONC["Calculation Method"] = String(CALCCONC);
+									addToASITable("CRITERIA POLLUTANT EMISSION",arrEmissionCONC,thrucapId);         
+					}//end of Table loop
+						logDebug("ProcessRate " + getAppSpecific("Process Rate",thrucapId));             
+					}//end of table if statement
+					
+						 var updateResult = aa.cap.editCapByPK(capModel);
+						if (updateResult.getSuccess()) {
+							aa.print("Record updated successfully.");
+						} else {
+							aa.print("Failed to update record: " + updateResult.getErrorMessage());
+						}
                                 
                                 if (CPECONC.length == 0 || typeof(CPECONC.length) == "undefined")
                                 {
@@ -832,111 +695,82 @@ if(matches(appType[3],"Concrete"))
                                 capCount++
                                 
                 }//End of CONC If statement                        
-                                
-if(matches(appType[3],"Crematory"))
-                {
-								var arrEmissionCRM = [];
-                                var PR  = CalcTotalHours(thrucapId) * 150;
-                                var CPECRM = loadASITable("CRITERIA POLLUTANT EMISSION",thrucapId);
-                                if(CPECRM.length > 0)
-                                {              
-                                                removeASITable("CRITERIA POLLUTANT EMISSION",thrucapId);
-                                                for (x in CPECRM)
-                                                {
-                                                                emisrowCRM = CPECRM[x]; 
-                                                                var PollutantCRM = emisrowCRM["Pollutant"].toString();
-                                                                var EF1GCRM = emisrowCRM["EF (lbs/ton charged)"].toString();
-                                                                //var EF1HCRM = emisrowCRM["EF Hourly Rate (lbs/hr)"].toString();
-                                                                var EFORGCRM = emisrowCRM["EF Origin Code"].toString();
-                                                                var HARPCRM = emisrowCRM["HARP EF"].toString();
-                                                                var CECRM = emisrowCRM["Control Efficiency"].toString();
-                                                                var EFNOTECRM = emisrowCRM["EF Note/Memo"].toString();
-                                                                var AELBSCRM = emisrowCRM["Annual Emissions (lbs)"].toString();
-                                                                var AEOLBCRM = emisrowCRM["Annual Emissions Override (lbs)"].toString();
-                                                                var AETONSCRM = emisrowCRM["Annual Emissions (tons)"].toString();
-                                                                var CALCCRM = emisrowCRM["Calculation Method"].toString();
-                                                                var EMISLIMCRM = emisrowCRM["Emissions Limit"].toString();
-                                                                //var LASTUPDATE = emisrowCOFF["Last Update"];
-                                                                //var TRANSACTIONDATE = emisrowCOAT ["Transaction Date"];
-                                                                AELBSCRM = String((EF1GCRM/2000) * PR );
-                                                                HARPCRM = String(Number(EF1GCRM).toFixed(2));
-
-                                                                if(AEOLBCRM != null && AEOLBCRM != "" && AEOLBCRM != " " )
-                                                                {
-
-                                                                                AETONSCRM = Number(String(AEOLBCRM / 2000)).toFixed(10).toString();
-                                                                }
-                                                                else
-                                                                {
-
-                                                                                AETONSCRM = Number(String(AELBSCRM/ 2000)).toFixed(10).toString();
-                                                                }
-
-                                                                
-                                                arrEmissionCRM["Pollutant"] = String(PollutantCRM);
-                                                arrEmissionCRM["EF (lbs/ton charged)"] = String(EF1GCRM);
-                                                //arrEmissionCRM["EF Hourly Rate (lb/hr)"] = String(EF1HCRM);
-                                                arrEmissionCRM["EF Origin Code"] = String(EFORGCRM);
-                                                arrEmissionCRM["HARP EF"] = String(HARPCRM);
-                                                if(CECRM != null && CECRM != "")
-                                                {
-                                                arrEmissionCRM["Control Efficiency"] = String(CECRM);
-                                                }
-                                                else
-                                                {
-                                                arrEmissionCRM["Control Efficiency"] = String(" ");  
-                                                }
-                                                if(EFNOTECRM != null && EFNOTECRM != "")
-                                                {
-                                                arrEmissionCRM["EF Note/Memo"] = String(EFNOTECRM);
-                                                }
-                                                else
-                                                {
-                                                arrEmissionCRM["EF Note/Memo"] = String(" ");      
-                                                }
-                                                arrEmissionCRM["Annual Emissions (lbs)"] = String(AELBSCRM);
-                                                if(AEOLBCRM != null && AEOLBCRM != "" && AEOLBCRM != " ")
-                                                {
-                                                arrEmissionCRM["Annual Emissions Override (lbs)"] = String(AEOLBCRM);
-                                                }
-                                                else
-                                                {
-                                                arrEmissionCRM["Annual Emissions Override (lbs)"] = String(" ");      
-                                                }
-                                                arrEmissionCRM["Annual Emissions (tons)"] = String(AETONSCRM);
-                                                arrEmissionCRM["Calculation Method"] = String(CALCCRM);
-
-                                                addToASITable("CRITERIA POLLUTANT EMISSION",arrEmissionCRM,thrucapId);    
-                                                                
-                                }//end of Table loop
-                                                 
-                                }//end of table if statement
-                                
-                                
-                                
-                                if (CPECRM.length == 0 || typeof(CPECRM.length) == "undefined")
-                                {
-                                                
-                                                logDebug("Throughput Record " + capIDString + " has no rows in CRITERIA POLLUTANT EMISSION");
-                                }
-
-                                                logDebug("Stop Working on Throughput " + capIDString);
-                                capCount++
-                                
+			if(matches(appType[3],"Crematory"))                {
+				var arrEmissionCRM = [];
+				var PR  = CalcTotalHours(thrucapId) * 150;
+				var CPECRM = loadASITable("CRITERIA POLLUTANT EMISSION",thrucapId);
+				if(CPECRM.length > 0)
+				{              
+					removeASITable("CRITERIA POLLUTANT EMISSION",thrucapId);
+					for (x in CPECRM)
+					{
+						emisrowCRM = CPECRM[x]; 
+						var PollutantCRM = emisrowCRM["Pollutant"].toString();
+						var EF1GCRM = emisrowCRM["EF (lbs/ton charged)"].toString();
+						//var EF1HCRM = emisrowCRM["EF Hourly Rate (lbs/hr)"].toString();
+						var EFORGCRM = emisrowCRM["EF Origin Code"].toString();
+						var HARPCRM = emisrowCRM["HARP EF"].toString();
+						var CECRM = emisrowCRM["Control Efficiency"].toString();
+						var EFNOTECRM = emisrowCRM["EF Note/Memo"].toString();
+						var AELBSCRM = emisrowCRM["Annual Emissions (lbs)"].toString();
+						var AEOLBCRM = emisrowCRM["Annual Emissions Override (lbs)"].toString();
+						var AETONSCRM = emisrowCRM["Annual Emissions (tons)"].toString();
+						var CALCCRM = emisrowCRM["Calculation Method"].toString();
+						var EMISLIMCRM = emisrowCRM["Emissions Limit"].toString();
+						AELBSCRM = String((EF1GCRM/2000) * PR );
+						HARPCRM = String(Number(EF1GCRM).toFixed(2));
+						if(AEOLBCRM != null && AEOLBCRM != "" && AEOLBCRM != " " )
+						{
+							AETONSCRM = Number(String(AEOLBCRM / 2000)).toFixed(10).toString();
+						}
+						else
+						{
+							AETONSCRM = Number(String(AELBSCRM/ 2000)).toFixed(10).toString();
+						}
+					arrEmissionCRM["Pollutant"] = String(PollutantCRM);
+					arrEmissionCRM["EF (lbs/ton charged)"] = String(EF1GCRM);
+					//arrEmissionCRM["EF Hourly Rate (lb/hr)"] = String(EF1HCRM);
+					arrEmissionCRM["EF Origin Code"] = String(EFORGCRM);
+					arrEmissionCRM["HARP EF"] = String(HARPCRM);
+					if(CECRM != null && CECRM != "")
+					{
+					arrEmissionCRM["Control Efficiency"] = String(CECRM);
+					}
+					else
+					{
+					arrEmissionCRM["Control Efficiency"] = String(" ");  
+					}
+					if(EFNOTECRM != null && EFNOTECRM != "")
+					{
+					arrEmissionCRM["EF Note/Memo"] = String(EFNOTECRM);
+					}
+					else
+					{
+					arrEmissionCRM["EF Note/Memo"] = String(" ");      
+					}
+					arrEmissionCRM["Annual Emissions (lbs)"] = String(AELBSCRM);
+					if(AEOLBCRM != null && AEOLBCRM != "" && AEOLBCRM != " ")
+					{
+					arrEmissionCRM["Annual Emissions Override (lbs)"] = String(AEOLBCRM);
+					}
+					else
+					{
+					arrEmissionCRM["Annual Emissions Override (lbs)"] = String(" ");      
+					}
+					arrEmissionCRM["Annual Emissions (tons)"] = String(AETONSCRM);
+					arrEmissionCRM["Calculation Method"] = String(CALCCRM);
+					addToASITable("CRITERIA POLLUTANT EMISSION",arrEmissionCRM,thrucapId);    
+				}//end of Table loop
+				}//end of table if statement
+				if (CPECRM.length == 0 || typeof(CPECRM.length) == "undefined")
+				{
+					logDebug("Throughput Record " + capIDString + " has no rows in CRITERIA POLLUTANT EMISSION");
+				}
+					logDebug("Stop Working on Throughput " + capIDString);
+				capCount++
                 }//End of CRM If statement          
-
-                
-                
-                
-                
-                
-                
-                
-                                
-                }//end if record type match
-
+            }//end if record type match
    return capCount;
-                                
 } // End of function
 
 /*------------------------------------------------------------------------------------------------------/
@@ -1028,12 +862,10 @@ function getAppSpecific(itemName,itemCap)  // optional: itemCap
                 
                 if (useAppSpecificGroupName)
                 {
-                                if (itemName.indexOf(".") < 0)
-                                                { logDebug("**WARNING: editAppSpecific requires group name prefix when useAppSpecificGroupName is true") ; return false }
-                                
-                                
-                                var itemGroup = itemName.substr(0,itemName.indexOf("."));
-                                var itemName = itemName.substr(itemName.indexOf(".")+1);
+					if (itemName.indexOf(".") < 0)
+		{ logDebug("**WARNING: editAppSpecific requires group name prefix when useAppSpecificGroupName is true") ; return false }
+					var itemGroup = itemName.substr(0,itemName.indexOf("."));
+					var itemName = itemName.substr(itemName.indexOf(".")+1);
                 }
                 
     var appSpecInfoResult = aa.appSpecificInfo.getByCapID(itemCap);
@@ -1057,37 +889,36 @@ function getAppSpecific(itemName,itemCap)  // optional: itemCap
 
 function getAppSpecificName(itemName,itemCap)  // optional: itemCap
 {
-                var updated = false;
-                var i=0;
-                useAppSpecificGroupName = true;
+var updated = false;
+var i=0;
+useAppSpecificGroupName = true;
                 
-                if (useAppSpecificGroupName)
-                {
-                                if (itemName.indexOf(".") < 0)
-                                                { logDebug("**WARNING: editAppSpecific requires group name prefix when useAppSpecificGroupName is true") ; return false }
-                                
-                                
-                                var itemGroup = itemName.substr(0,itemName.indexOf("."));
-                                var itemName = itemName.substr(itemName.indexOf(".")+1);
-                }
+	if (useAppSpecificGroupName)
+	{
+					if (itemName.indexOf(".") < 0)
+				{ logDebug("**WARNING: editAppSpecific requires group name prefix when useAppSpecificGroupName is true") ; return false }
+					
+					
+					var itemGroup = itemName.substr(0,itemName.indexOf("."));
+					var itemName = itemName.substr(itemName.indexOf(".")+1);
+	}
                 
     var appSpecInfoResult = aa.appSpecificInfo.getByCapID(itemCap);
-                if (appSpecInfoResult.getSuccess())
-               {
-                                var appspecObj = appSpecInfoResult.getOutput();
-                                
-                                if (itemName != "")
-                                {
-                                                for (i in appspecObj)
-                                                                if( appspecObj[i].getCheckboxDesc() == itemName && (!useAppSpecificGroupName || appspecObj[i].getCheckboxType() == itemGroup) )
-                                                                {
-                                                                                return appspecObj[i].getChecklistComment();
-                                                                                break;
-                                                                }
-                                } // item name blank
-                } 
-                else
-                                { logDebug( "**ERROR: getting app specific info for Cap : " + appSpecInfoResult.getErrorMessage()) }
+			if (appSpecInfoResult.getSuccess())
+			{
+			var appspecObj = appSpecInfoResult.getOutput();
+				if (itemName != "")
+				{
+					for (i in appspecObj)
+					if( appspecObj[i].getCheckboxDesc() == itemName && (!useAppSpecificGroupName || appspecObj[i].getCheckboxType() == itemGroup) )
+					{
+						return appspecObj[i].getChecklistComment();
+						break;
+					}
+				} // item name blank
+			} 
+			else
+			{ logDebug( "**ERROR: getting app specific info for Cap : " + appSpecInfoResult.getErrorMessage()) }
 }
 
 function getThroughputrecords(altid)
