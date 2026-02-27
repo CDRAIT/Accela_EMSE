@@ -11,6 +11,7 @@
 |
 | Notes   : TDunn 01/11/2022 created 3.0 version
 |         : TDunn Note disable the corresponding standard choice script.
+|         : eaftahi 02/27/2026 Added IT Request# 2698
 |
 /=============================================================================================*/
 if(currentUserID == "TDUNN") {
@@ -51,7 +52,13 @@ if(!publicUser) {
 		}
 		if(feeFlag == "FF|") {
 			feeName = varIsFee.substring(3); 
-			updateFee(feeName,"B_COM","FINAL",1,"N");
+			//IT Request# 2698 - Permanent Membrane Structure
+			//there's no 0919 under B_COM FS!
+			if(thisScope == "Permanent Membrane Structure" && matches(feeName,"0913")) {
+				thisQty = 2;
+			}
+			//End of IT Request # 2698			
+			updateFee(feeName,"B_COM","FINAL",thisQty,"N");
 		}
 		if(fsFlag == "SP|" && AInfo["Type of Work"] == "New") {
 			landUse = varIsFeeSched.substring(3); 
@@ -81,15 +88,4 @@ if(!publicUser) {
 	if(matches(appTypeArray[2],"Full Review","Limited")){
 		updateFee("TECH","ACCOUNTING","FINAL",1,varAutoInvoiceFees);
 	}
-}
-
-	
-/*=======================
-Notes
-
-
-
-
-
-
-========================*/
+}	
