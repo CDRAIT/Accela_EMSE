@@ -8,8 +8,8 @@
 |
 | Requires: EMSE 3.0 and Standard Choice: "EMSE_EXECUTE_OPTIONS": "SCRIPT" to be Active.
 |
-| Notes   : Abe   02/27/2026 converted from Standard Choice to EMSE 3.0
-|         : 
+| Notes   : Abe   02/27/2026 Created the branch
+|         : Abe   02/27/2026 Added IT Req# 3016
 
 |                
 /------------------------------------------------------------------------------------------------------*/
@@ -20,7 +20,7 @@ if (matches(currentUserID, "JMCKENZI", "EAFTAHI", "TDUNN")) {
 
 logDebug("Inside ISA:*/*/*/* ...");
 
-
+//IT Req# 3016 
 if (inspType == '513 Solar Panel-Final') {
     logDebug("Adding 515 ESS inspection if 513 Solar Panel-Final is scheduled ...");
 
@@ -49,6 +49,7 @@ if (inspType == '513 Solar Panel-Final') {
         }
     }
 }
+//End of IT Req# 3016
 
 
 function fixDateForACA(myDate)  {
