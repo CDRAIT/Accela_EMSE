@@ -13,7 +13,7 @@
 | START: USER CONFIGURABLE PARAMETERS
 /------------------------------------------------------------------------------------------------------*/
 var showDebug = true; 				// Set to true to see debug messages in event log and email confirmation
-var maxSeconds = 10 * 60; 			// number of seconds allowed for batch processing, usually < 5*60
+var maxSeconds = 15 * 60; 			// number of seconds allowed for batch processing, usually < 5*60
 var documentOnly = false; 			// Document Only -- displays hierarchy of std choice steps
 /*------------------------------------------------------------------------------------------------------/
 | END: USER CONFIGURABLE PARAMETERS
@@ -31,9 +31,9 @@ var batchStartTime = batchStartDate.getTime();                                  
 var timeExpired = false;                                                                // Variable to identify if batch script has timed out. Defaulted to "false".
 var systemUserObj = aa.person.getUser("ADMIN").getOutput();
 var useAppSpecificGroupName = false;                                                    // Use Group name when populating App Specific Info Values
-var senderEmailAddr = "pcapcd@placer.ca.gov";                                          // Email address of the sender
-var emailAddress = "ngraf@truepointsolutions.com";                                      // Email address of the person who will receive the batch script log information
-var emailAddress2 = "rmoore@placer.ca.gov";                                                                 // CC email address of the person who will receive the batch script log information
+var senderEmailAddr = "placercounty_noreply@accela.com";                                          // Email address of the sender
+var emailAddress = "rmoore@placer.ca.gov";                                      // Email address of the person who will receive the batch script log information
+var emailAddress2 = "rmoore@placer.ca.gov";                                             // CC email address of the person who will receive the batch script log information
 var emailText = "";                                                                     // Email body
 //Parameter variables
 var paramsOK = true;
@@ -68,9 +68,8 @@ if (emailAddress.length)
 function aboutExpLics() {
     var capCount = 0;
     var expResult = aa.cap.getCapIDsByAppSpecificInfoField("Quarter Billing","4th qtr");
-
     if (!expResult.getSuccess()) {
-        logMessage("**ERROR", "Retrieving records by Quarter Billing. Reason is: " + expResult.getErrorType() + ":" + expResult.getErrorMessage());
+        logMessage("**ERROR", "Retrieving records by Renewal Licenses Expiration Date and Status. Reason is: " + expResult.getErrorType() + ":" + expResult.getErrorMessage());
 
         return false;
     }
@@ -85,83 +84,413 @@ function aboutExpLics() {
             timeExpired = true;
             break;
         }
-		
-        var oldcapId = myExp[i].getCapID(); // CapIDModel Object
-	if (getAppSpecific("Invoice Sent",oldcapId) != "CHECKED")
-		 {
-			 var facinvoice = invoiceAllFeesPlacer(oldcapId);
-			 var invDate = dateFormatted(sysDate.getMonth(),sysDate.getDayOfMonth(),sysDate.getYear(),"");
-			 var facinvNbr = getinvoicenumberbydate(oldcapId,invDate);
-			 var ICContact = getContactEmailByContactType("Invoice Contact",oldcapId);
-			 var ROContact = getContactEmailByContactType("Responsible Official",oldcapId);
-			 var FACcapId = getCapId(myExp[i].getID1(), myExp[i].getID2(), myExp[i].getID3());
-			 var customID = FACcapId.getCustomID();
-			 var myCap = aa.cap.getCap(oldcapId).getOutput();
-          	 var FacAppName = myCap.getSpecialText();
-			 
-			 if (ICContact != "" && facinvNbr != null && facinvNbr !="")
-			 {
-				 paramMap = aa.util.newHashMap();
-				 paramMap.put("InvoiceNumber",String(facinvNbr));
-				 emailParameters = aa.util.newHashtable();
-				 addParameter(emailParameters,"$$RECORDALTID$$",FacAppName);
-				 //report = generateReport("AQ Invoice Report",paramMap,"AirQuality",oldcapId);//for testing
-				 //sendtest = sendNotification("pcapcd@placer.ca.gov","RMoore@placer.ca.gov","","AQ INVOICE",emailParameters,new Array(report),oldcapId); //for testing
-				 report = generateReport("AQ_Invoice_To_Disk",paramMap,"AirQuality",oldcapId);
-				 sendtest = sendNotification("pcapcd@placer.ca.gov",ICContact,"","AQ INVOICE",emailParameters,new Array(report),oldcapId);
-				 if (sendtest == "true")
-				 {
-					editAppSpecific("Invoice Sent","CHECKED",oldcapId);
-				 }
-			 }
 
-			  if (ICContact == "" && ROContact != "" && facinvNbr != null && facinvNbr !="")
-			 {
-				 paramMap = aa.util.newHashMap();
-				 paramMap.put("InvoiceNumber",String(facinvNbr));
-				 emailParameters = aa.util.newHashtable();
-				 addParameter(emailParameters,"$$RECORDALTID$$",FacAppName);
-				 //report = generateReport("AQ Invoice Report",paramMap,"AirQuality",oldcapId);//for testing
-				 //sendtest = sendNotification("pcapcd@placer.ca.gov","RMoore@placer.ca.gov","","AQ INVOICE",emailParameters,new Array(report),oldcapId); //for testing
-				 report = generateReport("AQ_Invoice_To_Disk",paramMap,"AirQuality",oldcapId);
-				 sendtest = sendNotification("pcapcd@placer.ca.gov",ROContact,"","AQ INVOICE",emailParameters,new Array(report),oldcapId);
-				 if (sendtest == "true")
-				 {
-					editAppSpecific("Invoice Sent","CHECKED",oldcapId);
-				 }
-			 }
-			 if (ICContact == "" && ROContact == "" && facinvNbr != null && facinvNbr !="")
-			 {
-				 paramMap = aa.util.newHashMap();
-				 paramMap.put("InvoiceNumber",String(facinvNbr));
-				 emailParameters = aa.util.newHashtable();
-				 addParameter(emailParameters,"$$RECORDALTID$$",FacAppName);
-				 //report = generateReport("AQ Invoice Report",paramMap,"AirQuality",oldcapId);//for testing
-				 //sendtest = sendNotification("pcapcd@placer.ca.gov","RMoore@placer.ca.gov","","AQ INVOICE",emailParameters,new Array(report),oldcapId); //for testing
-				 report = generateReport("AQ_Invoice_To_Disk",paramMap,"AirQuality",oldcapId);
-				 sendtest = sendNotification("pcapcd@placer.ca.gov","sfrancis@placer.ca.gov","RMoore@placer.ca.gov","AQ INVOICE",emailParameters,new Array(report),oldcapId);
-				 if (sendtest == "true")
-				 {
-					editAppSpecific("Invoice Sent","CHECKED",oldcapId);
-				 }
-			 }
-			 if (facinvNbr == null || facinvNbr =="")
-			 {
-				 logDebug(customID + " has No Invoice Number");
-			 }
+        var oldcapId = myExp[i].getCapID(); // CapIDModel Object
+		var fcap = aa.cap.getCap(oldcapId).getOutput();
+		var fstatus = fcap.getCapStatus();
+        var capchildren = getChildren("AirQuality/Stationary Source/Permit to Operate/*",oldcapId);
+		var childcount = getChildrencount("AirQuality/Stationary Source/Permit to Operate/*",oldcapId);
+		
+		if(fstatus == "Active" )
+		{
+		 for(eachchild in capchildren)
+		 {
+			 var eachChildCapId = capchildren[eachchild];
+			 var childcap = aa.cap.getCap(eachChildCapId).getOutput();
+			 var pcapId = getParentPlacer(childcap.getCapID());
+			 var customID = eachChildCapId.getCustomID();
+			 var catergory = childcap.getCapType().getCategory();
+			 var status = childcap.getCapStatus();
+	
+			 
+		     //add boiler fee
+			if (catergory == "Boilers" && (status == "ACTIVE" || status == "Active") && getAppSpecific("Renewal Fee Rating Type",childcap.getCapID()) == "MMBtu/hr")
+			{ 
+				addFee("AQ_P_BURNHTR","AQ_FAC","FINAL",Number(getAppSpecific("Renewal Fee Rating Total",childcap.getCapID())),"N",pcapId);
+				updatefeenotes(pcapId,"AQ_P_BURNHTR","null",customID);
+				var fee = feeAmountbynotes(pcapId,"AQ_P_BURNHTR",customID,sysDate.getYear());
+                editAppSpecific("Current Fee Total",fee,childcap.getCapID());
+			}
+                        //add coating fee 
+			if (catergory == "Coating" && (status == "ACTIVE" || status == "Active") && getAppSpecific("Renewal Fee Rating Type",childcap.getCapID()) == "MMBtu/hr")
+			{ 
+				addFee("AQ_P_BURNHTR","AQ_FAC","FINAL",Number(getAppSpecific("Renewal Fee Rating Total",childcap.getCapID())),"N",pcapId);
+				updatefeenotes(pcapId,"AQ_P_BURNHTR","null",customID);
+				var fee = feeAmountbynotes(pcapId,"AQ_P_BURNHTR",customID,sysDate.getYear());
+                editAppSpecific("Current Fee Total",fee,childcap.getCapID());
+			}
+			if (catergory == "Coating" && (status == "ACTIVE" || status == "Active") && getAppSpecific("Renewal Fee Rating Type",childcap.getCapID()) == "HP")
+			{
+				addFee("AQ_P_ELECHP","AQ_FAC","FINAL",Number(getAppSpecific("Renewal Fee Rating Total",childcap.getCapID())),"N",pcapId);
+				updatefeenotes(pcapId,"AQ_P_ELECHP","null",customID);
+				var fee = feeAmountbynotes(pcapId,"AQ_P_ELECHP",customID,sysDate.getYear());
+                editAppSpecific("Current Fee Total",fee,childcap.getCapID());
+			}
+                        //add Control Equipment fee 
+			if (catergory == "Control Equipment" && (status == "ACTIVE" || status == "Active") && getAppSpecific("Renewal Fee Rating Type",childcap.getCapID()) == "MMBtu/hr")
+			{ 
+				addFee("AQ_P_BURNHTR","AQ_FAC","FINAL",Number(getAppSpecific("Renewal Fee Rating Total",childcap.getCapID())),"N",pcapId);
+				updatefeenotes(pcapId,"AQ_P_BURNHTR","null",customID);
+				var fee = feeAmountbynotes(pcapId,"AQ_P_BURNHTR",customID,sysDate.getYear());
+                editAppSpecific("Current Fee Total",fee,childcap.getCapID());
+			}
+			if (catergory == "Control Equipment" && (status == "ACTIVE" || status == "Active") && getAppSpecific("Renewal Fee Rating Type",childcap.getCapID()) == "HP")
+			{
+				addFee("AQ_P_ELECHP","AQ_FAC","FINAL",Number(getAppSpecific("Renewal Fee Rating Total",childcap.getCapID())),"N",pcapId);
+				updatefeenotes(pcapId,"AQ_P_ELECHP","null",customID);
+				var fee = feeAmountbynotes(pcapId,"AQ_P_ELECHP",customID,sysDate.getYear());
+                editAppSpecific("Current Fee Total",fee,childcap.getCapID());
+			}
+            if (catergory == "Control Equipment" && (status == "ACTIVE" || status == "Active") && getAppSpecific("Renewal Fee Rating Type",childcap.getCapID()) == "KVA")
+			{
+				addFee("AQ_P_ELECENG","AQ_FAC","FINAL",Number(getAppSpecific("Renewal Fee Rating Total",childcap.getCapID())),"N",pcapId);
+				updatefeenotes(pcapId,"AQ_P_ELECENG","null",customID);
+				var fee = feeAmountbynotes(pcapId,"AQ_P_ELECENG",customID,sysDate.getYear());
+                editAppSpecific("Current Fee Total",fee,childcap.getCapID());
+			}
+			if (catergory == "Control Equipment" && (status == "ACTIVE" || status == "Active") && getAppSpecific("Renewal Fee Rating Type",childcap.getCapID()) == "GAL")
+			{
+				addFee("AQ_P_STATCON","AQ_FAC","FINAL",Number(getAppSpecific("Renewal Fee Rating Total",childcap.getCapID())),"N",pcapId);
+				updatefeenotes(pcapId,"AQ_P_STATCON","null",customID);
+				var fee = feeAmountbynotes(pcapId,"AQ_P_STATCON",customID,sysDate.getYear());
+                editAppSpecific("Current Fee Total",fee,childcap.getCapID());
+			}
+			if (catergory == "Control Equipment" && (status == "ACTIVE" || status == "Active") && getAppSpecific("Renewal Fee Rating Type",childcap.getCapID()) == "SEMI")
+			{
+				addFee("AQ_P_SEMICON","AQ_FAC","FINAL",Number(getAppSpecific("Renewal Fee Rating Total",childcap.getCapID())),"N",pcapId);
+				updatefeenotes(pcapId,"AQ_P_SEMICON","null",customID);
+				var fee = feeAmountbynotes(pcapId,"AQ_P_SEMICON",customID,sysDate.getYear());
+                editAppSpecific("Current Fee Total",fee,childcap.getCapID());
+			}
+			if (catergory == "Control Equipment" && (status == "ACTIVE" || status == "Active") && getAppSpecific("Renewal Fee Rating Type",childcap.getCapID()) == "EXCEP")
+			{
+				addFee("AQ_P_PFE","AQ_FAC","FINAL",Number(getAppSpecific("Renewal Fee Rating Total",childcap.getCapID())),"N",pcapId);
+				updatefeenotes(pcapId,"AQ_P_PFE","null",customID);
+				var fee = feeAmountbynotes(pcapId,"AQ_P_PFE",customID,sysDate.getYear());
+                editAppSpecific("Current Fee Total",fee,childcap.getCapID());
+			}
+			//add Dry Cleaning fee
+			if (catergory == "Dry Cleaning" && (status == "ACTIVE" || status == "Active") && getAppSpecific("Renewal Fee Rating Type",childcap.getCapID()) == "EXCEP")
+			{ 
+				addFee("AQ_P_PFE","AQ_FAC","FINAL",Number(getAppSpecific("Renewal Fee Rating Total",childcap.getCapID())),"N",pcapId);
+				updatefeenotes(pcapId,"AQ_P_PFE","null",customID);
+				var fee = feeAmountbynotes(pcapId,"AQ_P_PFE",customID,sysDate.getYear());
+                editAppSpecific("Current Fee Total",fee,childcap.getCapID());
+			}
+            //add Engine fee 
+			if (catergory == "Engine" && (status == "ACTIVE" || status == "Active") && getAppSpecific("IC Engine",childcap.getCapID()) == "Yes" && Number(getAppSpecific("Power Rating",childcap.getCapID())) < 4000)
+			{ 
+				addFee("AQ_P_PFE","AQ_FAC","FINAL",1,"N",pcapId);
+				updatefeenotes(pcapId,"AQ_P_PFE","null",customID);
+				var fee = feeAmountbynotes(pcapId,"AQ_P_PFE",customID,sysDate.getYear());
+                editAppSpecific("Current Fee Total",fee,childcap.getCapID());
+			}
+			if (catergory == "Engine" && (status == "ACTIVE" || status == "Active") && getAppSpecific("IC Engine",childcap.getCapID()) == "Yes" && Number(getAppSpecific("Power Rating",childcap.getCapID())) >= 4000)
+			{ 
+				addFee("AQ_P_BURNHTR","AQ_FAC","FINAL",Number(getAppSpecific("Renewal Fee Rating Total",childcap.getCapID())),"N",pcapId);
+				updatefeenotes(pcapId,"AQ_P_BURNHTR","null",customID);
+				var fee = feeAmountbynotes(pcapId,"AQ_P_BURNHTR",customID,sysDate.getYear());
+                editAppSpecific("Current Fee Total",fee,childcap.getCapID());
+			}
+			if (catergory == "Engine" && (status == "ACTIVE" || status == "Active") && getAppSpecific("IC Engine",childcap.getCapID()) != "Yes" && getAppSpecific("Renewal Fee Rating Type",childcap.getCapID()) == "HP")
+			{
+				addFee("AQ_P_ELECHP","AQ_FAC","FINAL",Number(getAppSpecific("Renewal Fee Rating Total",childcap.getCapID())),"N",pcapId);
+				updatefeenotes(pcapId,"AQ_P_ELECHP","null",customID);
+				var fee = feeAmountbynotes(pcapId,"AQ_P_ELECHP",customID,sysDate.getYear());
+                editAppSpecific("Current Fee Total",fee,childcap.getCapID());
+			}
+			if (catergory == "Engine" && (status == "ACTIVE" || status == "Active") && getAppSpecific("IC Engine",childcap.getCapID()) != "Yes" && getAppSpecific("Renewal Fee Rating Type",childcap.getCapID()) == "MMBtu/hr")
+			{
+				addFee("AQ_P_BURNHTR","AQ_FAC","FINAL",Number(getAppSpecific("Renewal Fee Rating Total",childcap.getCapID())),"N",pcapId);
+				updatefeenotes(pcapId,"AQ_P_BURNHTR","null",customID);
+				var fee = feeAmountbynotes(pcapId,"AQ_P_BURNHTR",customID,sysDate.getYear());
+                editAppSpecific("Current Fee Total",fee,childcap.getCapID());
+			}
+			//add Graphics Arts fee 
+			if (catergory == "Graphics Arts" && (status == "ACTIVE" || status == "Active") && getAppSpecific("Renewal Fee Rating Type",childcap.getCapID()) == "MMBtu/hr")
+			{ 
+				addFee("AQ_P_BURNHTR","AQ_FAC","FINAL",Number(getAppSpecific("Renewal Fee Rating Total",childcap.getCapID())),"N",pcapId);
+				updatefeenotes(pcapId,"AQ_P_BURNHTR","null",customID);
+				var fee = feeAmountbynotes(pcapId,"AQ_P_BURNHTR",customID,sysDate.getYear());
+                editAppSpecific("Current Fee Total",fee,childcap.getCapID());
+			}
+			if (catergory == "Graphics Arts" && (status == "ACTIVE" || status == "Active") && getAppSpecific("Renewal Fee Rating Type",childcap.getCapID()) == "HP")
+			{
+				addFee("AQ_P_ELECHP","AQ_FAC","FINAL",Number(getAppSpecific("Renewal Fee Rating Total",childcap.getCapID())),"N",pcapId);
+				updatefeenotes(pcapId,"AQ_P_ELECHP","null",customID);
+				var fee = feeAmountbynotes(pcapId,"AQ_P_ELECHP",customID,sysDate.getYear());
+                editAppSpecific("Current Fee Total",fee,childcap.getCapID());
+			}
+			if (catergory == "Graphics Arts" && (status == "ACTIVE" || status == "Active") && getAppSpecific("Renewal Fee Rating Type",childcap.getCapID()) == "KVA")
+			{
+				addFee("AQ_P_ELECENG","AQ_FAC","FINAL",Number(getAppSpecific("Renewal Fee Rating Total",childcap.getCapID())),"N",pcapId);
+				updatefeenotes(pcapId,"AQ_P_ELECENG","null",customID);
+				var fee = feeAmountbynotes(pcapId,"AQ_P_ELECENG",customID,sysDate.getYear());
+                editAppSpecific("Current Fee Total",fee,childcap.getCapID());
+			}
+			//add Miscellaneous Combustion fee 
+			if (catergory == "Miscellaneous Combustion" && (status == "ACTIVE" || status == "Active") && getAppSpecific("Renewal Fee Rating Type",childcap.getCapID()) == "MMBtu/hr")
+			{ 
+				addFee("AQ_P_BURNHTR","AQ_FAC","FINAL",Number(getAppSpecific("Renewal Fee Rating Total",childcap.getCapID())),"N",pcapId);
+				updatefeenotes(pcapId,"AQ_P_BURNHTR","null",customID);
+				var fee = feeAmountbynotes(pcapId,"AQ_P_BURNHTR",customID,sysDate.getYear());
+                editAppSpecific("Current Fee Total",fee,childcap.getCapID());
+			}
+			if (catergory == "Miscellaneous Combustion" && (status == "ACTIVE" || status == "Active") && getAppSpecific("Renewal Fee Rating Type",childcap.getCapID()) == "HP")
+			{
+				addFee("AQ_P_ELECHP","AQ_FAC","FINAL",Number(getAppSpecific("Renewal Fee Rating Total",childcap.getCapID())),"N",pcapId);
+				updatefeenotes(pcapId,"AQ_P_ELECHP","null",customID);
+				var fee = feeAmountbynotes(pcapId,"AQ_P_ELECHP",customID,sysDate.getYear());
+                editAppSpecific("Current Fee Total",fee,childcap.getCapID());
+			}
+			if (catergory == "Miscellaneous Combustion" && (status == "ACTIVE" || status == "Active") && getAppSpecific("Renewal Fee Rating Type",childcap.getCapID()) == "KVA")
+			{
+				addFee("AQ_P_ELECENG","AQ_FAC","FINAL",Number(getAppSpecific("Renewal Fee Rating Total",childcap.getCapID())),"N",pcapId);
+				updatefeenotes(pcapId,"AQ_P_ELECENG","null",customID);
+				var fee = feeAmountbynotes(pcapId,"AQ_P_ELECENG",customID,sysDate.getYear());
+                editAppSpecific("Current Fee Total",fee,childcap.getCapID());
+			}
+			if (catergory == "Miscellaneous Combustion" && (status == "ACTIVE" || status == "Active") && getAppSpecific("Renewal Fee Rating Type",childcap.getCapID()) == "GAL")
+			{
+				addFee("AQ_P_STATCON","AQ_FAC","FINAL",Number(getAppSpecific("Renewal Fee Rating Total",childcap.getCapID())),"N",pcapId);
+				updatefeenotes(pcapId,"AQ_P_STATCON","null",customID);
+				var fee = feeAmountbynotes(pcapId,"AQ_P_STATCON",customID,sysDate.getYear());
+                editAppSpecific("Current Fee Total",fee,childcap.getCapID());
+			}
+			if (catergory == "Miscellaneous Combustion" && (status == "ACTIVE" || status == "Active") && getAppSpecific("Renewal Fee Rating Type",childcap.getCapID()) == "SEMI")
+			{
+				addFee("AQ_P_SEMICON","AQ_FAC","FINAL",Number(getAppSpecific("Renewal Fee Rating Total",childcap.getCapID())),"N",pcapId);
+				updatefeenotes(pcapId,"AQ_P_SEMICON","null",customID);
+				var fee = feeAmountbynotes(pcapId,"AQ_P_SEMICON",customID,sysDate.getYear());
+                editAppSpecific("Current Fee Total",fee,childcap.getCapID());
+			}
+			if (catergory == "Miscellaneous Combustion" && (status == "ACTIVE" || status == "Active") && getAppSpecific("Renewal Fee Rating Type",childcap.getCapID()) == "EXCEP")
+			{
+				addFee("AQ_P_PFE","AQ_FAC","FINAL",Number(getAppSpecific("Renewal Fee Rating Total",childcap.getCapID())),"N",pcapId);
+				updatefeenotes(pcapId,"AQ_P_PFE","null",customID);
+				var fee = feeAmountbynotes(pcapId,"AQ_P_PFE",customID,sysDate.getYear());
+                editAppSpecific("Current Fee Total",fee,childcap.getCapID());
+			}
+			if (catergory == "Miscellaneous Combustion" && (status == "ACTIVE" || status == "Active") && getAppSpecific("Renewal Fee Rating Type",childcap.getCapID()) == "SQFT")
+			{
+				addFee("AQ_P_INCINER","AQ_FAC","FINAL",Number(getAppSpecific("Renewal Fee Rating Total",childcap.getCapID())),"N",pcapId);
+				updatefeenotes(pcapId,"AQ_P_INCINER","null",customID);
+				var fee = feeAmountbynotes(pcapId,"AQ_P_INCINER",customID,sysDate.getYear());
+                editAppSpecific("Current Fee Total",fee,childcap.getCapID());
+			}
+			//add Miscellaneous Equipment fee 
+			if (catergory == "Miscellaneous Equipment" && (status == "ACTIVE" || status == "Active") && getAppSpecific("Renewal Fee Rating Type",childcap.getCapID()) == "MMBtu/hr")
+			{ 
+				addFee("AQ_P_BURNHTR","AQ_FAC","FINAL",Number(getAppSpecific("Renewal Fee Rating Total",childcap.getCapID())),"N",pcapId);
+				updatefeenotes(pcapId,"AQ_P_BURNHTR","null",customID);
+				var fee = feeAmountbynotes(pcapId,"AQ_P_BURNHTR",customID,sysDate.getYear());
+                editAppSpecific("Current Fee Total",fee,childcap.getCapID());
+			}
+			if (catergory == "Miscellaneous Equipment" && (status == "ACTIVE" || status == "Active") && getAppSpecific("Renewal Fee Rating Type",childcap.getCapID()) == "HP")
+			{
+				addFee("AQ_P_ELECHP","AQ_FAC","FINAL",Number(getAppSpecific("Renewal Fee Rating Total",childcap.getCapID())),"N",pcapId);
+				updatefeenotes(pcapId,"AQ_P_ELECHP","null",customID);
+				var fee = feeAmountbynotes(pcapId,"AQ_P_ELECHP",customID,sysDate.getYear());
+                editAppSpecific("Current Fee Total",fee,childcap.getCapID());
+			}
+			if (catergory == "Miscellaneous Equipment" && (status == "ACTIVE" || status == "Active") && getAppSpecific("Renewal Fee Rating Type",childcap.getCapID()) == "KVA")
+			{
+				addFee("AQ_P_ELECENG","AQ_FAC","FINAL",Number(getAppSpecific("Renewal Fee Rating Total",childcap.getCapID())),"N",pcapId);
+				updatefeenotes(pcapId,"AQ_P_ELECENG","null",customID);
+				var fee = feeAmountbynotes(pcapId,"AQ_P_ELECENG",customID,sysDate.getYear());
+                editAppSpecific("Current Fee Total",fee,childcap.getCapID());
+			}
+			if (catergory == "Miscellaneous Equipment" && (status == "ACTIVE" || status == "Active") && getAppSpecific("Renewal Fee Rating Type",childcap.getCapID()) == "GAL")
+			{
+				addFee("AQ_P_STATCON","AQ_FAC","FINAL",Number(getAppSpecific("Renewal Fee Rating Total",childcap.getCapID())),"N",pcapId);
+				updatefeenotes(pcapId,"AQ_P_STATCON","null",customID);
+				var fee = feeAmountbynotes(pcapId,"AQ_P_STATCON",customID,sysDate.getYear());
+                editAppSpecific("Current Fee Total",fee,childcap.getCapID());
+			}
+			if (catergory == "Miscellaneous Equipment" && (status == "ACTIVE" || status == "Active") && getAppSpecific("Renewal Fee Rating Type",childcap.getCapID()) == "SEMI")
+			{
+				addFee("AQ_P_SEMICON","AQ_FAC","FINAL",Number(getAppSpecific("Renewal Fee Rating Total",childcap.getCapID())),"N",pcapId);
+				updatefeenotes(pcapId,"AQ_P_SEMICON","null",customID);
+				var fee = feeAmountbynotes(pcapId,"AQ_P_SEMICON",customID,sysDate.getYear());
+                editAppSpecific("Current Fee Total",fee,childcap.getCapID());
+			}
+			if (catergory == "Miscellaneous Equipment" && (status == "ACTIVE" || status == "Active") && getAppSpecific("Renewal Fee Rating Type",childcap.getCapID()) == "EXCEP")
+			{
+				addFee("AQ_P_PFE","AQ_FAC","FINAL",Number(getAppSpecific("Renewal Fee Rating Total",childcap.getCapID())),"N",pcapId);
+				updatefeenotes(pcapId,"AQ_P_PFE","null",customID);
+				var fee = feeAmountbynotes(pcapId,"AQ_P_PFE",customID,sysDate.getYear());
+                editAppSpecific("Current Fee Total",fee,childcap.getCapID());
+			}
+			if (catergory == "Miscellaneous Equipment" && (status == "ACTIVE" || status == "Active") && getAppSpecific("Renewal Fee Rating Type",childcap.getCapID()) == "SQFT")
+			{
+				addFee("AQ_P_INCINER","AQ_FAC","FINAL",Number(getAppSpecific("Renewal Fee Rating Total",childcap.getCapID())),"N",pcapId);
+				updatefeenotes(pcapId,"AQ_P_INCINER","null",customID);
+				var fee = feeAmountbynotes(pcapId,"AQ_P_INCINER",customID,sysDate.getYear());
+                editAppSpecific("Current Fee Total",fee,childcap.getCapID());
+			}
+			 //add Stationary Container fee
+			if (catergory == "Stationary Container" && (status == "ACTIVE" || status == "Active") && getAppSpecific("Renewal Fee Rating Type",childcap.getCapID()) == "GAL")
+			{ 
+				addFee("AQ_P_STATCON","AQ_FAC","FINAL",Number(getAppSpecific("Renewal Fee Rating Total",childcap.getCapID())),"N",pcapId);
+				updatefeenotes(pcapId,"AQ_P_STATCON","null",customID);
+				var fee = feeAmountbynotes(pcapId,"AQ_P_STATCON",customID,sysDate.getYear());
+                editAppSpecific("Current Fee Total",fee,childcap.getCapID());
+			}
+			if ((catergory == "Vapor Recovery AST" || catergory == "Vapor Recovery UST") && (status == "ACTIVE" || status == "Active"))
+			{
+				var rating = getAppSpecific("Number of Gasoline Dispensing Nozzles",childcap.getCapID());
+				if (Number(rating) >= 1)
+				{
+					var NozValue = lookup("PO_Gas_Nozzle_Fee",Nozrating(rating));
+					var value = (Number(NozValue) - Number(getAppSpecific("Last Year Nozzle Fee",childcap.getCapID())))/Number(getAppSpecific("Last Year Nozzle Fee",childcap.getCapID()));
+					var LYNF = getAppSpecific("Last Year Nozzle Fee",childcap.getCapID())
+					if(Number(value) > .15) 
+					{
+						if(LYNF != 0)
+						{	
+						var newfee = (Number(LYNF) + Number(LYNF) * .15);
+						}
+						if(LYNF == 0)
+						{
+						var newfee = Number(NozValue);
+						}					
+						addFee("AQ_P_MGASFUL","AQ_FAC","FINAL",newfee.toFixed(2),"N",pcapId);
+						updatefeenotes(pcapId,"AQ_P_MGASFUL","null",customID);
+						var fee = feeAmountbynotes(pcapId,"AQ_P_MGASFUL",customID,sysDate.getYear());
+						editAppSpecific("Current Fee Total",fee,childcap.getCapID());
+						editAppSpecific("Last Year Nozzle Fee",fee,childcap.getCapID());
+						addFee("AQ_GDFTRE","AQ_FAC","FINAL",1,"N",pcapId);
+						updatefeenotes(pcapId,"AQ_GDFTRE","null",customID);
+					}
+					if(Number(value) <= .15)
+					{
+						addFee("AQ_P_GASFUEL","AQ_FAC","FINAL",Number(getAppSpecific("Renewal Fee Rating Total",childcap.getCapID())),"N",pcapId);
+						updatefeenotes(pcapId,"AQ_P_GASFUEL","null",customID);
+						var fee = feeAmountbynotes(pcapId,"AQ_P_GASFUEL",customID,sysDate.getYear());
+						editAppSpecific("Current Fee Total",fee,childcap.getCapID());
+						editAppSpecific("Last Year Nozzle Fee",fee,childcap.getCapID());
+						addFee("AQ_GDFTRE","AQ_FAC","FINAL",1,"N",pcapId);
+						updatefeenotes(pcapId,"AQ_GDFTRE","null",customID);
+					}
+				}
+				if (Number(rating) == 0)
+				{
+					var RFRT = getAppSpecific("Renewal Fee Rating Type",childcap.getCapID());
+					if (RFRT == "MMBtu/hr")
+					{ 
+						addFee("AQ_P_BURNHTR","AQ_FAC","FINAL",Number(getAppSpecific("Renewal Fee Rating Total",childcap.getCapID())),"N",pcapId);
+						updatefeenotes(pcapId,"AQ_P_BURNHTR","null",customID);
+						var fee = feeAmountbynotes(pcapId,"AQ_P_BURNHTR",customID,sysDate.getYear());
+						editAppSpecific("Current Fee Total",fee,childcap.getCapID());
+					}
+					if (RFRT == "HP")
+					{
+						addFee("AQ_P_ELECHP","AQ_FAC","FINAL",Number(getAppSpecific("Renewal Fee Rating Total",childcap.getCapID())),"N",pcapId);
+						updatefeenotes(pcapId,"AQ_P_ELECHP","null",customID);
+						var fee = feeAmountbynotes(pcapId,"AQ_P_ELECHP",customID,sysDate.getYear());
+						editAppSpecific("Current Fee Total",fee,childcap.getCapID());
+					}
+					if (RFRT == "KVA")
+					{
+						addFee("AQ_P_ELECENG","AQ_FAC","FINAL",Number(getAppSpecific("Renewal Fee Rating Total",childcap.getCapID())),"N",pcapId);
+						updatefeenotes(pcapId,"AQ_P_ELECENG","null",customID);
+						var fee = feeAmountbynotes(pcapId,"AQ_P_ELECENG",customID,sysDate.getYear());
+						editAppSpecific("Current Fee Total",fee,childcap.getCapID());
+					}
+					if (RFRT == "GAL")
+					{
+						addFee("AQ_P_STATCON","AQ_FAC","FINAL",Number(getAppSpecific("Renewal Fee Rating Total",childcap.getCapID())),"N",pcapId);
+						updatefeenotes(pcapId,"AQ_P_STATCON","null",customID);
+						var fee = feeAmountbynotes(pcapId,"AQ_P_STATCON",customID,sysDate.getYear());
+						editAppSpecific("Current Fee Total",fee,childcap.getCapID());
+					}
+					if (RFRT == "SEMI")
+					{
+						addFee("AQ_P_SEMICON","AQ_FAC","FINAL",Number(getAppSpecific("Renewal Fee Rating Total",childcap.getCapID())),"N",pcapId);
+						updatefeenotes(pcapId,"AQ_P_SEMICON","null",customID);
+						var fee = feeAmountbynotes(pcapId,"AQ_P_SEMICON",customID,sysDate.getYear());
+						editAppSpecific("Current Fee Total",fee,childcap.getCapID());
+					}
+					if (RFRT == "EXCEP")
+					{
+						addFee("AQ_P_PFE","AQ_FAC","FINAL",Number(getAppSpecific("Renewal Fee Rating Total",childcap.getCapID())),"N",pcapId);
+						updatefeenotes(pcapId,"AQ_P_PFE","null",customID);
+						var fee = feeAmountbynotes(pcapId,"AQ_P_PFE",customID,sysDate.getYear());
+						editAppSpecific("Current Fee Total",fee,childcap.getCapID());
+					}
+					if (RFRT == "SQFT")
+					{
+						addFee("AQ_P_INCINER","AQ_FAC","FINAL",Number(getAppSpecific("Renewal Fee Rating Total",childcap.getCapID())),"N",pcapId);
+						updatefeenotes(pcapId,"AQ_P_INCINER","null",customID);
+						var fee = feeAmountbynotes(pcapId,"AQ_P_INCINER",customID,sysDate.getYear());
+						editAppSpecific("Current Fee Total",fee,childcap.getCapID());
+					}
+				}
+				
+			}  	
+	editAppSpecific("Print Permit","UNCHECKED",childcap.getCapID());
+			 
+		} //end of looping through children
+            editAppSpecific("Invoice Sent","UNCHECKED",oldcapId);
+		    editAppSpecific("First Letter Sent","UNCHECKED",oldcapId);
+			editAppSpecific("Second Letter Sent","UNCHECKED",oldcapId);
+		
+          if (Number(getAppSpecific("CO Total",oldcapId)) > 0) 
+		{
+			 addFee("AQ_APE_CO","AQ_FAC","FINAL",Math.ceil(Number(getAppSpecific("CO Total",oldcapId))),"N",oldcapId);
+		} 
+		 if (Number(getAppSpecific("NOx Total",oldcapId)) > 0)
+		{
+			 addFee("AQ_APE_NO","AQ_FAC","FINAL",Math.ceil(Number(getAppSpecific("NOx Total",oldcapId))),"N",oldcapId);
+		}
+		 if (Number(getAppSpecific("PM10 Total",oldcapId)) > 0)
+		{
+			addFee("AQ_APE_PM","AQ_FAC","FINAL",Math.ceil(Number(getAppSpecific("PM10 Total",oldcapId))),"N",oldcapId);
+		}
+		 if (Number(getAppSpecific("SOx Total",oldcapId)) > 0) 
+		{
+			addFee("AQ_APE_SO","AQ_FAC","FINAL",Math.ceil(Number(getAppSpecific("SOx Total",oldcapId))),"N",oldcapId);
+		}
+		 if (Number(getAppSpecific("VOC Total",oldcapId)) > 0)
+		{
+			addFee("AQ_APE_OG","AQ_FAC","FINAL",Math.ceil(Number(getAppSpecific("VOC Total",oldcapId))),"N",oldcapId);
+		}
+         if (Number(childcount) > 0 && getAppSpecific("SVAB Fee",oldcapId) == "CHECKED")
+		 {
+			addFee("SVAB_FEE","AQ_FAC","FINAL",Number(childcount),"N",oldcapId);
 		 }	
-		 
-		
-		
-            capCount++;
-     }
+		 if (getAppSpecific("Title V Fee",oldcapId) == "Title V Major Source With Combustion and Opacity CEMS")
+		 {
+			addFee("AQ_TVMSWCOC","AQ_FAC","FINAL",1,"N",oldcapId);
+		 }
+		 if (getAppSpecific("Title V Fee",oldcapId) == "Title V Major Source With Combustion CEMS")
+		 {
+			addFee("AQ_TVMSWCC","AQ_FAC","FINAL",1,"N",oldcapId);
+		 }
+		 if (getAppSpecific("Title V Fee",oldcapId) == "Title V Major Sources Without CEMS")
+		 {
+			addFee("AQ_TVMSWC","AQ_FAC","FINAL",1,"N",oldcapId);
+		 }
+		 if (getAppSpecific("Title V Fee",oldcapId) == "Non-Major Title V Sources Without CEMS")
+		 {
+			addFee("AQ_NMTVMSWC","AQ_FAC","FINAL",1,"N",oldcapId);
+		 }
+		 if (getAppSpecific("Title V Fee",oldcapId) == "Synthetic Minor Sources")
+		 {
+			addFee("AQ_SMS","AQ_FAC","FINAL",1,"N",oldcapId);
+		 }
+capCount++;		
+	} 
+}
+ 
+
     return capCount;
 }
-
 
 /*------------------------------------------------------------------------------------------------------/
 | <===========Internal Functions and Classes (Used by this script)
 /------------------------------------------------------------------------------------------------------*/
+
 function elapsed() {
     var thisDate = new Date();
     var thisTime = thisDate.getTime();
@@ -213,196 +542,62 @@ function getCapId(pid1, pid2, pid3) {
         return null;
     }
 }
-function getParentPlacer(childcapid) 
-	{
-	// returns the capId object of the parent.  Assumes only one parent!
-	//
-	getCapResult = aa.cap.getProjectParents(childcapid,1);
-	if (getCapResult.getSuccess())
-		{
-		parentArray = getCapResult.getOutput();
-		if (parentArray.length)
-			return parentArray[0].getCapID();
-		else
-			{
-			logDebug( "**WARNING: GetParent found no project parent for this application");
-			return false;
-			}
-		}
-	else
-		{ 
-		logDebug( "**WARNING: getting project parents:  " + getCapResult.getErrorMessage());
-		return false;
-		}
-	}
-	
-function getContactEmailByContactType(pContactType,capid)
+
+function dateAdd(td, amt)
+// perform date arithmetic on a string
+// td can be "mm/dd/yyyy" (or any string that will convert to JS date)
+// amt can be positive or negative (5, -3) days
+// if optional parameter #3 is present, use working days only
 {
-	//Invoice Contact
-	//Responsible Official
-	// Returns the email address for the first Contact found on a Record with Contact Type = pContactType parameter
-	// optional capid parameter
-	// added check for ApplicationSubmitAfter event since the contactsgroup array is only on pageflow,
-	// on ASA it should still be pulled normal way even though still partial cap
-	var thisCap = capid;
-	if (arguments.length == 2) thisCap = arguments[1];
 
-	var cArray = new Array();
+    var useWorking = false;
+    if (arguments.length == 3)
+        useWorking = true;
 
-	if (arguments.length == 0 && !cap.isCompleteCap() && controlString != "ApplicationSubmitAfter") // we are in a page flow script so use the capModel to get contacts
-		{
-		capContactArray = cap.getContactsGroup().toArray() ;
-		}
-	else
-		{
-		var capContactResult = aa.people.getCapContactByCapID(thisCap);
-		if (capContactResult.getSuccess())
-			{
-			var capContactArray = capContactResult.getOutput();
-			}
-		}
-	
-	var contactEmailToReturn = "";
-	var contactTypeForCompare = "";
-	
-	if (capContactArray)
-	{
-		for (yy in capContactArray)
-		{
-			contactTypeForCompare = capContactArray[yy].getPeople().contactType;
-		
-			if(contactTypeForCompare == pContactType)
-			{
-				contactEmailToReturn = capContactArray[yy].getPeople().email;
-				logDebug("DEBUG: Found Contact with Type = " + pContactType + ".  Email address for Contact = " + contactEmailToReturn);
-				break;
-			}
-		}
-	}
-
-	if(contactEmailToReturn == null)
-	{
-		contactEmailToReturn = "";
-	}
-	
-	logDebug("Returning contact email address: " + contactEmailToReturn);
-	return contactEmailToReturn;
-}	
-function getinvoicebalance(InvNbr)
-{
-	var feeAmount = 0;
-	var amtPaid = 0;
-	fList = aa.invoice.getFeeItemInvoiceByCustomizedNbr(InvNbr).getOutput()
-			for (fNum in fList)
-        	  if (fList[fNum].getInvoiceNbr() == InvNbr)
-			    {	
-				  feeAmount += new Number(String(fList[fNum].getFee()));
-			  var pfResult = aa.finance.getPaymentFeeItems(capId, null);
-			if (pfResult.getSuccess())
-				{
-				var pfObj = pfResult.getOutput();
-				for (ij in pfObj)
-					if ((fList[fNum].getFeeSeqNbr() == pfObj[ij].getFeeSeqNbr()) && (pfObj[ij].getInvoiceNbr() == InvNbr))
-						amtPaid+=pfObj[ij].getFeeAllocation()
-				}
-				}
-				
-				return feeAmount - amtPaid;
-}
-
-
-function getinvoicenumberbydate(capid,date)
-{
-	// date format needs to be MM/DD/YYYY
-	var invoicenumber = "";
-	
-	iListResult = aa.finance.getInvoiceByCapID(capid,null);
-	iList = iListResult.getOutput();
-	for (iNum in iList)
-		if(dateFormatted(iList[iNum].getInvDate().getMonth(),iList[iNum].getInvDate().getDayOfMonth(),iList[iNum].getInvDate().getYear(),"").equals(date))
-			invoicenumber = iList[iNum].getInvNbr();
-	return 	invoicenumber
-}
-
-function dateFormatted(pMonth,pDay,pYear,pFormat)
-//returns date string formatted as YYYY-MM-DD or MM/DD/YYYY (default)
-	{
-	var mth = "";
-	var day = "";
-	var ret = "";
-	if (pMonth > 9)
-		mth = pMonth.toString();
-	else
-		mth = "0"+pMonth.toString();
-
-	if (pDay > 9)
-		day = pDay.toString();
-	else
-		day = "0"+pDay.toString();
-
-	if (pFormat=="YYYY-MM-DD")
-		ret = pYear.toString()+"-"+mth+"-"+day;
-	else
-		ret = ""+mth+"/"+day+"/"+pYear.toString();
-
-	return ret;
-	}
-
-function generateReport(aaReportName,parameters,rModule,capid) {
-	var reportName = aaReportName;
-      
-    report = aa.reportManager.getReportInfoModelByName(reportName);
-    report = report.getOutput();
-  
-    report.setModule(rModule);
-    report.setCapId(capid);
-
-    report.setReportParameters(parameters);
-
-    var permit = aa.reportManager.hasPermission(reportName,"Admin");
-
-    if(permit.getOutput().booleanValue()) {
-       var reportResult = aa.reportManager.getReportResult(report);
-     
-       if(reportResult) {
-	       reportResult = reportResult.getOutput();
-	       var reportFile = aa.reportManager.storeReportToDisk(reportResult);
-			logMessage("Report Result: "+ reportResult);
-	       reportFile = reportFile.getOutput();
-	       return reportFile
-       } else {
-       		logMessage("Unable to run report: "+ reportName + " for Admin" + systemUserObj);
-       		return false;
-       }
-    } else {
-         logMessage("No permission to report: "+ reportName + " for Admin" + systemUserObj);
-         return false;
+    if (!td)
+        dDate = new Date();
+    else
+        dDate = new Date(td);
+    var i = 0;
+    if (useWorking)
+        if (!aa.calendar.getNextWorkDay) {
+        logDebug("**ERROR", "getNextWorkDay function is only available in Accela Automation 6.3.2 or higher.");
+        while (i < Math.abs(amt)) {
+            dDate.setTime(dDate.getTime() + (1000 * 60 * 60 * 24 * (amt > 0 ? 1 : -1)));
+            if (dDate.getDay() > 0 && dDate.getDay() < 6)
+                i++
+        }
     }
+    else {
+        while (i < Math.abs(amt)) {
+            dDate = new Date(aa.calendar.getNextWorkDay(aa.date.parseDate(dDate.getMonth() + 1 + "/" + dDate.getDate() + "/" + dDate.getFullYear())).getOutput().getTime());
+            i++;
+        }
+    }
+    else
+        dDate.setTime(dDate.getTime() + (1000 * 60 * 60 * 24 * amt));
+
+    return (dDate.getMonth() + 1) + "/" + dDate.getDate() + "/" + dDate.getFullYear();
 }
 
-function sendNotification(emailFrom,emailTo,emailCC,templateName,params,reportFile,capid)
-{
-	sca = String(capid).split("-"); 
-	var id1 = sca[0];
- 	var id2 = sca[1];
- 	var id3 = sca[2];
-
-	var capIDScriptModel = aa.cap.createCapIDScriptModel(id1, id2, id3);
-
-
-	var result = null;
-	result = aa.document.sendEmailAndSaveAsDocument(emailFrom, emailTo, emailCC, templateName, params, capIDScriptModel, reportFile);
-	if(result.getSuccess())
+function lookup(stdChoice,stdValue) 
 	{
-		logDebug("Sent email successfully to " + emailTo + "!");
-		return true;
-	}
+	var strControl;
+	var bizDomScriptResult = aa.bizDomain.getBizDomainByValue(stdChoice,stdValue);
+	
+   	if (bizDomScriptResult.getSuccess())
+   		{
+		var bizDomScriptObj = bizDomScriptResult.getOutput();
+		strControl = "" + bizDomScriptObj.getDescription(); // had to do this or it bombs.  who knows why?
+		logDebug("lookup(" + stdChoice + "," + stdValue + ") = " + strControl);
+		}
 	else
-	{
-		logDebug("Failed to send mail. - " + result.getErrorType());
-		return false;
+		{
+		logDebug("lookup(" + stdChoice + "," + stdValue + ") does not exist");
+		}
+	return strControl;
 	}
-}
+	
 function getChildren(pCapType, pParentCapId) 
 	{
 	// Returns an array of children capId objects whose cap type matches pCapType parameter
@@ -410,10 +605,8 @@ function getChildren(pCapType, pParentCapId)
 	// Optional 3rd parameter pChildCapIdSkip: capId of child to skip
 
 	var retArray = new Array();
-	if (pParentCapId!=null) //use cap in parameter 
-		var vCapId = pParentCapId;
-	else // use current cap
-		var vCapId = capId;
+	var vCapId = pParentCapId;
+
 		
 	if (arguments.length>2)
 		var childCapIdSkip = arguments[2];
@@ -460,51 +653,11 @@ function getChildren(pCapType, pParentCapId)
 	logDebug("getChildren returned " + retArray.length + " capIds");
 	return retArray;
 
-	}
-
-function email(pToEmail, pFromEmail, pSubject, pText) 
-	{
-	//Sends email to specified address
-	//06SSP-00221
-	//
-	aa.sendMail(pFromEmail, pToEmail, "", pSubject, pText);
-	logDebug("Email sent to "+pToEmail);
-	return true;
 	}	
-function addParameter(pamaremeters, key, value)
-{
-	if(key != null)
-	{
-		if(value == null)
-		{
-			value = "";
-		}
-		pamaremeters.put(key, value);
-	}
-}	
-
-function lookup(stdChoice,stdValue) 
-	{
-	var strControl;
-	var bizDomScriptResult = aa.bizDomain.getBizDomainByValue(stdChoice,stdValue);
-	
-   	if (bizDomScriptResult.getSuccess())
-   		{
-		var bizDomScriptObj = bizDomScriptResult.getOutput();
-		strControl = "" + bizDomScriptObj.getDescription(); // had to do this or it bombs.  who knows why?
-		logDebug("lookup(" + stdChoice + "," + stdValue + ") = " + strControl);
-		}
-	else
-		{
-		logDebug("lookup(" + stdChoice + "," + stdValue + ") does not exist");
-		}
-	return strControl;
-	}
-	
-	
 function addFee(fcode,fsched,fperiod,fqty,finvoice,feeCap) // Adds a single fee, optional argument: fCap
 	{
 	// Updated Script will return feeSeq number or null if error encountered (SR5112) 
+	var customId = aa.cap.getCap(feeCap).getOutput().getCapModel().getAltID();
 	var feeCapMessage = "";
 	var feeSeq_L = new Array();				// invoicing fee for CAP in args
 	var paymentPeriod_L = new Array();			// invoicing pay periods for CAP in args
@@ -512,14 +665,14 @@ function addFee(fcode,fsched,fperiod,fqty,finvoice,feeCap) // Adds a single fee,
 	if (arguments.length > 5) 
 		{
 		feeCap = arguments[5]; // use cap ID specified in args
-		feeCapMessage = " to specified CAP";
+		feeCapMessage = " to facility";
 		}
 
 	assessFeeResult = aa.finance.createFeeItem(feeCap,fsched,fcode,fperiod,fqty);
 	if (assessFeeResult.getSuccess())
 		{
 		feeSeq = assessFeeResult.getOutput();
-		logDebug("Successfully added Fee " + fcode + ", Qty " + fqty + feeCapMessage + " " + feeCap);
+		logDebug("Successfully added Fee " + fcode + ", Qty " + fqty + feeCapMessage + " " + customId);
 
 		if (finvoice == "Y" && arguments.length == 5) // use current CAP
 			{
@@ -540,7 +693,7 @@ function addFee(fcode,fsched,fperiod,fqty,finvoice,feeCap) // Adds a single fee,
 		}
 	else
 		{
-		logDebug( "**ERROR: assessing fee (" + fcode + "): " + assessFeeResult.getErrorMessage());
+		logDebug( "**ERROR: assessing fee (" + fcode + "): to " + customId + " " + assessFeeResult.getErrorMessage());
 		feeSeq = null;
 		}
 	
@@ -716,7 +869,6 @@ function getChildrencount(pCapType, pParentCapId)
 
 function updatefeenotes(feeCap,fcode,altid,feeComment)
 {
-	var maltid = altid + ".";
 	var feeResult=aa.finance.getFeeItemByFeeCode(feeCap,fcode,"FINAL");
 	if (feeResult.getSuccess())
 		{ var feeObjArr = feeResult.getOutput(); }
@@ -724,21 +876,44 @@ function updatefeenotes(feeCap,fcode,altid,feeComment)
 		{ logDebug( "**ERROR: getting fee items: " + capContResult.getErrorMessage()); return false }
 	
 	for (ff in feeObjArr)
-		if (altid.equals(feeObjArr[ff].getF4FeeItem().getFeeNotes()) || maltid.equals(feeObjArr[ff].getF4FeeItem().getFeeNotes()))
+		if (altid.equals(feeObjArr[ff].getF4FeeItem().getFeeNotes()))
 		fsm1 = feeObjArr[ff].getF4FeeItem();
 	        fsm1.setFeeNotes(feeComment);
                 aa.finance.editFeeItem(fsm1);
 }
 	
+function getParentPlacer(childcapid) 
+	{
+	// returns the capId object of the parent.  Assumes only one parent!
+	//
+	getCapResult = aa.cap.getProjectParents(childcapid,1);
+	if (getCapResult.getSuccess())
+		{
+		parentArray = getCapResult.getOutput();
+		if (parentArray.length)
+			return parentArray[0].getCapID();
+		else
+			{
+			logDebug( "**WARNING: GetParent found no project parent for this application");
+			return false;
+			}
+		}
+	else
+		{ 
+		logDebug( "**WARNING: getting project parents:  " + getCapResult.getErrorMessage());
+		return false;
+		}
+	}
+
 function invoiceAllFeesPlacer(capid) {
 	var itemCap = capid;
-	var targetFees = loadFeesplacer(itemCap);
+	var targetFees = loadFees(itemCap);
 	var feeSeqArray = new Array();
 	var paymentPeriodArray = new Array();
 	for (tFeeNum in targetFees)
 		{
 		targetFee = targetFees[tFeeNum];
-			if (targetFee.status == "NEW" && targetFee.notes.substring(0,3) != "AC-")
+			if (targetFee.status == "NEW")
 				{
 				feeSeqArray.push(targetFee.sequence);
 				paymentPeriodArray.push(targetFee.period);
@@ -753,90 +928,23 @@ function invoiceAllFeesPlacer(capid) {
 			}
 }
 
-function loadFeesplacer(capid)
-	{
-	//  load the fees into an array of objects.  Does not
-	var itemCap = capid;
-	if (arguments.length > 0)
-		{
-		ltcapidstr = arguments[0]; // use cap ID specified in args
-		if (typeof(ltcapidstr) == "string")
-                {
-				var ltresult = aa.cap.getCapID(ltcapidstr);
-	 			if (ltresult.getSuccess())
-  				 	itemCap = ltresult.getOutput();
-	  			else
-  				  	{ logMessage("**ERROR: Failed to get cap ID: " + ltcapidstr + " error: " +  ltresult.getErrorMessage()); return false; }
-                }
-		else
-			itemCap = ltcapidstr;
-		}
-
-  	var feeArr = new Array();
-
-	var feeResult=aa.fee.getFeeItems(itemCap);
-		if (feeResult.getSuccess())
-			{ var feeObjArr = feeResult.getOutput(); }
-		else
-			{ logDebug( "**ERROR: getting fee items: " + feeResult.getErrorMessage()); return false }
-
-		for (ff in feeObjArr)
-			{
-			fFee = feeObjArr[ff];
-			var myFee = new Fee();
-			var amtPaid = 0;
-			var invoicenotes = "Blank"
-
-			var pfResult = aa.finance.getPaymentFeeItems(itemCap, null);
-			if (pfResult.getSuccess())
-				{
-				var pfObj = pfResult.getOutput();
-				for (ij in pfObj)
-					if (fFee.getFeeSeqNbr() == pfObj[ij].getFeeSeqNbr())
-						amtPaid+=pfObj[ij].getFeeAllocation()
-				}
-                    if (fFee.getF4FeeItemModel().getFeeNotes() != null)
-					{
-						invoicenotes = fFee.getF4FeeItemModel().getFeeNotes();
-					}
-
-			myFee.notes = invoicenotes;
-			myFee.sequence = fFee.getFeeSeqNbr();
-			myFee.code =  fFee.getFeeCod();
-			myFee.description = fFee.getFeeDescription();
-			myFee.unit = fFee.getFeeUnit();
-			myFee.amount = fFee.getFee();
-			myFee.amountPaid = amtPaid;
-			if (fFee.getApplyDate()) myFee.applyDate = convertDate(fFee.getApplyDate());
-			if (fFee.getEffectDate()) myFee.effectDate = convertDate(fFee.getEffectDate());
-			if (fFee.getExpireDate()) myFee.expireDate = convertDate(fFee.getExpireDate());
-			myFee.status = fFee.getFeeitemStatus();
-			myFee.period = fFee.getPaymentPeriod();
-			myFee.display = fFee.getDisplay();
-			myFee.accCodeL1 = fFee.getAccCodeL1();
-			myFee.accCodeL2 = fFee.getAccCodeL2();
-			myFee.accCodeL3 = fFee.getAccCodeL3();
-			myFee.formula = fFee.getFormula();
-			myFee.udes = fFee.getUdes();
-			myFee.UDF1 = fFee.getUdf1();
-			myFee.UDF2 = fFee.getUdf2();
-			myFee.UDF3 = fFee.getUdf3();
-			myFee.UDF4 = fFee.getUdf4();
-			myFee.subGroup = fFee.getSubGroup();
-			myFee.calcFlag = fFee.getCalcFlag();;
-			myFee.calcProc = fFee.getFeeCalcProc();
-
-			feeArr.push(myFee)
-			}
-
-		return feeArr;
-		}
+function getinvoicenumberbydate(capid,date)
+{
+	// date format needs to be MM/DD/YYYY
+	var invoicenumber = "";
+	
+	iListResult = aa.finance.getInvoiceByCapID(capid,null);
+	iList = iListResult.getOutput();
+	for (iNum in iList)
+		if(dateFormatted(iList[iNum].getInvDate().getMonth(),iList[iNum].getInvDate().getDayOfMonth(),iList[iNum].getInvDate().getYear(),"").equals(date))
+			invoicenumber = iList[iNum].getInvNbr();
+	return 	invoicenumber
+}
 
 function feeExistsbynotes(feestr,altid) // optional statuses to check for
 	{
 	var checkStatus = false;
 	var statusArray = new Array(); 
-	var maltid = altid + ".";
 
 	//get optional arguments 
 	if (arguments.length > 2)
@@ -853,16 +961,16 @@ function feeExistsbynotes(feestr,altid) // optional statuses to check for
 		{ logDebug( "**ERROR: getting fee items: " + capContResult.getErrorMessage()); return false }
 	
 	for (ff in feeObjArr)
-		if ( feestr.equals(feeObjArr[ff].getF4FeeItem().getFeeCod()) && (!checkStatus || exists(feeObjArr[ff].getF4FeeItem().getFeeitemStatus(),statusArray) ) && (altid.equals(feeObjArr[ff].getF4FeeItem().getFeeNotes()) || maltid.equals(feeObjArr[ff].getF4FeeItem().getFeeNotes())))
+		if ( feestr.equals(feeObjArr[ff].getF4FeeItem().getFeeCod()) && (!checkStatus || exists(feeObjArr[ff].getF4FeeItem().getFeeitemStatus(),statusArray) ) && altid.equals(feeObjArr[ff].getF4FeeItem().getFeeNotes()))
 			return true;
 			
 	return false;
 	}
 
-function feeAmountbynotes(capid,fcode,altid) 
+function feeAmountbynotes(capid,fcode,altid,year) 
 	{
 	var feeTotal = 0;
-	var maltid = altid + ".";
+    var maltid = altid + ".";
 	var feeResult=aa.finance.getFeeItemByFeeCode(capid,fcode,"FINAL");
 	if (feeResult.getSuccess())
 		{ var feeObjArr = feeResult.getOutput(); }
@@ -870,84 +978,9 @@ function feeAmountbynotes(capid,fcode,altid)
 		{ logDebug( "**ERROR: getting fee items: " + capContResult.getErrorMessage()); return false }
 	
 	for (ff in feeObjArr)
-		if (altid.equals(feeObjArr[ff].getF4FeeItem().getFeeNotes()) || maltid.equals(feeObjArr[ff].getF4FeeItem().getFeeNotes()))
+		if ((altid.equals(feeObjArr[ff].getF4FeeItem().getFeeNotes()) || maltid.equals(feeObjArr[ff].getF4FeeItem().getFeeNotes())) && String(feeObjArr[ff].getF4FeeItem().getApplyDate()).substring(0,4) == year)
 		feeTotal+= feeObjArr[ff].getF4FeeItem().getFee();
 	
 			
 	return feeTotal;
-	}
-	
-function Fee() // Fee Object
-	{
-	this.sequence = null;
-	this.code =  null;
-	this.description = null;  // getFeeDescription()
-	this.unit = null; //  getFeeUnit()
-	this.amount = null; //  getFee()
-	this.amountPaid = null;
-	this.applyDate = null; // getApplyDate()
-	this.effectDate = null; // getEffectDate();
-	this.expireDate = null; // getExpireDate();
-	this.status = null; // getFeeitemStatus()
-	this.recDate = null;
-	this.period = null; // getPaymentPeriod()
-	this.display = null; // getDisplay()
-	this.accCodeL1 = null; // getAccCodeL1()
-	this.accCodeL2 = null; // getAccCodeL2()
-	this.accCodeL3 = null; // getAccCodeL3()
-	this.formula = null; // getFormula()
-	this.udes = null; // String getUdes()
-	this.UDF1 = null; // getUdf1()
-	this.UDF2 = null; // getUdf2()
-	this.UDF3 = null; // getUdf3()
-	this.UDF4 = null; // getUdf4()
-	this.subGroup = null; // getSubGroup()
-	this.calcFlag = null; // getCalcFlag();
-	this.calcProc = null; // getFeeCalcProc()
-	this.auditDate = null; // getAuditDate()
-	this.auditID = null; // getAuditID()
-	this.auditStatus = null; // getAuditStatus()
-	}
-function convertDate(thisDate)
-	{
-
-	if (typeof(thisDate) == "string")
-		{
-		var retVal = new Date(String(thisDate));
-		if (!retVal.toString().equals("Invalid Date"))
-			return retVal;
-		}
-
-	if (typeof(thisDate)== "object")
-		{
-
-		if (!thisDate.getClass) // object without getClass, assume that this is a javascript date already
-			{
-			return thisDate;
-			}
-
-		if (thisDate.getClass().toString().equals("class com.accela.aa.emse.util.ScriptDateTime"))
-			{
-			return new Date(thisDate.getMonth() + "/" + thisDate.getDayOfMonth() + "/" + thisDate.getYear());
-			}
-
-		if (thisDate.getClass().toString().equals("class java.util.Date"))
-			{
-			return new Date(thisDate.getTime());
-			}
-
-		if (thisDate.getClass().toString().equals("class java.lang.String"))
-			{
-			return new Date(String(thisDate));
-			}
-		}
-
-	if (typeof(thisDate) == "number")
-		{
-		return new Date(thisDate);  // assume milliseconds
-		}
-
-	logDebug("**WARNING** convertDate cannot parse date : " + thisDate);
-	return null;
-
 	}
