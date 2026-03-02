@@ -31,21 +31,13 @@ var batchStartTime = batchStartDate.getTime();                                  
 var timeExpired = false;                                                                // Variable to identify if batch script has timed out. Defaulted to "false".
 var systemUserObj = aa.person.getUser("ADMIN").getOutput();
 var useAppSpecificGroupName = false;                                                    // Use Group name when populating App Specific Info Values
-var senderEmailAddr = "pcapcd@placer.ca.gov";                                          // Email address of the sender
-var emailAddress = "ngraf@truepointsolutions.com";                                      // Email address of the person who will receive the batch script log information
+var senderEmailAddr = "placercounty_noreply@accela.com";                                          // Email address of the sender
+var emailAddress = "rmoore@placer.ca.gov";                                      // Email address of the person who will receive the batch script log information
 var emailAddress2 = "rmoore@placer.ca.gov";                                             // CC email address of the person who will receive the batch script log information
 var emailText = "";                                                                     // Email body
 //Parameter variables
 var paramsOK = true;
 
-/*------------------------------------------------------------------------------------------------------/
-| END: Batch Specific Variables
-/------------------------------------------------------------------------------------------------------*/
-
-/*------------------------------------------------------------------------------------------------------/
-| <===========Main=Loop================>
-|
-/------------------------------------------------------------------------------------------------------*/
 
 if (paramsOK) {
     logMessage("START", "Start of Sending of Permit Batch Job.");
@@ -58,13 +50,6 @@ if (paramsOK) {
 
 if (emailAddress.length)
     aa.sendMail(senderEmailAddr, emailAddress, emailAddress2, batchJobName + " Results for Sending of Permit", emailText);
-/*------------------------------------------------------------------------------------------------------/
-| <===========END=Main=Loop================>
-/------------------------------------------------------------------------------------------------------*/
-
-/*------------------------------------------------------------------------------------------------------/
-| <===========External Functions (used by Action entries)
-/------------------------------------------------------------------------------------------------------*/
 function aboutExpLics() {
     var capCount = 0;
     var expResult = aa.cap.getCapIDsByAppSpecificInfoField("Quarter Billing","4th qtr");
@@ -486,44 +471,33 @@ capCount++;
 
     return capCount;
 }
-
-/*------------------------------------------------------------------------------------------------------/
-| <===========Internal Functions and Classes (Used by this script)
-/------------------------------------------------------------------------------------------------------*/
-
 function elapsed() {
     var thisDate = new Date();
     var thisTime = thisDate.getTime();
     return ((thisTime - batchStartTime) / 1000)
 }
-
-// exists:  return true if Value is in Array
 function exists(eVal, eArray) {
     for (ii in eArray)
         if (eArray[ii] == eVal) return true;
     return false;
 }
-
 function matches(eVal, argList) {
     for (var i = 1; i < arguments.length; i++)
         if (arguments[i] == eVal)
         return true;
 
 }
-
 function isNull(pTestValue, pNewValue) {
     if (pTestValue == null || pTestValue == "")
         return pNewValue;
     else
         return pTestValue;
 }
-
 function logMessage(etype, edesc) {
     aa.eventLog.createEventLog(etype, "Batch Process", batchJobName, sysDate, sysDate, "", edesc, batchJobID);
     aa.print(etype + " : " + edesc);
     emailText += etype + " : " + edesc + "<br />";
 }
-
 function logDebug(edesc) {
     if (showDebug) {
         aa.eventLog.createEventLog("DEBUG", "Batch Process", batchJobName, sysDate, sysDate, "", edesc, batchJobID);
@@ -531,7 +505,6 @@ function logDebug(edesc) {
         emailText += "DEBUG : " + edesc + " <br />";
     }
 }
-
 function getCapId(pid1, pid2, pid3) {
 
     var s_capResult = aa.cap.getCapID(pid1, pid2, pid3);
@@ -542,13 +515,7 @@ function getCapId(pid1, pid2, pid3) {
         return null;
     }
 }
-
-function dateAdd(td, amt)
-// perform date arithmetic on a string
-// td can be "mm/dd/yyyy" (or any string that will convert to JS date)
-// amt can be positive or negative (5, -3) days
-// if optional parameter #3 is present, use working days only
-{
+function dateAdd(td, amt){
 
     var useWorking = false;
     if (arguments.length == 3)
@@ -579,9 +546,7 @@ function dateAdd(td, amt)
 
     return (dDate.getMonth() + 1) + "/" + dDate.getDate() + "/" + dDate.getFullYear();
 }
-
-function lookup(stdChoice,stdValue) 
-	{
+function lookup(stdChoice,stdValue) {
 	var strControl;
 	var bizDomScriptResult = aa.bizDomain.getBizDomainByValue(stdChoice,stdValue);
 	
@@ -597,9 +562,7 @@ function lookup(stdChoice,stdValue)
 		}
 	return strControl;
 	}
-	
-function getChildren(pCapType, pParentCapId) 
-	{
+function getChildren(pCapType, pParentCapId) {
 	// Returns an array of children capId objects whose cap type matches pCapType parameter
 	// Wildcard * may be used in pCapType, e.g. "Building/Commercial/*/*"
 	// Optional 3rd parameter pChildCapIdSkip: capId of child to skip
@@ -654,8 +617,7 @@ function getChildren(pCapType, pParentCapId)
 	return retArray;
 
 	}	
-function addFee(fcode,fsched,fperiod,fqty,finvoice,feeCap) // Adds a single fee, optional argument: fCap
-	{
+function addFee(fcode,fsched,fperiod,fqty,finvoice,feeCap) {
 	// Updated Script will return feeSeq number or null if error encountered (SR5112) 
 	var customId = aa.cap.getCap(feeCap).getOutput().getCapModel().getAltID();
 	var feeCapMessage = "";
@@ -700,9 +662,7 @@ function addFee(fcode,fsched,fperiod,fqty,finvoice,feeCap) // Adds a single fee,
 	return feeSeq;
 	   
 	}
-
-function updateFeeItemInvoiceFlag(feeSeq,finvoice)
-{
+function updateFeeItemInvoiceFlag(feeSeq,finvoice) {
 	if(feeSeq == null)
 		return;
 	if(publicUser && !cap.isCompleteCap())
@@ -716,8 +676,7 @@ function updateFeeItemInvoiceFlag(feeSeq,finvoice)
 		}
 	}
 }
-function editAppSpecific(itemName,itemValue,capId)  // optional: itemCap
-{
+function editAppSpecific(itemName,itemValue,capId) {
 	var itemCap = capId;
 	var itemGroup = null;
    	
@@ -741,9 +700,7 @@ function editAppSpecific(itemName,itemValue,capId)  // optional: itemCap
 	else
 		{ logDebug( "WARNING: " + itemName + " was not updated."); }
 }	
-	
-function getAppSpecific(itemName,itemCap)  // optional: itemCap
-{
+function getAppSpecific(itemName,itemCap) {
 	var updated = false;
 	var i=0;
    	
@@ -775,9 +732,7 @@ function getAppSpecific(itemName,itemCap)  // optional: itemCap
 	else
 		{ logDebug( "**ERROR: getting app specific info for Cap : " + appSpecInfoResult.getErrorMessage()) }
 }
-
-function Nozrating (Noz)
-{
+function Nozrating (Noz) {
 if(Number(Noz) > 0 && Number(Noz) < 7)
 {
 	var rating = "06";
@@ -808,9 +763,7 @@ else
 }
 return rating;
 }
-
-function getChildrencount(pCapType, pParentCapId) 
-	{
+function getChildrencount(pCapType, pParentCapId) {
 	// Returns an array of children capId objects whose cap type matches pCapType parameter
 	// Wildcard * may be used in pCapType, e.g. "Building/Commercial/*/*"
 	// Optional 3rd parameter pChildCapIdSkip: capId of child to skip
@@ -866,9 +819,7 @@ function getChildrencount(pCapType, pParentCapId)
 	return retArray.length;
 
 	}
-
-function updatefeenotes(feeCap,fcode,altid,feeComment)
-{
+function updatefeenotes(feeCap,fcode,altid,feeComment) {
 	var feeResult=aa.finance.getFeeItemByFeeCode(feeCap,fcode,"FINAL");
 	if (feeResult.getSuccess())
 		{ var feeObjArr = feeResult.getOutput(); }
@@ -881,9 +832,7 @@ function updatefeenotes(feeCap,fcode,altid,feeComment)
 	        fsm1.setFeeNotes(feeComment);
                 aa.finance.editFeeItem(fsm1);
 }
-	
-function getParentPlacer(childcapid) 
-	{
+function getParentPlacer(childcapid) {
 	// returns the capId object of the parent.  Assumes only one parent!
 	//
 	getCapResult = aa.cap.getProjectParents(childcapid,1);
@@ -904,7 +853,6 @@ function getParentPlacer(childcapid)
 		return false;
 		}
 	}
-
 function invoiceAllFeesPlacer(capid) {
 	var itemCap = capid;
 	var targetFees = loadFees(itemCap);
@@ -927,9 +875,7 @@ function invoiceAllFeesPlacer(capid) {
 			return false;
 			}
 }
-
-function getinvoicenumberbydate(capid,date)
-{
+function getinvoicenumberbydate(capid,date) {
 	// date format needs to be MM/DD/YYYY
 	var invoicenumber = "";
 	
@@ -940,9 +886,7 @@ function getinvoicenumberbydate(capid,date)
 			invoicenumber = iList[iNum].getInvNbr();
 	return 	invoicenumber
 }
-
-function feeExistsbynotes(feestr,altid) // optional statuses to check for
-	{
+function feeExistsbynotes(feestr,altid) {
 	var checkStatus = false;
 	var statusArray = new Array(); 
 
@@ -966,9 +910,7 @@ function feeExistsbynotes(feestr,altid) // optional statuses to check for
 			
 	return false;
 	}
-
-function feeAmountbynotes(capid,fcode,altid,year) 
-	{
+function feeAmountbynotes(capid,fcode,altid,year) {
 	var feeTotal = 0;
     var maltid = altid + ".";
 	var feeResult=aa.finance.getFeeItemByFeeCode(capid,fcode,"FINAL");
@@ -984,3 +926,6 @@ function feeAmountbynotes(capid,fcode,altid,year)
 			
 	return feeTotal;
 	}
+	
+	
+	
