@@ -4,28 +4,17 @@
 |
 | Version 1.0 - Base Version. 09/03/2017 - TruePoint Solutions
 | Version 1.1 - Modified criteria and correct syntax errors.  09/10/2017 TJD
-|
+| Version 2.0 - Code cleanup/formating 3/2/2026 - RM
 | Script is run to email permit to facilities.
 |
 | Batch Requirements:
 /------------------------------------------------------------------------------------------------------*/
-/*------------------------------------------------------------------------------------------------------/
-| START: USER CONFIGURABLE PARAMETERS
-/------------------------------------------------------------------------------------------------------*/
 var showDebug = true; 				// Set to true to see debug messages in event log and email confirmation
 var maxSeconds = 15 * 60; 			// number of seconds allowed for batch processing, usually < 5*60
 var documentOnly = false; 			// Document Only -- displays hierarchy of std choice steps
-/*------------------------------------------------------------------------------------------------------/
-| END: USER CONFIGURABLE PARAMETERS
-/------------------------------------------------------------------------------------------------------*/
-
-/*------------------------------------------------------------------------------------------------------/
-| START: Batch specific variables
-/------------------------------------------------------------------------------------------------------*/
 var sysDate = aa.date.getCurrentDate();
 var batchJobID = aa.batchJob.getJobID().getOutput();
 var batchJobName = "" + aa.env.getValue("batchJobName");
-//Global variables
 var batchStartDate = new Date();                                                        // System Date
 var batchStartTime = batchStartDate.getTime();                                          // Start timer
 var timeExpired = false;                                                                // Variable to identify if batch script has timed out. Defaulted to "false".
@@ -34,11 +23,13 @@ var useAppSpecificGroupName = false;                                            
 var senderEmailAddr = "pcapcd@placer.ca.gov";                                          // Email address of the sender
 var emailAddress = "rmoore@placer.ca.gov";                                      // Email address of the person who will receive the batch script log information
 var emailAddress2 = "rmoore@placer.ca.gov";                                             // CC email address of the person who will receive the batch script log information
-var emailText = "";                                                                     // Email body
+var emailText = "";       
+
+                                                              // Email body
 //Parameter variables
 var paramsOK = true;
-var TPvalue="TP23";
-//var TPvalue = aa.env.getValue("Throughput");
+//var TPvalue="TP24";
+var TPvalue = aa.env.getValue("Throughput");
 var currentUserID = "ADMIN"
 var ratingCO = 0;
 var ratingNOx = 0;
@@ -51,15 +42,6 @@ var parrEmission = new Array();
 var message = "";
 var debug = "";
 
-/*------------------------------------------------------------------------------------------------------/
-| END: Batch Specific Variables
-/------------------------------------------------------------------------------------------------------*/
-
-/*------------------------------------------------------------------------------------------------------/
-| <===========Main=Loop================>
-|
-/------------------------------------------------------------------------------------------------------*/
-
 if (paramsOK) {
     logMessage("START", "Start of Sending of Permit Batch Job.");
 
@@ -71,232 +53,12 @@ if (paramsOK) {
 
 if (emailAddress.length)
     aa.sendMail(senderEmailAddr, emailAddress, emailAddress2, batchJobName + " Results for Sending of Permit", emailText);
-/*------------------------------------------------------------------------------------------------------/
-| <===========END=Main=Loop================>
-/------------------------------------------------------------------------------------------------------*/
 
-/*------------------------------------------------------------------------------------------------------/
-| <===========External Functions (used by Action entries)
-/------------------------------------------------------------------------------------------------------*/
-function aboutExpLics() 
-{
+function aboutExpLics() {
     var capCount = 0;
-/*
-var thru = [];
-thru.push("TP23-SESC-41-01-01");
-thru.push("TP23-SFGS-41-01-01");
-thru.push("TP23-SESG-41-01-01");
-thru.push("TP23-SESS-41-01-01");
-thru.push("TP23-SESE-41-01-01");
-thru.push("TP23-SELR-41-01-01");
-thru.push("TP23-SESN-41-01-01");
-thru.push("TP23-7ELA-41-01-01");
-thru.push("TP23-RKFM-41-01-01");
-thru.push("TP23-RALL-41-01-01");
-thru.push("TP23-RLSS-41-01-01");
-thru.push("TP23-AMSC-42-01-01");
-thru.push("TP23-ALPI-42-01-01");
-thru.push("TP23-APST-41-01-01");
-thru.push("TP23-ARCC-41-01-01");
-thru.push("TP23-ARCB-41-01-01");
-thru.push("TP23-ARCE-41-01-01");
-thru.push("TP23-ARCG-41-01-01");
-thru.push("TP23-ARCL-41-01-01");
-thru.push("TP23-ARCM-41-01-01");
-thru.push("TP23-ARCH-41-01-01");
-thru.push("TP23-ARCI-41-01-01");
-thru.push("TP23-ARCF-41-01-01");
-thru.push("TP23-ARCN-41-01-01");
-thru.push("TP23-ARCK-41-01-01");
-thru.push("TP23-ARCA-41-01-01");
-thru.push("TP23-ABAP-47-01-01");
-thru.push("TP23-ABAP-48-01-01");
-thru.push("TP23-ABVL-41-01-01");
-thru.push("TP23-ABCM-44-01-01");
-thru.push("TP23-AFAG-41-01-01");
-thru.push("TP23-AGDS-41-01-01");
-thru.push("TP23-AGAS-41-01-01");
-thru.push("TP23-AUVL-41-01-01");
-thru.push("TP23-BOLI-41-01-01");
-thru.push("TP23-BCAM-42-01-01");
-thru.push("TP23-BOOS-48-01-01");
-thru.push("TP23-BOOS-48-02-01");
-thru.push("TP23-BOOS-48-03-01");
-thru.push("TP23-BOOS-48-04-01");
-thru.push("TP23-BOOS-48-05-01");
-thru.push("TP23-BOOS-48-06-01");
-thru.push("TP23-BOOS-48-07-01");
-thru.push("TP23-BOOS-48-08-01");
-thru.push("TP23-ARCR-41-01-01");
-thru.push("TP23-BPRK-41-01-01");
-thru.push("TP23-CDFA-42-01-01");
-thru.push("TP23-CFCX-42-01-01");
-thru.push("TP23-CCCP-42-01-01");
-thru.push("TP23-CLTA-42-01-01");
-thru.push("TP23-CLTR-42-01-01");
-thru.push("TP23-CTTC-42-01-01");
-thru.push("TP23-CTWM-42-01-01");
-thru.push("TP23-CRMX-43-01-01");
-thru.push("TP23-CARV-42-01-01");
-thru.push("TP23-CHVO-41-01-01");
-thru.push("TP23-CHVE-41-01-01");
-thru.push("TP23-CHVB-41-01-01");
-thru.push("TP23-CHVG-41-01-01");
-thru.push("TP23-CHVD-41-01-01");
-thru.push("TP23-CHVJ-41-01-01");
-thru.push("TP23-CHVH-41-01-01");
-thru.push("TP23-CHVF-41-01-01");
-thru.push("TP23-CHVP-41-01-01");
-thru.push("TP23-CHVL-41-01-01");
-thru.push("TP23-CHVQ-41-01-01");
-thru.push("TP23-CHVA-41-01-01");
-thru.push("TP23-CHPA-42-01-01");
-thru.push("TP23-RCCY-42-01-01");
-thru.push("TP23-CRFI-42-01-01");
-thru.push("TP23-CRHC-43-01-01");
-thru.push("TP23-CLFX-41-01-01");
-thru.push("TP23-COVA-41-01-01");
-thru.push("TP23-CSTC-41-01-01");
-thru.push("TP23-CHVK-41-01-01");
-thru.push("TP23-TSRC-42-01-01");
-thru.push("TP23-DOBR-40-01-01");
-thru.push("TP23-DOBW-41-01-01");
-thru.push("TP23-DOCR-41-01-01");
-thru.push("TP23-DWCC-42-01-01");
-thru.push("TP23-DOGC-42-01-01");
-thru.push("TP23-DOCC-42-01-01");
-thru.push("TP23-EUSD-42-01-01");
-thru.push("TP23-BRCW-41-01-01");
-thru.push("TP23-FDLE-42-01-01");
-thru.push("TP23-FRVL-41-01-01");
-thru.push("TP23-FWNS-42-01-01");
-thru.push("TP23-GAWF-41-01-01");
-thru.push("TP23-GLBN-42-01-01");
-thru.push("TP23-CECE-41-01-01");
-thru.push("TP23-CEFW-41-01-01");
-thru.push("TP23-CLEA-41-01-01");
-thru.push("TP23-COES-41-01-01");
-thru.push("TP23-COLB-41-01-01");
-thru.push("TP23-CHVC-41-01-01");
-thru.push("TP23-CHVM-41-01-01");
-thru.push("TP23-DRYC-41-01-01");
-thru.push("TP23-HRTZ-42-01-01");
-thru.push("TP23-HRBC-41-01-01");
-thru.push("TP23-HWHD-44-01-01");
-thru.push("TP23-HOMR-42-01-01");
-thru.push("TP23-HGAF-41-01-01");
-thru.push("TP23-USPA-41-01-01");
-thru.push("TP23-JLSS-42-01-01");
-thru.push("TP23-JRPP-42-01-01");
-thru.push("TP23-SUVL-41-01-01");
-thru.push("TP23-LGCM-42-01-01");
-thru.push("TP23-LEXM-41-01-01");
-thru.push("TP23-LRAP-47-02-01");
-thru.push("TP23-LRAP-48-01-01");
-thru.push("TP23-CGFD-41-01-01");
-thru.push("TP23-MDMR-41-01-01");
-thru.push("TP23-MCCG-42-01-01");
-thru.push("TP23-MVEM-40-01-01");
-thru.push("TP23-MPPS-43-01-01");
-thru.push("TP23-MCGC-42-01-01");
-thru.push("TP23-FLAA-47-01-01");
-thru.push("TP23-NIDT-42-01-01");
-thru.push("TP23-NIDL-42-01-01");
-thru.push("TP23-NIDN-42-01-01");
-thru.push("TP23-NCFF-41-01-01");
-thru.push("TP23-NTFP-42-01-01");
-thru.push("TP23-NTMA-44-01-01");
-thru.push("TP23-NTHP-42-01-01");
-thru.push("TP23-NORT-41-01-01");
-thru.push("TP23-NORT-42-01-01");
-thru.push("TP23-NORT-42-02-01");
-thru.push("TP23-NSCM-42-01-01");
-thru.push("TP23-OBXR-44-01-01");
-thru.push("TP23-OBGC-42-01-01");
-thru.push("TP23-PGEL-42-01-01");
-thru.push("TP23-PGEB-42-01-01");
-thru.push("TP23-PPCL-41-01-01");
-thru.push("TP23-PPCR-41-01-01");
-thru.push("TP23-PATT-42-01-01");
-thru.push("TP23-PCWD-42-01-01");
-thru.push("TP23-PCWG-42-01-01");
-thru.push("TP23-PCWS-42-01-01");
-thru.push("TP23-PRTC-41-01-01");
-thru.push("TP23-PICK-46-01-01");
-thru.push("TP23-PCDP-42-01-01");
-thru.push("TP23-PCFR-42-01-01");
-thru.push("TP23-PCLR-42-01-01");
-thru.push("TP23-PPBF-41-01-01");
-thru.push("TP23-PRSC-41-01-01");
-thru.push("TP23-RMOC-40-01-01");
-thru.push("TP23-RMOC-45-01-01");
-thru.push("TP23-RMOC-45-02-01");
-thru.push("TP23-RMOC-47-01-01");
-thru.push("TP23-HCVP-42-01-01");
-thru.push("TP23-MGMK-41-01-01");
-thru.push("TP23-RKGS-41-01-01");
-thru.push("TP23-RFLH-41-01-01");
-thru.push("TP23-RLFG-41-01-01");
-thru.push("TP23-ARCJ-41-01-01");
-thru.push("TP23-RVAM-43-01-01");
-thru.push("TP23-RCEM-42-01-01");
-thru.push("TP23-RFPZ-41-01-01");
-thru.push("TP23-RGLL-42-01-01");
-thru.push("TP23-RWRD-41-01-01");
-thru.push("TP23-SWYD-41-01-01");
-thru.push("TP23-SWYL-41-01-01");
-thru.push("TP23-SWIR-41-01-01");
-thru.push("TP23-SWYR-41-01-01");
-thru.push("TP23-SWYW-41-01-01");
-thru.push("TP23-SMCB-41-01-01");
-thru.push("TP23-SANJ-42-01-01");
-thru.push("TP23-SHLE-41-01-01");
-thru.push("TP23-SHLF-41-01-01");
-thru.push("TP23-SHLH-41-01-01");
-thru.push("TP23-SHLD-41-01-01");
-thru.push("TP23-SHLK-41-01-01");
-thru.push("TP23-SHLB-41-01-01");
-thru.push("TP23-SHLA-41-01-01");
-thru.push("TP23-SHLJ-41-01-01");
-thru.push("TP23-SRBP-44-01-01");
-thru.push("TP23-SRMM-41-01-01");
-thru.push("TP23-SVCC-42-01-01");
-thru.push("TP23-SPFD-42-01-01");
-thru.push("TP23-SPFA-42-01-01");
-thru.push("TP23-TSRA-41-01-01");
-thru.push("TP23-FADI-41-01-01");
-thru.push("TP23-FABW-41-01-01");
-thru.push("TP23-FLNC-41-01-01");
-thru.push("TP23-SVPF-42-01-01");
-thru.push("TP23-SUGB-42-01-01");
-thru.push("TP23-SCGL-42-01-01");
-thru.push("TP23-SRRV-42-01-01");
-thru.push("TP23-SNYM-44-01-01");
-thru.push("TP23-SNEQ-42-01-01");
-thru.push("TP23-THCL-42-01-01");
-thru.push("TP23-THCM-44-01-01");
-thru.push("TP23-THCP-42-01-01");
-thru.push("TP23-THCS-41-01-01");
-thru.push("TP23-PLEA-42-01-01");
-thru.push("TP23-TRGC-42-01-01");
-thru.push("TP23-TRST-41-01-01");
-thru.push("TP23-STOR-41-01-01");
-thru.push("TP23-TCGC-42-01-01");
-thru.push("TP23-TBGC-42-01-01");
-thru.push("TP23-SENS-41-01-01");
-thru.push("TP23-UNPS-43-01-01");
-thru.push("TP23-UNRI-42-01-01");
-thru.push("TP23-USPB-41-01-01");
-thru.push("TP23-WSMM-41-01-01");
-thru.push("TP23-WCST-41-01-01");
-thru.push("TP23-WPUS-42-01-01");
-thru.push("TP23-WOGC-42-01-01");
-thru.push("TP23-WCCC-42-01-01");
-thru.push("TP23-WCGC-42-01-01");
-thru.push("TP23-WCGC-42-02-01");
-*/
+//var thru = [];
+//thru.push("TP24-SESC-41-01-01");
 var thru = getThroughputrecords(TPvalue)
-
 	for (x in thru)
 	{
 		tpratingCO = 0;
@@ -311,17 +73,14 @@ var thru = getThroughputrecords(TPvalue)
 		var thrucapId = aa.cap.getCapID(thru[x]).getOutput();
 		var process = aa.cap.getProjectByChildCapID(thrucapId,null, null).getOutput();
 		var permit = getParentPlacer(process[0].getProjectID())
-
 		if(permit != "false")
 		 {
 			 logDebug("Working on Throughput " + capIDString);
-			 
 			 // Getting all CRITERIA POLLUTANT EMISSION entered
 			var CPE = loadASITable("CRITERIA POLLUTANT EMISSION",thrucapId);
 			for (x in CPE)
 			{
 				emisrow = CPE[x]; 
-
 				if(emisrow["Pollutant"].toString() == "Carbon Monoxide (CO)")
 				{
 					arrEmission["CO"] = String(Number(emisrow["Annual Emissions (tons)"]).toFixed(10));
@@ -331,15 +90,13 @@ var thru = getThroughputrecords(TPvalue)
 				if(emisrow["Pollutant"].toString() == "Particulate Matter (PM10)")
 				{
 					arrEmission["PM10"] = String(Number(emisrow["Annual Emissions (tons)"]).toFixed(10))
-				tpratingPM10 = String(Number(emisrow["Annual Emissions (tons)"]).toFixed(10))
+					tpratingPM10 = String(Number(emisrow["Annual Emissions (tons)"]).toFixed(10))
 					aa.print("Particulate Matter (PM10) = " + emisrow["Annual Emissions (tons)"].toString())
 				}
 				if(emisrow["Pollutant"].toString() == "Sulfur Oxides (SOx)")
 				{
 					arrEmission["SOx"] = String(Number(emisrow["Annual Emissions (tons)"]).toFixed(10))
-					
-						tpratingSOx = String(Number(emisrow["Annual Emissions (tons)"]).toFixed(10))
-						
+					tpratingSOx = String(Number(emisrow["Annual Emissions (tons)"]).toFixed(10))
 					aa.print("Sulfur Oxides (SOx)= " + emisrow["Annual Emissions (tons)"].toString())
 				}
 				if(emisrow["Pollutant"].toString() == "Volatile Organic Compounds (VOC)")
@@ -358,27 +115,21 @@ var thru = getThroughputrecords(TPvalue)
 				arrEmission["Throughput record"] = capIDString;
 				arrEmission["Throughput Year"] = year;
 			}
-
 			logDebug("CPE Length: " + CPE.length);
 			logDebug("permit: " + aa.cap.getCap(permit).getOutput().getCapModel().getAltID());
-
 		//if table has rows check to see if row already exists in table on permit
 		if(CPE.length > 0)
 		{
 			var throughputcheck = checkthroughput(permit,capIDString, year);
-			
 			logDebug("throughputcheck: " + throughputcheck);
-			
 			if(throughputcheck == "No Match")				//// what is this for ?
 			{
 				addToASITable("THROUGHPUT ACTUAL EMISSIONS",arrEmission,permit); // add rows to throughput table on permit
 					capCount++;
-				
 				if(permitIds.valueOf().toString().match(permit) == null)
 				{
 					permitIds.push(permit);
 					logDebug("permitpush: " + permit);
-					
 				}
 			}//done with no match
 			if(throughputcheck == "Match")				//// Added for Match, and now pushes to facility record
@@ -399,7 +150,6 @@ var thru = getThroughputrecords(TPvalue)
 					tparrEmission["VOC"] = String(Number(tpratingVOC).toFixed(10));
 					tparrEmission["Throughput record"] = String(capIDString);
 					tparrEmission["Throughput Year"] = String(year);
-					
 				}
 				else 
 				{
@@ -414,9 +164,7 @@ var thru = getThroughputrecords(TPvalue)
 				
 				addToASITable("THROUGHPUT ACTUAL EMISSIONS",tparrEmission,permit);
 			}
-				
 				capCount++;
-				
 				if(permitIds.valueOf().toString().match(permit) == null)
 				{
 					permitIds.push(permit);
@@ -429,11 +177,9 @@ var thru = getThroughputrecords(TPvalue)
 			{
 				logDebug("Throughput " + capIDString + " does not have any CRITERIA POLLUTANT EMISSION data");
 			}
-
 			logDebug("Stop Working on Throughput " + capIDString);
 		 }
 	}//done with throughput records
-
 //start working on permits
 	for (x in permitIds)
 	{		ratingCO = 0;
@@ -444,11 +190,8 @@ var thru = getThroughputrecords(TPvalue)
 			var pcap = aa.cap.getCap(permitIds[x]).getOutput();
 			var pstatus = pcap.getCapStatus();
 			var permcustomId = pcap.getCapModel().getAltID();
-
 			logDebug("pstatus: " + pstatus);
 			logDebug("permcustomId: " + permcustomId);
-
-
 
 		if(pstatus != "Closed")
 		{
@@ -560,8 +303,6 @@ var thru = getThroughputrecords(TPvalue)
 								carrEmission["SOx"] = String(Number(pratingSOx).toFixed(10));
 								carrEmission["VOC"] = String(Number(pratingVOC).toFixed(10));
 								carrEmission["PO Permit"] = fEmmisionTable[eachrow]["PO Permit"];
-								
-								
 							}
 							else 
 							{
@@ -571,16 +312,11 @@ var thru = getThroughputrecords(TPvalue)
 								carrEmission["SOx"] = fEmmisionTable[eachrow]["SOx"];
 								carrEmission["VOC"] = fEmmisionTable[eachrow]["VOC"];
 								carrEmission["PO Permit"] = fEmmisionTable[eachrow]["PO Permit"];
-
 							}
 						addToASITable("ACTUAL PERMIT EMISSIONS (TPY)",carrEmission,facility);	
 					}
-			
 				}
 			}//end of match 	
-					
-		
-		
 		if(facIds.valueOf().toString().match(facility) == null)
 			{
 				facIds.push(facility);
@@ -588,7 +324,6 @@ var thru = getThroughputrecords(TPvalue)
 			logDebug("Stop Working on Permit " + permcustomId);
 	}
 	}// done working on permit array
-
 	for (x in facIds)
 	{
 		var facility = aa.cap.getCap(facIds[x]).getOutput()
@@ -651,7 +386,6 @@ var thru = getThroughputrecords(TPvalue)
 		{
 			editAppSpecific("VOC Total",String(Number(fratingVOC).toFixed(2)),facIds[x]);	
 		};
-
 		var fachistorycheck = "No Match";
 		newRatingTableHistory = loadASITable("ACTUAL PERMIT EMISSIONS HIST",facIds[x]);
 			for (eachrow in newRatingTableHistory)
@@ -661,7 +395,6 @@ var thru = getThroughputrecords(TPvalue)
 					fachistorycheck = "Match";
 				 }
 				 }
-
 		if(fachistorycheck == "No Match")				
 			{
 			 var harrEmission = new Array();
@@ -674,11 +407,9 @@ var thru = getThroughputrecords(TPvalue)
 			 harrEmission["YEAR"] = String(year);
 			addToASITable("ACTUAL PERMIT EMISSIONS HIST",harrEmission,facIds[x]);
 			}
-		 
-		if(fachistorycheck == "Match")				
+		 	if(fachistorycheck == "Match")				
 			{
 				harrEmission = [];
-
 				removeASITable("ACTUAL PERMIT EMISSIONS HIST",facIds[x]);
 				for (eachrow in newRatingTableHistory)
 				 {
@@ -704,64 +435,39 @@ var thru = getThroughputrecords(TPvalue)
 				
 				 }//end of loop
 			}// end if matched
-			 
-		
-
-		
 			  
-logDebug("Stop Working on Facility record " + faccustomId);
-
+	logDebug("Stop Working on Facility record " + faccustomId);
 	}
-
-
-
-
    return capCount;
-		
 } 
-
- 
-
-    
-
-
-/*------------------------------------------------------------------------------------------------------/
-| <===========Internal Functions and Classes (Used by this script)
-/------------------------------------------------------------------------------------------------------*/
 
 function elapsed() {
     var thisDate = new Date();
     var thisTime = thisDate.getTime();
     return ((thisTime - batchStartTime) / 1000)
 }
-
-// exists:  return true if Value is in Array
 function exists(eVal, eArray) {
     for (ii in eArray)
         if (eArray[ii] == eVal) return true;
     return false;
 }
-
 function matches(eVal, argList) {
     for (var i = 1; i < arguments.length; i++)
         if (arguments[i] == eVal)
         return true;
 
 }
-
 function isNull(pTestValue, pNewValue) {
     if (pTestValue == null || pTestValue == "")
         return pNewValue;
     else
         return pTestValue;
 }
-
 function logMessage(etype, edesc) {
     aa.eventLog.createEventLog(etype, "Batch Process", batchJobName, sysDate, sysDate, "", edesc, batchJobID);
     aa.print(etype + " : " + edesc);
     emailText += etype + " : " + edesc + "<br />";
 }
-
 function logDebug(edesc) {
     if (showDebug) {
         aa.eventLog.createEventLog("DEBUG", "Batch Process", batchJobName, sysDate, sysDate, "", edesc, batchJobID);
@@ -769,7 +475,6 @@ function logDebug(edesc) {
         emailText += "DEBUG : " + edesc + " <br />";
     }
 }
-
 function getCapId(pid1, pid2, pid3) {
 
     var s_capResult = aa.cap.getCapID(pid1, pid2, pid3);
@@ -780,13 +485,7 @@ function getCapId(pid1, pid2, pid3) {
         return null;
     }
 }
-
-function dateAdd(td, amt)
-// perform date arithmetic on a string
-// td can be "mm/dd/yyyy" (or any string that will convert to JS date)
-// amt can be positive or negative (5, -3) days
-// if optional parameter #3 is present, use working days only
-{
+function dateAdd(td, amt){
 
     var useWorking = false;
     if (arguments.length == 3)
@@ -817,9 +516,7 @@ function dateAdd(td, amt)
 
     return (dDate.getMonth() + 1) + "/" + dDate.getDate() + "/" + dDate.getFullYear();
 }
-
-function lookup(stdChoice,stdValue) 
-	{
+function lookup(stdChoice,stdValue) 	{
 	var strControl;
 	var bizDomScriptResult = aa.bizDomain.getBizDomainByValue(stdChoice,stdValue);
 	
@@ -835,9 +532,7 @@ function lookup(stdChoice,stdValue)
 		}
 	return strControl;
 	}
-	
-function getChildren(pCapType, pParentCapId) 
-	{
+function getChildren(pCapType, pParentCapId) 	{
 	// Returns an array of children capId objects whose cap type matches pCapType parameter
 	// Wildcard * may be used in pCapType, e.g. "Building/Commercial/*/*"
 	// Optional 3rd parameter pChildCapIdSkip: capId of child to skip
@@ -892,8 +587,7 @@ function getChildren(pCapType, pParentCapId)
 	return retArray;
 
 	}	
-function addFee(fcode,fsched,fperiod,fqty,finvoice,feeCap) // Adds a single fee, optional argument: fCap
-	{
+function addFee(fcode,fsched,fperiod,fqty,finvoice,feeCap) 	{
 	// Updated Script will return feeSeq number or null if error encountered (SR5112) 
 	var customId = aa.cap.getCap(feeCap).getOutput().getCapModel().getAltID();
 	var feeCapMessage = "";
@@ -938,9 +632,7 @@ function addFee(fcode,fsched,fperiod,fqty,finvoice,feeCap) // Adds a single fee,
 	return feeSeq;
 	   
 	}
-
-function updateFeeItemInvoiceFlag(feeSeq,finvoice)
-{
+function updateFeeItemInvoiceFlag(feeSeq,finvoice){
 	if(feeSeq == null)
 		return;
 	if(publicUser && !cap.isCompleteCap())
@@ -954,8 +646,7 @@ function updateFeeItemInvoiceFlag(feeSeq,finvoice)
 		}
 	}
 }
-function editAppSpecific(itemName,itemValue,capId)  // optional: itemCap
-{
+function editAppSpecific(itemName,itemValue,capId) {
 	var itemCap = capId;
 	var itemGroup = null;
    	var customId = aa.cap.getCap(itemCap).getOutput().getCapModel().getAltID();
@@ -980,9 +671,7 @@ function editAppSpecific(itemName,itemValue,capId)  // optional: itemCap
 	else
 		{ logDebug( "WARNING: " + itemName + " was not updated."); }
 }	
-	
-function getAppSpecific(itemName,itemCap)  // optional: itemCap
-{
+function getAppSpecific(itemName,itemCap)  {
 	var updated = false;
 	var i=0;
    	
@@ -1014,42 +703,7 @@ function getAppSpecific(itemName,itemCap)  // optional: itemCap
 	else
 		{ logDebug( "**ERROR: getting app specific info for Cap : " + appSpecInfoResult.getErrorMessage()) }
 }
-
-function Nozrating (Noz)
-{
-if(Number(Noz) > 0 && Number(Noz) < 7)
-{
-	var rating = "06";
-}
-else if(Number(Noz) >= 7 && Number(Noz) < 13)
-{
-	var rating = "12";
-}
-else if(Number(Noz) >= 13 && Number(Noz) < 19)
-{
-	var rating = "18";
-}
-else if(Number(Noz) >= 19 && Number(Noz) < 25)
-{
-	var rating = "24";
-}
-else if(Number(Noz) >= 25 && Number(Noz) < 31)
-{
-	var rating = "30";
-} 
-else if(Number(Noz) >= 31)
-{
-	var rating = "31";
-}
-else
-{
-	var rating = "no rating";
-}
-return rating;
-}
-
-function getChildrencount(pCapType, pParentCapId) 
-	{
+function getChildrencount(pCapType, pParentCapId) {
 	// Returns an array of children capId objects whose cap type matches pCapType parameter
 	// Wildcard * may be used in pCapType, e.g. "Building/Commercial/*/*"
 	// Optional 3rd parameter pChildCapIdSkip: capId of child to skip
@@ -1105,24 +759,7 @@ function getChildrencount(pCapType, pParentCapId)
 	return retArray.length;
 
 	}
-
-function updatefeenotes(feeCap,fcode,altid,feeComment)
-{
-	var feeResult=aa.finance.getFeeItemByFeeCode(feeCap,fcode,"FINAL");
-	if (feeResult.getSuccess())
-		{ var feeObjArr = feeResult.getOutput(); }
-	else
-		{ logDebug( "**ERROR: getting fee items: " + capContResult.getErrorMessage()); return false }
-	
-	for (ff in feeObjArr)
-		if (altid.equals(feeObjArr[ff].getF4FeeItem().getFeeNotes()))
-		fsm1 = feeObjArr[ff].getF4FeeItem();
-	        fsm1.setFeeNotes(feeComment);
-                aa.finance.editFeeItem(fsm1);
-}
-	
-function getParentPlacer(childcapid) 
-	{
+function getParentPlacer(childcapid) {
 	// returns the capId object of the parent.  Assumes only one parent!
 	//
 	getCapResult = aa.cap.getProjectParents(childcapid,1);
@@ -1143,88 +780,7 @@ function getParentPlacer(childcapid)
 		return false;
 		}
 	}
-
-function invoiceAllFeesPlacer(capid) {
-	var itemCap = capid;
-	var targetFees = loadFees(itemCap);
-	var feeSeqArray = new Array();
-	var paymentPeriodArray = new Array();
-	for (tFeeNum in targetFees)
-		{
-		targetFee = targetFees[tFeeNum];
-			if (targetFee.status == "NEW")
-				{
-				feeSeqArray.push(targetFee.sequence);
-				paymentPeriodArray.push(targetFee.period);
-
-				}
-		}
-		var invoicingResult = aa.finance.createInvoice(itemCap, feeSeqArray, paymentPeriodArray);
-		if (!invoicingResult.getSuccess())
-			{
-			logDebug("**ERROR: Invoicing fee items not successful.  Reason: " +  invoicingResult.getErrorMessage());
-			return false;
-			}
-}
-
-function getinvoicenumberbydate(capid,date)
-{
-	// date format needs to be MM/DD/YYYY
-	var invoicenumber = "";
-	
-	iListResult = aa.finance.getInvoiceByCapID(capid,null);
-	iList = iListResult.getOutput();
-	for (iNum in iList)
-		if(dateFormatted(iList[iNum].getInvDate().getMonth(),iList[iNum].getInvDate().getDayOfMonth(),iList[iNum].getInvDate().getYear(),"").equals(date))
-			invoicenumber = iList[iNum].getInvNbr();
-	return 	invoicenumber
-}
-
-function feeExistsbynotes(feestr,altid) // optional statuses to check for
-	{
-	var checkStatus = false;
-	var statusArray = new Array(); 
-
-	//get optional arguments 
-	if (arguments.length > 2)
-		{
-		checkStatus = true;
-		for (var i=2; i<arguments.length; i++)
-			statusArray.push(arguments[i]);
-		}
-
-	var feeResult=aa.finance.getFeeItemByFeeCode(capId,feestr,"FINAL");
-	if (feeResult.getSuccess())
-		{ var feeObjArr = feeResult.getOutput(); }
-	else
-		{ logDebug( "**ERROR: getting fee items: " + capContResult.getErrorMessage()); return false }
-	
-	for (ff in feeObjArr)
-		if ( feestr.equals(feeObjArr[ff].getF4FeeItem().getFeeCod()) && (!checkStatus || exists(feeObjArr[ff].getF4FeeItem().getFeeitemStatus(),statusArray) ) && altid.equals(feeObjArr[ff].getF4FeeItem().getFeeNotes()))
-			return true;
-			
-	return false;
-	}
-
-function feeAmountbynotes(capid,fcode,altid,year) 
-	{
-	var feeTotal = 0;
-    var maltid = altid + ".";
-	var feeResult=aa.finance.getFeeItemByFeeCode(capid,fcode,"FINAL");
-	if (feeResult.getSuccess())
-		{ var feeObjArr = feeResult.getOutput(); }
-	else
-		{ logDebug( "**ERROR: getting fee items: " + capContResult.getErrorMessage()); return false }
-	
-	for (ff in feeObjArr)
-		if ((altid.equals(feeObjArr[ff].getF4FeeItem().getFeeNotes()) || maltid.equals(feeObjArr[ff].getF4FeeItem().getFeeNotes())) && String(feeObjArr[ff].getF4FeeItem().getApplyDate()).substring(0,4) == year)
-		feeTotal+= feeObjArr[ff].getF4FeeItem().getFee();
-	
-			
-	return feeTotal;
-	}
-function getThroughputrecords(altid)
-{
+function getThroughputrecords(altid) {
 var conn = aa.db.getConnection(); 
  var result = new Array();
  var B1_ALT_ID = "";
@@ -1241,9 +797,7 @@ var conn = aa.db.getConnection();
  conn.close();
  return result ;
 }
-
-function getParentPlacer(childcapid) 
-	{
+function getParentPlacer(childcapid) {
 	// returns the capId object of the parent.  Assumes only one parent!
 	//
 	getCapResult = aa.cap.getProjectParents(childcapid,1);
@@ -1264,7 +818,6 @@ function getParentPlacer(childcapid)
 		return false;
 		}
 	}
-	
 function loadASITable(tname,itemCap) {
 		LASITcapID = aa.cap.getCap(itemCap).getOutput();
 		LASITcapIDString = LASITcapID.getCapModel().getAltID();
@@ -1321,9 +874,7 @@ logDebug("Loading ASI Table " + tname + " for record " + LASITcapIDString);
 	  }
 	  return tempArray;
 	}	
-	
-function addASITable(tableName, tableValueArray, itemCap) // optional capId
-{
+function addASITable(tableName, tableValueArray, itemCap) {
 	ASITcapID = aa.cap.getCap(itemCap).getOutput();
 		ASITcapIDString = ASITcapID.getCapModel().getAltID();
 	//  tableName is the name of the ASI table
@@ -1380,11 +931,7 @@ function addASITable(tableName, tableValueArray, itemCap) // optional capId
 		logDebug("Successfully added record to ASI Table: " + tableName + " for Record " + ASITcapIDString);
 
 }
- 
- 
-
-function addASITable4ACAPageFlow(destinationTableGroupModel, tableName, tableValueArray) // optional capId
-{
+function addASITable4ACAPageFlow(destinationTableGroupModel, tableName, tableValueArray) {
 	//  tableName is the name of the ASI table
 	//  tableValueArray is an array of associative array values.  All elements MUST be either a string or asiTableVal object
 	//
@@ -1471,22 +1018,14 @@ function addASITable4ACAPageFlow(destinationTableGroupModel, tableName, tableVal
 	tssm = tsm;
 	return destinationTableGroupModel;
 }	
-
-
 function logGlobals(globArray) {
 
 	for (loopGlob in globArray)
 		logDebug("{" + loopGlob + "} = " + globArray[loopGlob])
 	}
-
- 
- 
-
-function logMessage(dstr)
-	{
+function logMessage(dstr) {
 	message+=dstr;
 	}
-	
 function asiTableValObj(columnName, fieldValue, readOnly) {
 	this.columnName = columnName;
 	this.fieldValue = fieldValue;
@@ -1495,9 +1034,7 @@ function asiTableValObj(columnName, fieldValue, readOnly) {
 
 	asiTableValObj.prototype.toString=function(){ return this.hasValue ? String(this.fieldValue) : String(""); }
 }; 	
-
-function addToASITable(tableName,tableValues,itemCap) // optional capId
-  	{
+function addToASITable(tableName,tableValues,itemCap) {
 		ASITcapID = aa.cap.getCap(itemCap).getOutput();
 		ASITcapIDString = ASITcapID.getCapModel().getAltID();
 	//  tableName is the name of the ASI table
@@ -1545,9 +1082,7 @@ function addToASITable(tableName,tableValues,itemCap) // optional capId
 	else
 		aa.print("Successfully added record to ASI Table: " + tableName + " for record " + ASITcapIDString);
 	}
-
-function removeASITable(tableName,itemCap) // optional capId
-  	{
+function removeASITable(tableName,itemCap) {
 		RASITcapID = aa.cap.getCap(itemCap).getOutput();
 		RASITcapIDString = RASITcapID.getCapModel().getAltID();
 	//  tableName is the name of the ASI table
@@ -1561,9 +1096,7 @@ function removeASITable(tableName,itemCap) // optional capId
 	aa.print("Successfully removed all rows from ASI Table: " + tableName + " for record " + RASITcapIDString);
 
 	}
-
-function checkthroughput(permitId,trecord,tyear)
-		{
+function checkthroughput(permitId,trecord,tyear) {
 			var result = "No Match";
 			var TAE = loadASITable("THROUGHPUT ACTUAL EMISSIONS",permitId);
 			for (x in TAE)
@@ -1576,9 +1109,7 @@ function checkthroughput(permitId,trecord,tyear)
 			}
 			return result
 		}
-
-function checkpermit(capid,recordid)
-		{
+function checkpermit(capid,recordid) {
 			var result = "No Match";
 			var TAE = loadASITable("ACTUAL PERMIT EMISSIONS (TPY)",capid);
 			for (x in TAE)
@@ -1590,10 +1121,8 @@ function checkpermit(capid,recordid)
 				}
 			}
 			return result
-		}
-		
-function checkhistory(capId,year)
-		{
+		}	
+function checkhistory(capId,year) {
 			var result = "No Match";
 			var TAE = loadASITable("ACTUAL PERMIT EMISSIONS HIST",capId);
 			for (x in TAE)
@@ -1606,9 +1135,7 @@ function checkhistory(capId,year)
 			}
 			return result
 		}		
-	
-function deleteASITrow(arr, column_name, value)
-{
+function deleteASITrow(arr, column_name, value) {
 for(var i = 0; i < arr.length; i++)
 {
 if (String(arr[i][column_name]) == String(value)) {
@@ -1617,3 +1144,5 @@ if (String(arr[i][column_name]) == String(value)) {
 }
 return arr
 }
+
+
