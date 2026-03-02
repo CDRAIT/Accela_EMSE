@@ -56,9 +56,20 @@ if (emailAddress.length)
 
 function aboutExpLics() {
     var capCount = 0;
-//var thru = [];
-//thru.push("TP24-SESC-41-01-01");
-var thru = getThroughputrecords(TPvalue)
+var thru = [];
+thru.push("TP24-AUCC-30-01-01");
+thru.push("TP24-AUCC-30-01-02");
+thru.push("TP24-AUCC-30-01-03");
+thru.push("TP24-AUCC-30-02-01");
+thru.push("TP24-AUCC-30-02-02");
+thru.push("TP24-AUCC-30-02-03");
+thru.push("TP24-AUCC-30-03-01");
+thru.push("TP24-AUCC-30-03-02");
+thru.push("TP24-AUCC-30-03-03");
+thru.push("TP24-AUCC-30-04-01");
+thru.push("TP24-AUCC-30-04-02");
+thru.push("TP24-AUCC-30-04-03");
+//var thru = getThroughputrecords(TPvalue)
 	for (x in thru)
 	{
 		tpratingCO = 0;
@@ -66,8 +77,8 @@ var thru = getThroughputrecords(TPvalue)
 		tpratingPM10 = 0;
 		tpratingSOx = 0;
 		tpratingVOC = 0;
-		var year = String(TPvalue).replace("TP","");
-//		var year = "23";		//hard coded for testing
+//		var year = String(TPvalue).replace("TP","");
+		var year = "24";		//hard coded for testing
 		var capIDString = thru[x];
 		var arrEmission = new Array(); 
 		var thrucapId = aa.cap.getCapID(thru[x]).getOutput();
@@ -293,12 +304,11 @@ var thru = getThroughputrecords(TPvalue)
 					carrEmission = [];	 
 					for (eachrow in fEmmisionTable) 
 					{
-						
 						if(String(fEmmisionTable[eachrow]["PO Permit"]) == permcustomId)
 							{
 								carrEmission["CO"] = String(Number(pratingCO).toFixed(10));
 								carrEmission["NOx"] = String(Number(pratingNOx).toFixed(10));
-									logDebug("4thratingNOx: " + String(Number(pratingNOx).toFixed(10)));				
+								logDebug("4thratingNOx: " + String(Number(pratingNOx).toFixed(10)));				
 								carrEmission["PM10"] = String(Number(pratingPM10).toFixed(10));
 								carrEmission["SOx"] = String(Number(pratingSOx).toFixed(10));
 								carrEmission["VOC"] = String(Number(pratingVOC).toFixed(10));
@@ -337,11 +347,11 @@ var thru = getThroughputrecords(TPvalue)
 		var fratingVOC = 0;
 		for (eachrow in fnewRatingTable)
 		{
-		 fratingCO += new Number(fnewRatingTable[eachrow]["CO"]);
-		 fratingNOx += new Number(fnewRatingTable[eachrow]["NOx"]);
-		 fratingPM10 += new Number(fnewRatingTable[eachrow]["PM10"]);
-		 fratingSOx += new Number(fnewRatingTable[eachrow]["SOx"]);
-		 fratingVOC += new Number(fnewRatingTable[eachrow]["VOC"]);
+			fratingCO += toNumber(fnewRatingTable[eachrow]["CO"]);
+			fratingNOx += toNumber(fnewRatingTable[eachrow]["NOx"]);
+			fratingPM10 += toNumber(fnewRatingTable[eachrow]["PM10"]);
+			fratingSOx += toNumber(fnewRatingTable[eachrow]["SOx"]);
+			fratingVOC += toNumber(fnewRatingTable[eachrow]["VOC"]);
 		}
 		if(Number(fratingCO) > 0 && Number(fratingCO) < 0.01)
 		{
@@ -1144,5 +1154,11 @@ if (String(arr[i][column_name]) == String(value)) {
 }
 return arr
 }
+function toNumber(val) {
+	if (val == null || val === "" || isNaN(val))
+		return 0;
+	return Number(val);
+}
+
 
 
