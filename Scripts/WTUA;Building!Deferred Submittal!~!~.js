@@ -1,5 +1,5 @@
 /*-----------------------------------------------------------------------------------------------------------------------/
-| Program : WTUA;Building!Deferred!~!~
+| Program : WTUA;Building!Deferred Submittal!~!~
 | Event   : WorkflowTaskUpdateAfter
 |
 | Client  : Placer County, CA
@@ -23,6 +23,7 @@
 |         : TDunn 08/31/2025 deployed to Github
 |         : TDunn 12/26/2025 removed getTaskAssignUserHistTD() function script and added to INCLUDES_CUSTOM
 |         : TDunn 12/26/2025 corrected parameters for call to getTaskAssignUserHistTD
+|         : TDunn 03/05/2026 added Approval notification to applicant, owner
 |
 \-------------------------------------------------------------------------------------------------------------------------*/
 if(matches(currentUserID,"TDUNN")) {showDebug = 1;}
@@ -412,6 +413,52 @@ if(wfProcess == "BLD_DEFERRED_20240710")
 			else if (pCapId == null) {
 			logDebug("No documents moved because there's no destination record.");
 			}
+			
+			/* Notification for Deferred Submittal Approved */
+			showMessage = true;
+			comment("Generating Notice of Approval");
+			var emailTemplate = "NOTICE_BUILDING_REV-DEF_APPROVED";
+			var vFromEmail = "";
+			var vToEmail = "";
+			var vCcEmail = "";
+			var cTypeArray = new Array();
+			var vContactTypes = "Applicant,Owner";
+			cTypeArray = vContactTypes.split(",");
+			emailParameters = aa.util.newHashtable();
+			var acaSite = lookup("ACA_CONFIGS","ACA_SITE");
+			acaSite = acaSite.substr(0,acaSite.toUpperCase().indexOf("/ADMIN"));
+			getACARecordParam4Notification(emailParameters,acaSite,pCapId); // returns $$acaRecordUrl$$;
+			addParameter(emailParameters,"$$projectTypeParam$$","building permit");	
+			addParameter(emailParameters,"$$sourceParam$$","Deferred Submittal");
+			addParameter(emailParameters,"$$sourceID$$",capIDString);
+			// Parameters returned by getRecordParameters4Notification: $$altID$$; $$capName$$; $$capStatus$$; $$fileDate$$; $$workDesc$$; $$balanceDue$$; $$capTypeAlias$$
+			getRecordParams4Notification(emailParameters,pCapId);
+			getPrimaryAddressLineParam4Notification(emailParameters);
+			addParameter(emailParameters,"$$scopeOfWork$$",getAppSpecific("Scope of Work",pCapId));
+			
+			var conArray = new Array();
+			conArray = getContactArrayWithPrimary(capId); 
+			for (thisCon in conArray) 
+			{
+				if (exists(conArray[thisCon]["contactType"],cTypeArray)) 
+				{
+					logDebug(conArray[thisCon]["contactType"]) ;
+					getContactParams4Notification(emailParameters, conArray[thisCon]);
+					if(!matches(emailParameters.get("$$contactEmail$$"),null,undefined,""))
+					{
+						vToEmail = vToEmail + emailParameters.get("$$contactEmail$$") + "; ";
+					}
+				}
+			}
+			if(vToEmail != "")
+			{
+			logDebug("vFromEmail= " + vFromEmail + "; vToEmail= " + vToEmail + "; vCcEmail = " + vCcEmail + "; vEmailTemplate= " + emailTemplate + "; emailParameters= " + emailParameters);
+			var	emailResult = sendNotification(vFromEmail,vToEmail,vCcEmail,emailTemplate,emailParameters,null);
+			} else
+			{
+				showMessage = true;
+				comment("<font size = 4 color=ff000><b>No applicant email address found. Payment Due notification was NOT sent.</b></font><br><br>Please review applicant contact record for a valid email address");
+			}			
 		}
 		
 		if(wfStatus == "Applicant Information Requested")
