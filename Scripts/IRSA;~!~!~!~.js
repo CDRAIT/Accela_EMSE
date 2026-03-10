@@ -92,13 +92,18 @@ if(matches(vEventName,"InspectionResultModifyAfter"))
 			sendElecUtilRelease();
 		}
 
-		//Start: IT Req# 2504
+		//Start: IT Req# 3221
 		if (inspType == "515 ESS" && matches(AInfo['ParcelAttribute.ELECTRIC UTILITY'], "SMUD", "PGE") && ( inspResult == "FINALPASS" || inspResult == "Final Pass" || inspResult == "PASS" || inspResult == "Pass"))
 		{
 			sendElecUtilRelease();
 		}
+<<<<<<< HEAD
 		//End of IT Req# 2504	
 
+=======
+		//End of IT Req# 3221
+		
+>>>>>>> 4acb9e4 (IT 3221)
 		//IT Req# 2981
 		if (isTRPA) {
 			if (inspType == "914 TRPA Final" && (inspResult == "FINALPASS" || inspResult == "Final Pass" || inspResult == "PASS" || inspResult == "Pass"))
@@ -236,13 +241,18 @@ if(matches(vEventName,"InspectionResultSubmitAfter","V360InspectionResultSubmitA
 		{
 			sendElecUtilRelease();
 		}
-		//Start: IT Req# 2504
-		if (inspType == "515 ESS" && (inspResult == "FINALPASS" || inspResult == "Final Pass" || inspResult == "PASS" || inspResult == "Pass"))
+		//Start: IT Req# 3221
+		if (inspType == "515 ESS" && matches(AInfo['ParcelAttribute.ELECTRIC UTILITY'], "SMUD", "PGE") && ( inspResult == "FINALPASS" || inspResult == "Final Pass" || inspResult == "PASS" || inspResult == "Pass"))
 		{
 			sendElecUtilRelease();
 		}
+<<<<<<< HEAD
 		//End of IT Req# 2504	
 
+=======
+		//End of IT Req# 3221
+		
+>>>>>>> 4acb9e4 (IT 3221)
 		//IT Req# 2981
 		if (isTRPA) {
 			if (inspType == "914 TRPA Final" && (inspResult == "FINALPASS" || inspResult == "Final Pass" || inspResult == "PASS" || inspResult == "Pass"))
