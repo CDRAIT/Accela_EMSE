@@ -24,6 +24,7 @@
 |         : TDunn 08/29/2025 added two service request by Abe
 |         : TDunn 08/29/2025 deployed to Github
 |         : Abe   01/13/2026 Added TRPARelease to the Buildings with isTRPA= True (IT Req# 2981)
+|         : Abe   03/10/2026 Added AInfo['ParcelAttribute.ELECTRIC UTILITY'] check to the 515 ESS inspection result controls (IT Req# 3221)
 | 
 /-----------------------------------------------------------------------------------------------------------------*/
 if (matches(currentUserID,"JMCKENZI","TDUNN","EAFTAHI")) 
@@ -92,7 +93,7 @@ if(matches(vEventName,"InspectionResultModifyAfter"))
 		}
 
 		//Start: IT Req# 2504
-		if (inspType == "515 ESS" && (inspResult == "FINALPASS" || inspResult == "Final Pass" || inspResult == "PASS" || inspResult == "Pass"))
+		if (inspType == "515 ESS" && matches(AInfo['ParcelAttribute.ELECTRIC UTILITY'], "SMUD", "PGE") && ( inspResult == "FINALPASS" || inspResult == "Final Pass" || inspResult == "PASS" || inspResult == "Pass"))
 		{
 			sendElecUtilRelease();
 		}
