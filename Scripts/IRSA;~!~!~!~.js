@@ -97,13 +97,8 @@ if(matches(vEventName,"InspectionResultModifyAfter"))
 		{
 			sendElecUtilRelease();
 		}
-<<<<<<< HEAD
-		//End of IT Req# 2504	
-
-=======
 		//End of IT Req# 3221
 		
->>>>>>> 4acb9e4 (IT 3221)
 		//IT Req# 2981
 		if (isTRPA) {
 			if (inspType == "914 TRPA Final" && (inspResult == "FINALPASS" || inspResult == "Final Pass" || inspResult == "PASS" || inspResult == "Pass"))
@@ -246,13 +241,8 @@ if(matches(vEventName,"InspectionResultSubmitAfter","V360InspectionResultSubmitA
 		{
 			sendElecUtilRelease();
 		}
-<<<<<<< HEAD
-		//End of IT Req# 2504	
-
-=======
 		//End of IT Req# 3221
 		
->>>>>>> 4acb9e4 (IT 3221)
 		//IT Req# 2981
 		if (isTRPA) {
 			if (inspType == "914 TRPA Final" && (inspResult == "FINALPASS" || inspResult == "Final Pass" || inspResult == "PASS" || inspResult == "Pass"))
