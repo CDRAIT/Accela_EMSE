@@ -42,7 +42,7 @@ if(publicUser) {
 			fsFlag = varIsFeeSched.substring(0,3);
 		}
 		if(fsFlag == "FS|") {
-			fSchedName = varIsFeeSched.substring(3); 
+			fSchedName = varIsFeeSched.substring(3);
 			logDebug("Sched Name = " + fSchedName); 
 			addAllFees(fSchedName,"FINAL",1,"N");
 		}
@@ -86,20 +86,4 @@ if(publicUser) {
 	if(matches(appTypeArray[2],"Full Review","Limited")){
 		updateFee("TECH","ACCOUNTING","FINAL",1,varAutoInvoiceFees);
 	}
-
-	//IT Request# 2698
-	if(AInfo["Scope of Work"] == "Permanent Membrane Structure"){
-		addFee("0913", "B_COM", "FINAL",2,"N");
-	}
-	//end of IT Request# 2698
 }
-	
-/*=======================
-Notes
-
-
-
-
-
-
-========================*/
