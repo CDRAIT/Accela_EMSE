@@ -272,7 +272,8 @@ if (wfProcess == "CODE_ENF") { //New Workflow
         //Send Process Fine email to Staff (15)    
         emailTemplate = "CE_STAFF_NOTIFICATION";
         emailCc = (getAppSpecific("Project Office") == "Auburn") ? "CodeEnforce@placer.ca.gov" : "CodeEnforceTahoe@placer.ca.gov";
-        emailTo = getUserEmail(getAssignedToStaff());
+        if(getAssignedToStaff())
+            emailTo = getUserEmail(getAssignedToStaff());
         var emailContentStr = "The above referenced case is ready for fee processing. Please generate and send the invoice to request payment.";
         addParameter(emailParams, "$$emailSubject$$", "PROCESS INVOICE");
         addParameter(emailParams, "$$contentString$$", emailContentStr);
@@ -398,3 +399,4 @@ function sendNotice2Recipients(fileName) {
                 }
         }
 }
+
