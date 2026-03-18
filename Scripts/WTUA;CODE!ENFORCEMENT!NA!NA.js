@@ -98,7 +98,7 @@ if (wfProcess == "CODE_ENF") { //New Workflow
                 if (emailTo.indexOf('@') != -1)
                     var sendResult = sendNotification(emailFrom, emailTo, emailCc, generalEmailTemplate, emailParams, new Array(reportFile));
         }
-        if (wfStatus == "Referred & Investigation" || wfStatus == "Courtesy Notice Sent") {
+        if (wfStatus == "Referred & Investigation" || wfStatus == "Courtesy Notice") {
             //Send Courtesy Notice to Parties
             reportName = "Complaint Courtesy Notice";
             addParameter(emailParams, "$$emailSubject$$", "COMPLAINT COURTESY NOTICE");
@@ -203,10 +203,7 @@ if (wfProcess == "CODE_ENF") { //New Workflow
                     //send email with report attached
                     var sendResult = sendNotification(emailFrom, emailTo, emailCc, generalEmailTemplate, emailParams, new Array(reportFile));
                 }
-        }
-        if (wfStatus == "Continued") {
-            //TBD...
-        }
+        }        
         if (wfStatus == "Citation Upheld") {
             //save the wfdate in an ASI for - Batchjob
 
@@ -258,40 +255,38 @@ if (wfProcess == "CODE_ENF") { //New Workflow
             //Eamil Fines Due to Staff (17) - batchjob
         }
     }
-}
 
+    /** Fisrt Revision Updates
+     * 
+     * Record Status should only reflect 'Fine Processing'
+     * if that is the only task remaining active.
+     */
+    if ((wfTask == "Citation" && wfStatus == "Complied") ||
+        (wfTask == "Appeal" && wfStatus == "No Appeal") ||
+        (wfTask == "Administrative Hearing" && matches(wfStatus, "Citation Upheld", "Complied")) ||
+        (wfTask == "Abatement Processing" && wfStatus == "Abatement Complete")
+    ) {
+        if (!activeTasksCheckExcept("Fine Processing")) {
+            updateAppStatus("Fine Processing", "Updated by WTUA EMSE Event");
+        }
+        //Send Process Fine email to Staff (15)    
+        emailTemplate = "CE_STAFF_NOTIFICATION";
+        emailCc = (getAppSpecific("Project Office") == "Auburn") ? "CodeEnforce@placer.ca.gov" : "CodeEnforceTahoe@placer.ca.gov";
+        emailTo = getUserEmail(getAssignedToStaff());
+        var emailContentStr = "The above referenced case is ready for fee processing. Please generate and send the invoice to request payment.";
+        addParameter(emailParams, "$$emailSubject$$", "PROCESS INVOICE");
+        addParameter(emailParams, "$$contentString$$", emailContentStr);
 
-/** Fisrt Revision Updates
- * 
- * Record Status should only reflect 'Fine Processing'
- * if that is the only task remaining active.
- */
-if ((wfTask == "Citation" && wfStatus == "Complied") ||
-    //(wfTask == "Appeal" && wfStatus == "No Appeal") || It activates a parallel task
-    (wfTask == "Administrative Hearing" && matches(wfStatus, "Citation Upheld", "Complied")) ||
-    (wfTask == "Abatement Processing" && wfStatus == "Abatement Complete")
-) {
-    if (!activeTasksCheckExcept("Fine Processing")) {
-        updateAppStatus("Fine Processing", "Updated by WTUA EMSE Event");
+        if (!isBlank(emailTo))
+            if (emailTo.indexOf('@') != -1)
+                var sendResult = sendNotification(emailFrom, emailTo, emailCc, emailTemplate, emailParams, null);
     }
-    //Send Process Fine email to Staff (15)    
-    emailTemplate = "CE_STAFF_NOTIFICATION";
-    emailCc = (getAppSpecific("Project Office") == "Auburn") ? "CodeEnforce@placer.ca.gov" : "CodeEnforceTahoe@placer.ca.gov";
-    emailTo = getUserEmail(getAssignedToStaff());
-    var emailContentStr = "The above referenced case is ready for fee processing. Please generate and send the invoice to request payment.";
-    addParameter(emailParams,"$$emailSubject$$", "PROCESS INVOICE");
-    addParameter(emailParams,"$$contentString$$", emailContentStr);
 
-    if (!isBlank(emailTo))
-        if (emailTo.indexOf('@') != -1)
-            var sendResult = sendNotification(emailFrom, emailTo, emailCc, emailTemplate, emailParams, null);
+    //Close cap after "Complied" on some tasks- Bcoz there r some exceptions!
+    if (matches(wfTask, "Nuisance Outcome", "Abatement Hearing", "Reinspection Outcome", "Abatement Processing") && wfStatus == "Complied") {
+        closeCap(currentUserID);
+    }
 }
-
-//Close cap after "Complied" on some tasks- Bcoz there r some exceptions!
-if(matches(wfTask,"Nuisance Outcome", "Abatement Hearing", "Reinspection Outcome", "Abatement Processing") && wfStatus == "Complied"){
-    closeCap(currentUserID);
-}   
-
 
 /********************************* 
  Local Functions used here only
