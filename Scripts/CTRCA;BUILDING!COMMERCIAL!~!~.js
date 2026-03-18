@@ -11,7 +11,8 @@
 |
 | Notes   : TDunn 01/11/2022 created 3.0 version
 |         : TDunn 07/18/2024 remarked out section that calls addSPFees to eliminate error.
-|         : eaftahi 02/27/2026 Added IT Request# 2698
+|         : Abe   02/27/2026 Added IT Request# 2698
+|         : Abe   03/18/2026  Removed the IT Req 2698 - Fees handled with StdChoice 
 |         
 |
 /=============================================================================================*/
@@ -51,14 +52,8 @@ if(publicUser) {
 			feeFlag = varIsFee.substring(0,3);
 		}
 		if(feeFlag == "FF|") {
-			feeName = varIsFee.substring(3); 
-			//IT Request# 2698 - Permanent Membrane Structure
-			//there's no 0919 under B_COM FS!
-			if(thisScope == "Permanent Membrane Structure" && matches(feeName,"0913")) {
-				thisQty = 2;
-			}
-			//end of IT Request # 2698
-			updateFee(feeName,"B_COM","FINAL",thisQty,"N");
+			feeName = varIsFee.substring(3); 			
+			updateFee(feeName,"B_COM","FINAL",1,"N");
 		}		
 
 		/*
