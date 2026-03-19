@@ -105,6 +105,7 @@
 |         : TDunn 01/22/2026 added test for null for FIREINSP parcel attribute.
 |         : TDunn 02/05/2026 fixed issue with Fire Review - Partner Agency not activating.
 |         : TDunn 02/06/2026 added rules for activating Fire Review - Partner Agency when Fire Review TSI is checked but not Placer Fire District.
+|         : TDunn 03/19/2026 updated due date for Closure
 |
 /---------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 
