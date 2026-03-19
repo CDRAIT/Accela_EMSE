@@ -2377,7 +2377,7 @@ if(wfProcess == "BLD_20230501_MAIN")
 		// Contruction Complete Actions
 		if(wfStatus == "Construction Complete")
 		{
-			editTaskDueDate("Closure",dateAdd(null,2),wfProcess);
+			editTaskDueDate("Closure",dateAdd(null,180),wfProcess);
 			thisStaff = closureStaff;
 			thisTask = "Closure";
 			assignTask(thisTask,thisStaff,wfProcess);
