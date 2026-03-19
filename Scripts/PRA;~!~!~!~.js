@@ -26,6 +26,7 @@
 |         : TDunn 08/31/2025 deployed to Github
 |         : TDunn 01/03/2026 added date flag for older records
 |         : TDunn 01/05/2026 remarked out override to TDunn emails
+|         : TDunn 03/19/2026 added including TRPA/Building permits update child Deferred Submittals and Revisions
 |
 \-------------------------------------------------------------------------------------------------------*/
 if(matches(currentUserID,"TDUNN","JMCKENZI","EAFTAHI")) { showDebug = 1;}
@@ -101,7 +102,7 @@ if(matches(appTypeArray[1],"Residential","Commercial"))
 
 try
 {
-	if (matches(appTypeArray[0],"Building") && matches(appTypeArray[1],"Commercial","Residential") && !matches(appTypeArray[2],"PV Solar")) 
+	if (matches(appTypeArray[0],"Building","TRPA") && matches(appTypeArray[1],"Commercial","Residential","Building") && !matches(appTypeArray[2],"PV Solar")) 
 	{
 		myChildArray = getChildren("Building/*/*/*",capId);
 		if(myChildArray != null && myChildArray.length > 0) 
