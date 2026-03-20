@@ -24,6 +24,7 @@
 |         : TDunn 04/17/2025 added test for if the revision is for the Master plan check only
 |         : TDunn 08/29/2025 copied to Non-prod1
 |         : TDunn 08/31/2025 deployed to Github
+|         : TDunn 03/20/2026 added updating due dates for originating tasks on payment
 |
 \-------------------------------------------------------------------------------------------------------*/
 
@@ -79,6 +80,7 @@ if(matches(appTypeArray[1],"Residential","Commercial"))
 	{
 		updateTask("Process for Issuance","Payment Received","Payment Received via Citizen Portal. Updated by script","");
 		updateAppStatus("Payment Received","Updated by script on Payment Received via Citizen Portal");
+		editTaskDueDate("Process for Issuance",dateAdd(null,2,"Y"),wfProcess);
 	}
 	if(isTaskActive("Distribution") && isTaskStatus("Distribution","Payment Requested"))
 	{
@@ -87,13 +89,14 @@ if(matches(appTypeArray[1],"Residential","Commercial"))
 		{
 			updateTask("Distribution","Payment Received","Updated on Payment of fees due","");
 			updateAppStatus("Payment Received","Updated by script on Payment Received via Citizen Portal");
+			editTaskDueDate("Distribution",dateAdd(null,1,"Y"),wfProcess);
 		}
 	}
 }
 
 try
 {
-	if (matches(appTypeArray[0],"Building") && matches(appTypeArray[1],"Commercial","Residential") && !matches(appTypeArray[2],"PV Solar")) 
+	if (matches(appTypeArray[0],"Building","TRPA") && matches(appTypeArray[1],"Commercial","Residential","Building") && !matches(appTypeArray[2],"PV Solar")) 
 	{
 		myChildArray = getChildren("Building/*/*/*",capId);
 		if(myChildArray != null && myChildArray.length > 0) 
@@ -151,6 +154,7 @@ if(matches(appTypeArray[1],"Revision"))
 	{
 		updateTask("Process for Issuance","Payment Received","Payment Received via Citizen Portal. Updated by script","");
 		updateAppStatus("Payment Received","Updated by script on Payment Received via Citizen Portal");
+		editTaskDueDate("Process for Issuance",dateAdd(null,2,"Y"),wfProcess);
 	}
 	if(isTaskActive("Distribution") && isTaskStatus("Distribution","Payment Requested"))
 	{
@@ -159,6 +163,7 @@ if(matches(appTypeArray[1],"Revision"))
 		{
 			updateTask("Distribution","Payment Received","Updated on Payment of fees due","");
 			updateAppStatus("Payment Received","Updated by script on Payment Received via Citizen Portal");
+			editTaskDueDate("Distribution",dateAdd(null,1,"Y"),wfProcess);
 		}
 	}
 }
@@ -169,10 +174,32 @@ if(appTypeArray[1] == "Deferred Submittal")
 	if(isTaskStatus("Process for Issuance","Payment Requested"))
 	{
 		updateTask("Process for Issuance","Payment Received","Payment Received via Citizen Portal. Updated by script","");
-		updateAppStatus("Payment Received","Updated by script on Payment Received via Citizen Portal");			
+		updateAppStatus("Payment Received","Updated by script on Payment Received via Citizen Portal");	
+		editTaskDueDate("Process for Issuance",dateAdd(null,2,"Y"),wfProcess);
 	}
 }
-	
+
+// Begin rules for Master
+//======================================================
+if(appTypeArray[2] == "Master")
+{
+	if(isTaskStatus("Process for Issuance","Payment Requested"))
+	{
+		updateTask("Process for Issuance","Payment Received","Payment Received via Citizen Portal. Updated by script","");
+		updateAppStatus("Payment Received","Updated by script on Payment Received via Citizen Portal");	
+		editTaskDueDate("Process for Issuance",dateAdd(null,2,"Y"),wfProcess);		
+	}
+	if(isTaskActive("Distribution") && isTaskStatus("Distribution","Payment Requested"))
+	{
+		logDebug("running actions for active Distribution at Payment Requested");
+		if(balanceDue < 1) 
+		{
+			updateTask("Distribution","Payment Received","Updated on Payment of fees due","");
+			updateAppStatus("Payment Received","Updated by script on Payment Received via Citizen Portal");
+			editTaskDueDate("Distribution",dateAdd(null,1,"Y"),wfProcess);
+		}
+	}	
+}
 	
 /**
  * Abe >> IT Req# 1566: added AA/ACA initiated auto-advance 
