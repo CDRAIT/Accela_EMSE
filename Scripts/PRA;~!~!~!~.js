@@ -80,7 +80,7 @@ if(matches(appTypeArray[1],"Residential","Commercial"))
 	{
 		updateTask("Process for Issuance","Payment Received","Payment Received via Citizen Portal. Updated by script","");
 		updateAppStatus("Payment Received","Updated by script on Payment Received via Citizen Portal");
-		editTaskDueDate("Process for Issuance",dateAdd(null,2,"Y"),wfProcess);
+		editTaskDueDate("Process for Issuance",dateAdd(null,2,"Y"));
 	}
 	if(isTaskActive("Distribution") && isTaskStatus("Distribution","Payment Requested"))
 	{
@@ -89,7 +89,7 @@ if(matches(appTypeArray[1],"Residential","Commercial"))
 		{
 			updateTask("Distribution","Payment Received","Updated on Payment of fees due","");
 			updateAppStatus("Payment Received","Updated by script on Payment Received via Citizen Portal");
-			editTaskDueDate("Distribution",dateAdd(null,1,"Y"),wfProcess);
+			editTaskDueDate("Distribution",dateAdd(null,1,"Y"));
 		}
 	}
 }
@@ -154,7 +154,7 @@ if(matches(appTypeArray[1],"Revision"))
 	{
 		updateTask("Process for Issuance","Payment Received","Payment Received via Citizen Portal. Updated by script","");
 		updateAppStatus("Payment Received","Updated by script on Payment Received via Citizen Portal");
-		editTaskDueDate("Process for Issuance",dateAdd(null,2,"Y"),wfProcess);
+		editTaskDueDate("Process for Issuance",dateAdd(null,2,"Y"));
 	}
 	if(isTaskActive("Distribution") && isTaskStatus("Distribution","Payment Requested"))
 	{
@@ -163,7 +163,7 @@ if(matches(appTypeArray[1],"Revision"))
 		{
 			updateTask("Distribution","Payment Received","Updated on Payment of fees due","");
 			updateAppStatus("Payment Received","Updated by script on Payment Received via Citizen Portal");
-			editTaskDueDate("Distribution",dateAdd(null,1,"Y"),wfProcess);
+			editTaskDueDate("Distribution",dateAdd(null,1,"Y"));
 		}
 	}
 }
@@ -175,7 +175,7 @@ if(appTypeArray[1] == "Deferred Submittal")
 	{
 		updateTask("Process for Issuance","Payment Received","Payment Received via Citizen Portal. Updated by script","");
 		updateAppStatus("Payment Received","Updated by script on Payment Received via Citizen Portal");	
-		editTaskDueDate("Process for Issuance",dateAdd(null,2,"Y"),wfProcess);
+		editTaskDueDate("Process for Issuance",dateAdd(null,2,"Y"));
 	}
 }
 
@@ -187,7 +187,7 @@ if(appTypeArray[2] == "Master")
 	{
 		updateTask("Process for Issuance","Payment Received","Payment Received via Citizen Portal. Updated by script","");
 		updateAppStatus("Payment Received","Updated by script on Payment Received via Citizen Portal");	
-		editTaskDueDate("Process for Issuance",dateAdd(null,2,"Y"),wfProcess);		
+		editTaskDueDate("Process for Issuance",dateAdd(null,2,"Y"));		
 	}
 	if(isTaskActive("Distribution") && isTaskStatus("Distribution","Payment Requested"))
 	{
@@ -196,7 +196,7 @@ if(appTypeArray[2] == "Master")
 		{
 			updateTask("Distribution","Payment Received","Updated on Payment of fees due","");
 			updateAppStatus("Payment Received","Updated by script on Payment Received via Citizen Portal");
-			editTaskDueDate("Distribution",dateAdd(null,1,"Y"),wfProcess);
+			editTaskDueDate("Distribution",dateAdd(null,1,"Y"));
 		}
 	}	
 }
