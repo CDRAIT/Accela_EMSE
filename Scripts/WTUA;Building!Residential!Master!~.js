@@ -21,6 +21,8 @@
 |         : TDunn 04/24/2025 corrected issue with Deferred submittal child record creation using wrong record type.
 |         : TDunn 08/29/2025 copied to Non-prod1
 |         : TDunn 08/31/2025 deployed to Github
+|         : TDunn 03/20/2026 reenabled update to Expiration Date and updated period to 120 months for dateAddMonths
+|         : TDunn 03/20/2026 deployed to production
 |
 /--------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 
@@ -609,7 +611,7 @@ if(wfProcess == "BLD_PLNCHK_20241222")
 		{
 			logDebug("Updating Approval Date " + dateAdd(null,0));
 			editAppSpecific("Issue Date",dateAdd(null,0));
-			//editAppSpecific("Expiration Date",dateAdd(null,730));
+			editAppSpecific("Expiration Date",dateAddMonths(null,120));
 			if(trpaFlag.indexOf("Tahoe Regional") > -1)
 			{
 				editAppSpecific("TRPA Permit Expiration",dateAdd(null,1095));
