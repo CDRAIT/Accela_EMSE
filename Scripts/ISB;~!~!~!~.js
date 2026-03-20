@@ -184,7 +184,7 @@ if(matches(capStatus,"Issued - Revision Pending"))
 		commentStr = "The " + inspType + " inspection cannot be scheduled when the Building Permt status is " + capStatus;
 		showMessage = true;
 		customComment(commentStr);
-		cancel = true;
+		//cancel = true;
 	}
 }
 // Prohibit scheduling inspections on Revisons and Deferred Submittals
