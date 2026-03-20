@@ -18,6 +18,8 @@
 |         : TDunn   08/30/2024 added revision wfProcess to criteria to pre-issue rules
 |         : TDunn   10/11/2024 added cancel rules for allowing only one active revision at a time.
 |         : TDunn   02/24/2025 added new status for completed Revision: 'Approved' for active Preissue task rule
+|         : TDunn   03/19/2026 updated Permit issuance rules for fees due to Signature Requested
+|         : TDunn   03/20/2026 deployed to nonprod1 for testing
 |
 /=================================================================================================*/
 if(matches(currentUserID,"TDUNN","JMCKENZI","EAFTAHI")) { showDebug = 1;}
@@ -308,7 +310,7 @@ if(wfProcess == "BLD_20230501_MAIN" || wfProcess == "BLD_20231116_REV")
 		}		
 	}
 	// Process Rules for Inspections task
-	if(matches(wfTask,"Inspections","Inspection")
+	if(matches(wfTask,"Inspections","Inspection"))
 	{
 		if(wfStatus == "Revisions")
 		{
