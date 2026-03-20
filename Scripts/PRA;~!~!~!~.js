@@ -71,8 +71,9 @@ if(matches(appTypeArray[1],"Administrative","MBLA","Pre Development","Project","
 		if(AInfo["Project Office"] == "Tahoe") assignCap("PLNSUP_TAH");
 	}
 }
-// Begin new rules for BLD_20230501_MAIN process
-//================================================================
+
+// Begin rules for BLD_20230501_MAIN and Plan Check Master processes
+//====================================================================
 if(matches(appTypeArray[1],"Residential","Commercial"))
 {
 	logDebug("Running actions for Building Records and Revisions at PRA");
@@ -179,27 +180,6 @@ if(appTypeArray[1] == "Deferred Submittal")
 	}
 }
 
-// Begin rules for Master
-//======================================================
-if(appTypeArray[2] == "Master")
-{
-	if(isTaskStatus("Process for Issuance","Payment Requested"))
-	{
-		updateTask("Process for Issuance","Payment Received","Payment Received via Citizen Portal. Updated by script","");
-		updateAppStatus("Payment Received","Updated by script on Payment Received via Citizen Portal");	
-		editTaskDueDate("Process for Issuance",dateAdd(null,2,"Y"));		
-	}
-	if(isTaskActive("Distribution") && isTaskStatus("Distribution","Payment Requested"))
-	{
-		logDebug("running actions for active Distribution at Payment Requested");
-		if(balanceDue < 1) 
-		{
-			updateTask("Distribution","Payment Received","Updated on Payment of fees due","");
-			updateAppStatus("Payment Received","Updated by script on Payment Received via Citizen Portal");
-			editTaskDueDate("Distribution",dateAdd(null,1,"Y"));
-		}
-	}	
-}
 	
 /**
  * Abe >> IT Req# 1566: added AA/ACA initiated auto-advance 
