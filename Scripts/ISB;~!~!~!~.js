@@ -12,7 +12,9 @@
 |         : TDunn 01/10/2022 updated script to generate rescheduled notice from ISB event.
 |         : Abe   06/25/2024 IT Request# 1485 - New Building Inspection Flags/Conditions
 |         : TDunn 01/11/2026 Restored cancel for when status is Issued - Revision Pending based on inspection type  
-|         : TDunn 01/11/2026 added cancel for scheduling attempt on Revisions and Deferred Submittals.  
+|         : TDunn 01/11/2026 added cancel for scheduling attempt on Revisions and Deferred Submittals. 
+|         : TDunn 03/29/2026 added additional 'final' inspection to block lookup list
+|         : TDunn 03/20/2026 fixed issue with incorrect cancel
 |     
 /------------------------------------------------------------------------------------------------------------------*/
 
@@ -20,7 +22,9 @@ if (matches(currentUserID,"JMCKENZI","TDUNN","EAFTAHI"))
 {
 	showDebug = 1;
 }
-	
+// Initialize  cancel to false to counter bug
+cancel = false;	
+logDebug("cancel initialized to " + cancel);
 var	appTypeString = "";
 var	appTypeArray = new Array();
 if(capId != null){
@@ -174,6 +178,7 @@ if(allowInsp100s || allowInsp200s || allowInsp300s){
 // List of inspection to block:  914 TRPA Final, Final Inspection to Close Permit, 601 Final-Building.  May want to include 602 Final-Electrical, 603 Final-Plumbing, 604 Final-Mechanical
 if(matches(capStatus,"Issued - Revision Pending"))
 {
+	logDebug("cancel state after if statement for Rev pending status: " + cancel);
 	var blockFinalArray = new Array();
 	var commentStr = "";
 	var lkUpValue = "blockFinalFull";
@@ -184,8 +189,9 @@ if(matches(capStatus,"Issued - Revision Pending"))
 		commentStr = "The " + inspType + " inspection cannot be scheduled when the Building Permt status is " + capStatus;
 		showMessage = true;
 		customComment(commentStr);
-		//cancel = true;
+		cancel = true;
 	}
+	logDebug("cancel status after testing for block inspections: " + cancel);
 }
 // Prohibit scheduling inspections on Revisons and Deferred Submittals
 if(matches(appTypeArray[1],"Revision","Deferred Submittal"))
