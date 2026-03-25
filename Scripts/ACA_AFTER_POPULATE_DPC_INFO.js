@@ -538,7 +538,8 @@ try {
 			}
 			if(matches(AInfo["Owner Builder"],"Yes","Y","YES")) {
 				rDocTypes.push("Owner-Builder Acknowledgement");
-			}			
+			}
+			if(matches(AInfo["Includes Ground Disturbance"],"Yes","Y","YES")) rDocTypes.push("Grading Questionnaire");			
 		}
 		if(appMatch("Building/Residential/Plan Check Only/Master < 3000")) {
 			documentGroupforDPC = "BLD_PLANREVIEW_DPC";
@@ -571,7 +572,8 @@ try {
 			}
 			if(matches(AInfo["Owner Builder"],"Yes","Y","YES")) {
 				rDocTypes.push("Owner-Builder Acknowledgement");
-			}			
+			}
+			if(matches(AInfo["Includes Ground Disturbance"],"Yes","Y","YES")) rDocTypes.push("Grading Questionnaire");			
 		}
 
 		if(appMatch("Building/Revision/*/*")) {
