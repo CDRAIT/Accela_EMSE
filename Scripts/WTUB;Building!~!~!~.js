@@ -273,7 +273,7 @@ if(wfProcess == "BLD_20230501_MAIN" || wfProcess == "BLD_20231116_REV")
 				cancel = true;
 			}
 		}
-		if(matches(wfStatus,"Issued","Approved"))
+		if(matches(wfStatus,"Issued","Approved","Signature Requested"))
 		{
 			for (ata in allTasksArray) 
 				{
