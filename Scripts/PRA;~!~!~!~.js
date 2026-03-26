@@ -27,6 +27,9 @@
 |         : TDunn 01/03/2026 added date flag for older records
 |         : TDunn 01/05/2026 remarked out override to TDunn emails
 |         : TDunn 03/19/2026 added including TRPA/Building permits update child Deferred Submittals and Revisions
+|         : TDunn 03/20/2026 added updating due dates for originating tasks on payment
+|         : TDunn 03/25/2026 added updating child task due dates
+|         : TDunn 03/26/2026 added including old 'Plan Check Only' type in criteria for Master/Rev updates
 |
 \-------------------------------------------------------------------------------------------------------*/
 if(matches(currentUserID,"TDUNN","JMCKENZI","EAFTAHI")) { showDebug = 1;}
@@ -79,8 +82,9 @@ if(matches(appTypeArray[1],"Administrative","MBLA","Pre Development","Project","
 		if(AInfo["Project Office"] == "Tahoe") assignCap("PLNSUP_TAH");
 	}
 }
-// Begin new rules for BLD_20230501_MAIN process
-//================================================================
+
+// Begin rules for BLD_20230501_MAIN and Plan Check Master processes
+//===================================================================
 if(matches(appTypeArray[1],"Residential","Commercial"))
 {
 	logDebug("Running actions for Building Records and Revisions at PRA");
@@ -88,6 +92,7 @@ if(matches(appTypeArray[1],"Residential","Commercial"))
 	{
 		updateTask("Process for Issuance","Payment Received","Payment Received via Citizen Portal. Updated by script","");
 		updateAppStatus("Payment Received","Updated by script on Payment Received via Citizen Portal");
+		editTaskDueDate("Process for Issuance",dateAdd(null,2,"Y"));		
 	}
 	if(isTaskActive("Distribution") && isTaskStatus("Distribution","Payment Requested"))
 	{
@@ -96,6 +101,7 @@ if(matches(appTypeArray[1],"Residential","Commercial"))
 		{
 			updateTask("Distribution","Payment Received","Updated on Payment of fees due","");
 			updateAppStatus("Payment Received","Updated by script on Payment Received via Citizen Portal");
+			editTaskDueDate("Distribution",dateAdd(null,1,"Y"));			
 		}
 	}
 }
@@ -109,8 +115,10 @@ try
 		{
 			logDebug("Number of Children: " + myChildArray.length);
 			var cProcess = "BLD_20231116_REV";
-			if(appTypeArray[2] == "Master") {cProcess = "BLD_PLNCHK_20241222";}
+			if(matches(appTypeArray[2],"Master","Plan Check Only")) {cProcess = "BLD_PLNCHK_20241222";}
 			var cTask = "Process for Issuance";
+			var cNumDay = 2;
+			var saveCapId = capId;			
 			for (thisChild in myChildArray) 
 			{
 				cCapId = myChildArray[thisChild];
@@ -138,6 +146,10 @@ try
 						
 						updateTask(cTask,"Payment Received","Payment Received on parent via Citizen Portal. Updated by script","",cProcess,cCapId);
 						updateAppStatus("Payment Received","Updated by script on Payment Received on parent via Citizen Portal",cCapId);
+						saveCapId = capId;
+						capId = cCapId;
+						editTaskDueDate(cTask,dateAdd(null,cNumDay,"Y",cProcess));
+						capId = saveCapId;						
 					}
 				}
 			}
@@ -160,6 +172,7 @@ if(matches(appTypeArray[1],"Revision"))
 	{
 		updateTask("Process for Issuance","Payment Received","Payment Received via Citizen Portal. Updated by script","");
 		updateAppStatus("Payment Received","Updated by script on Payment Received via Citizen Portal");
+		editTaskDueDate("Process for Issuance",dateAdd(null,2,"Y"));		
 	}
 	if(isTaskActive("Distribution") && isTaskStatus("Distribution","Payment Requested"))
 	{
@@ -168,6 +181,7 @@ if(matches(appTypeArray[1],"Revision"))
 		{
 			updateTask("Distribution","Payment Received","Updated on Payment of fees due","");
 			updateAppStatus("Payment Received","Updated by script on Payment Received via Citizen Portal");
+			editTaskDueDate("Distribution",dateAdd(null,1,"Y"));			
 		}
 	}
 }
@@ -178,7 +192,8 @@ if(appTypeArray[1] == "Deferred Submittal")
 	if(isTaskStatus("Process for Issuance","Payment Requested"))
 	{
 		updateTask("Process for Issuance","Payment Received","Payment Received via Citizen Portal. Updated by script","");
-		updateAppStatus("Payment Received","Updated by script on Payment Received via Citizen Portal");			
+		updateAppStatus("Payment Received","Updated by script on Payment Received via Citizen Portal");	
+		editTaskDueDate("Process for Issuance",dateAdd(null,2,"Y"));		
 	}
 }
 	
