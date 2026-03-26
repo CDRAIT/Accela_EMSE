@@ -136,10 +136,10 @@ try
 						
 						updateTask(cTask,"Payment Received","Payment Received on parent via Citizen Portal. Updated by script","",cProcess,cCapId);
 						updateAppStatus("Payment Received","Updated by script on Payment Received on parent via Citizen Portal",cCapId);
-						saveCapId = capId;
-						capId = cCapId;
-						editTaskDueDate(cTask,dateAdd(null,cNumDay,"Y",cProcess));
-						capId = saveCapId;
+						// saveCapId = capId;
+						// capId = cCapId;
+						// editTaskDueDate(cTask,dateAdd(null,cNumDay,"Y",cProcess));
+						// capId = saveCapId;
 					}
 				}
 			}
