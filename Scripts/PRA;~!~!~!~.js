@@ -141,6 +141,7 @@ try
 						else if(taskStatus("Distribution",cProcess,cCapId) == "Payment Requested")
 						{
 							cTask = "Distribution";
+							cNumDay = 1;
 						}	
 						logDebug("Found child " + c_appTypeArray[1] + "/*/" + c_appTypeArray[3] + " with status of " + c_capStatus + " at " + cTask);
 						
