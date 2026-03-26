@@ -25,6 +25,8 @@
 |         : TDunn 08/29/2025 copied to Non-prod1
 |         : TDunn 08/31/2025 deployed to Github
 |         : TDunn 03/20/2026 added updating due dates for originating tasks on payment
+|         : TDunn 03/25/2026 added updating child task due dates
+|         : TDunn 03/26/2026 added including old 'Plan Check Only' type in criteria for Master/Rev updates
 |
 \-------------------------------------------------------------------------------------------------------*/
 
@@ -104,7 +106,7 @@ try
 		{
 			logDebug("Number of Children: " + myChildArray.length);
 			var cProcess = "BLD_20231116_REV";
-			if(appTypeArray[2] == "Master") {cProcess = "BLD_PLNCHK_20241222";}
+			if(matches(appTypeArray[2],"Master","Plan Check Only") {cProcess = "BLD_PLNCHK_20241222";}
 			var cTask = "Process for Issuance";
 			var cNumDay = 2;
 			var saveCapId = capId;
