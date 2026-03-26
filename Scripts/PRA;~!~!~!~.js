@@ -106,7 +106,7 @@ try
 		{
 			logDebug("Number of Children: " + myChildArray.length);
 			var cProcess = "BLD_20231116_REV";
-			if(matches(appTypeArray[2],"Master","Plan Check Only") {cProcess = "BLD_PLNCHK_20241222";}
+			if(matches(appTypeArray[2],"Master","Plan Check Only")) {cProcess = "BLD_PLNCHK_20241222";}
 			var cTask = "Process for Issuance";
 			var cNumDay = 2;
 			var saveCapId = capId;
