@@ -107,6 +107,7 @@ try
 			if(appTypeArray[2] == "Master") {cProcess = "BLD_PLNCHK_20241222";}
 			var cTask = "Process for Issuance";
 			var cNumDay = 2;
+			var saveCapId = capId;
 			for (thisChild in myChildArray) 
 			{
 				cCapId = myChildArray[thisChild];
@@ -135,7 +136,10 @@ try
 						
 						updateTask(cTask,"Payment Received","Payment Received on parent via Citizen Portal. Updated by script","",cProcess,cCapId);
 						updateAppStatus("Payment Received","Updated by script on Payment Received on parent via Citizen Portal",cCapId);
-						editTaskDueDateGPT(cTask,dateAdd(null,cNumDay,"Y",cProcess,cCapId));
+						saveCapId = capId;
+						capId = cCapId;
+						editTaskDueDate(cTask,dateAdd(null,cNumDay,"Y",cProcess));
+						capId = saveCapId;
 					}
 				}
 			}
