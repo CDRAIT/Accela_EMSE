@@ -106,6 +106,7 @@ try
 			var cProcess = "BLD_20231116_REV";
 			if(appTypeArray[2] == "Master") {cProcess = "BLD_PLNCHK_20241222";}
 			var cTask = "Process for Issuance";
+			var cNumDay = 2;
 			for (thisChild in myChildArray) 
 			{
 				cCapId = myChildArray[thisChild];
@@ -128,11 +129,13 @@ try
 						else if(taskStatus("Distribution",cProcess,cCapId) == "Payment Requested")
 						{
 							cTask = "Distribution";
+							cNumDay = 1;
 						}	
 						logDebug("Found child " + c_appTypeArray[1] + "/*/" + c_appTypeArray[3] + " with status of " + c_capStatus + " at " + cTask);
 						
 						updateTask(cTask,"Payment Received","Payment Received on parent via Citizen Portal. Updated by script","",cProcess,cCapId);
 						updateAppStatus("Payment Received","Updated by script on Payment Received on parent via Citizen Portal",cCapId);
+						editTaskDueDateGPT(cTask,dateAdd(null,cNumDay,"Y",cProcess,cCapId));
 					}
 				}
 			}
@@ -207,6 +210,54 @@ if (matches(appTypeArray[1], "Administrative", "MBLA", "Pre Development", "Proje
 var sendResult = aa.sendMail("noreply@placer.ca.gov","tdunn@truepointsolutions.com", "", "Testing PRA script ", debug);	
 
 /*============================ Internal Functions required for this script =================================================*/
+
+function editTaskDueDateGPT(wfstr, wfdate) // optional process name.  if wfstr == "*", set for all tasks
+{
+	var useProcess = false;
+	var processName = "";
+	if (arguments.length == 3) {
+		processName = arguments[2]; // subprocess
+		useProcess = true;
+	}
+	if (arguments.length == 4) {
+		vCapId = arguments[3]; // subprocess
+	}
+	var taskDesc = wfstr;
+	if (wfstr == "*") {
+		taskDesc = "";
+	}
+	var workflowResult = aa.workflow.getTaskItems(vCapId, taskDesc, processName, null, null, null);
+	if (workflowResult.getSuccess())
+		wfObj = workflowResult.getOutput();
+	else {
+		logMessage("**ERROR: Failed to get workflow object: " + workflowResult.getErrorMessage());
+		return false;
+	}
+
+	for (i in wfObj) {
+		var fTask = wfObj[i];
+		if ((fTask.getTaskDescription().toUpperCase().equals(wfstr.toUpperCase()) || wfstr == "*") && (!useProcess || fTask.getProcessCode().equals(processName))) {
+			wfObj[i].setDueDate(aa.date.parseDate(wfdate));
+			var fTaskModel = wfObj[i].getTaskItem();
+			var tResult = aa.workflow.adjustTaskWithNoAudit(fTaskModel);
+			if (tResult.getSuccess())
+				logDebug("Set Workflow Task: " + fTask.getTaskDescription() + " due Date " + wfdate);
+			else {
+				logMessage("**ERROR: Failed to update due date on workflow: " + tResult.getErrorMessage());
+				return false;
+			}
+		}
+	}
+}
+
+
+
+
+
+
+
+
+
 
 function createNotificationTPS3(emailTemplate,doContacts,vContactTypes,doLp,vLicType,lpToEmail,doOtherContacts,getOwner,getPrimeAddr,doStaffEmail,addParentID,staffDefault) {
 /*========================================================================================================================================================================== 
