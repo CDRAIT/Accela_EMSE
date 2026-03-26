@@ -215,6 +215,7 @@ function editTaskDueDateGPT(wfstr, wfdate) // optional process name.  if wfstr =
 {
 	var useProcess = false;
 	var processName = "";
+	var vCapId = capId;
 	if (arguments.length == 3) {
 		processName = arguments[2]; // subprocess
 		useProcess = true;
