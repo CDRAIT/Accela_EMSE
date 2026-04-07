@@ -31,6 +31,7 @@
 |         : TDunn   08/29/2025 deployed to GitHub
 |         : Abe     09/02/2025 IT Request # 2504 - Added Fee code 0515 to the SolarApp Fee Calculations
 |         : TDunn   09/23/2025 added try clause on IT requests 1978 and 2221
+|         : eaftahi 04/07/2026 Added IT Request# 2698
 |
 /================================================================================================================================*/
 if (currentUserID == "TDUNN" || currentUserID == "EAFTAHI") {
@@ -167,6 +168,12 @@ try
 							// less than 750 sqft
 						}
 					}
+
+					//IT Request # 2698 - Permanent Membrane Structure
+					if (thisScope == "Permanent Membrane Structure" && matches(feeName, "0913", "0919")) {
+						thisQty = 2;
+					}
+					//End of IT Request # 2698 
 
 					if (addFeeFlag) {
 						updateFee(feeName, "B_RES", "FINAL", thisQty, varAutoInvoiceFees);
