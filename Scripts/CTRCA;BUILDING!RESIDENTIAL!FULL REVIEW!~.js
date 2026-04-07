@@ -15,6 +15,7 @@
 |         : eaftahi 01/16/2025 IT Req# 2221 Fee deferral - SB937 
 |         : eaftahi 04/09/2024 IT Request# 2035 - updated ADU Fees
 |         : TDunn  12/31/2025 Remarked out addition of adHoc tasks
+|         : eaftahi 04/07/2026 Added IT Request# 2698
 |
 /==========================================================================================================*/
 
@@ -124,7 +125,13 @@ if(publicUser && !appMatch("Building/Residential/Limited/*")) {
 						// less than 750 sqft
 					}
 				}
-					
+				
+				//IT Request# 2698 - Permanent Membrane Structure
+				if (thisScope == "Permanent Membrane Structure" && matches(feeName, "0913", "0919")) {
+					thisQty = 2;
+				}
+				//End of IT Request # 2698
+
 				if(addFeeFlag) {
 					updateFee(feeName,"B_RES","FINAL",thisQty,varAutoInvoiceFees);
 				}
