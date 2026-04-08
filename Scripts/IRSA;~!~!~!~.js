@@ -25,6 +25,7 @@
 |         : TDunn 08/29/2025 deployed to Github
 |         : Abe   01/13/2026 Added TRPARelease to the Buildings with isTRPA= True (IT Req# 2981)
 |         : Abe   03/10/2026 Added AInfo['ParcelAttribute.ELECTRIC UTILITY'] check to the 515 ESS inspection result controls (IT Req# 3221)
+|         : Abe   04/08/2026 replaced aa.finance.reCalculateFees() with recalcFees(capItem) - Req# 2787 - error on adding re-inspection fee (0910)
 | 
 /-----------------------------------------------------------------------------------------------------------------*/
 if (matches(currentUserID,"JMCKENZI","TDUNN","EAFTAHI")) 
@@ -196,7 +197,8 @@ if(matches(vEventName,"InspectionResultSubmitAfter","V360InspectionResultSubmitA
 
 		if (matches(inspResult,"Not Ready - Fee Charged","Phased pass fee charged","Phased fail fee charged")) {
 			addFee("0910","B_RES","FINAL",1,"Y");
-			aa.finance.reCalculateFees();
+			//aa.finance.reCalculateFees();
+			recalcFees(capId);
 		}
 
 		if (lookup("Group Inspection Lookup",inspType) != null) {
@@ -274,19 +276,25 @@ if(matches(vEventName,"InspectionResultSubmitAfter","V360InspectionResultSubmitA
 			if (matches(inspResult,"Not Ready - Fee Charged")) 
 			{
 				addFee("0910","B_RES","FINAL",1,"Y");
-				aa.finance.reCalculateFees();
+				//aa.finance.reCalculateFees();
+				recalcFees(capId);
+				
 			}
 
 			if (matches(inspResult,"Phased pass fee charged")) 
 			{
 				addFee("0910","B_RES","FINAL",1,"Y");
-				aa.finance.reCalculateFees();
+				//aa.finance.reCalculateFees();
+				recalcFees(capId);
+
 			}
 
 			if (matches(inspResult,"Phased fail fee charged")) 
 			{
 				addFee("0910","B_RES","FINAL",1,"Y");
-				aa.finance.reCalculateFees();
+				//aa.finance.reCalculateFees();
+				recalcFees(capId);
+
 			}
 
 			/* Next section test if inspection is a Group inspection.  If true results all inspection in group same as Group insp */
