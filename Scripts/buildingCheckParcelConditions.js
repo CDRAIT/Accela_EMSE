@@ -24,7 +24,7 @@ if (varParcels && varParcels.length > 0)
                 var varCondStatus = varConditions[varEachCondition].getConditionStatus();
                 var varCondDesc = varConditions[varEachCondition].getConditionDescription();
                 if (varCondTypeCode == "Parcel" && varCondDesc == "FEE DEFERRAL" && varCondStatus == "Applied") {
-                    vString += "<font size = 4 color=ff000>This permit cannot be finaled because the <b>Fee Deferral Condition</b> has not been met.</font><br><br>";
+                    vString += "<font size = 4 color=ff000>This permit cannot be finaled because the <b>Fee Deferral Condition</b> has not been met.</font><br>";
                     vCancelFlag = true;
                 }
                 if (varCondStatus == "Applied" &&
@@ -44,4 +44,4 @@ if (varParcels && varParcels.length > 0)
             }
     }
 
-    logDebug("End of buildingCheckParcelConditions");
+    logDebug("Exiting buildingCheckParcelConditions ...");

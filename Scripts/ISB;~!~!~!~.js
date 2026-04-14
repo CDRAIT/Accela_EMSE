@@ -112,7 +112,7 @@ if(varUseInspInspector) {
 	}
 }
 
-// Converted from EMSE 2.0 ISB:Building/*/*/* on 11/02/2024
+// Converted from EMSE 2.0 ISB:Building/~/~/~ on 11/02/2024
 
 if (!matches(capStatus,"Inspection Request Received","Issued","Re-Issue","OPEN","Revisions","Issued - Revision Pending"))
 {

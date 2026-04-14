@@ -10,7 +10,7 @@
 /----------------------------------------------------------------------------------------------------*/
 
 //var vCancelFlag = false;
-vString = "<font size = 4 color=ff000><b>The following condition(s) has(have) not been met:</b></font><br><br>";
+vString = "<font size = 4 color=ff000><b>The following condition(s) has(have) not been met:</b></font><br>";
 if (appHasCondition("Final","Applied","APCD Final",null)) {
 	vCancelFlag = true;
 	vString = vString + "APCD Final Condition has not been met<br>";
@@ -235,6 +235,6 @@ if (appHasCondition("Fire Defensible Inspection","Applied",null,null)) {
 	vCancelFlag = true;
 	vString = vString + "Fire Sprinkler Inspection has not been met<br>";
 	}
-vString += "<br><br>";
+vString += "<br>";
 
-logDebug("End of BuildingCheckConditions");
+logDebug("Exiting of BuildingCheckConditions ...");
