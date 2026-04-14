@@ -18,6 +18,7 @@
 |                
 /------------------------------------------------------------------------------------------------------*/
 
+/*
 if(matches(currentUserID,"JMCKENZI", "EAFTAHI","TDUNN"))
 {
 	showDebug = 1;
@@ -283,3 +284,6 @@ if(matches(appTypeArray[1],"Revision","Deferred Submittal"))
 	customComment(messageStr);
 	cancel = true;
 }
+
+*/
+
