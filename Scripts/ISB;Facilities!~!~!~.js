@@ -24,9 +24,9 @@ showMessage = false;
 //#100
 if(balanceDue > 0) {
     showMessage = true;
-    var vString = "<font size = 4 color=ff000><b>Balance Due:</b></font><br><br>There is a balance due of $" 
+    var vString = "<font size = 4 color=ff000><b>Balance Due:</b></font><br>r>There is a balance due of $" 
     vString += balanceDue; 
-    vString += " for this Facilities Permit.  No additional inspections can be scheduled until the balance due it paid.<br>";
+    vString += " for this Facilities Permit.  No additional inspections can be scheduled until the balance due it paid.<br><br>";
 
     customComment(vString);
     cancel = true;
@@ -35,9 +35,9 @@ if(balanceDue > 0) {
 //#110
 if(feeGetTotByDateRange(dateAdd(null,-730),dateAdd(null,0),"NEW") > 0){
     showMessage = true;
-    var vString = "<font size = 4 color=ff000><b>Assessed Fees:</b></font><br><br>There are uninvoiced assessed fees in the amount of $"; 
+    var vString = "<font size = 4 color=ff000><b>Assessed Fees:</b></font><br>There are uninvoiced assessed fees in the amount of $"; 
     vString += feeGetTotByDateRange(dateAdd(null,-730),dateAdd(null,0),"NEW"); 
-    vString += " for this Facilities Permit.  No additional inspections can be scheduled until the fees are assessed and paid.<br>";
+    vString += " for this Facilities Permit.  No additional inspections can be scheduled until the fees are assessed and paid.<br><br>";
 
     customComment(vString);
     cancel = true

@@ -235,6 +235,6 @@ if (appHasCondition("Fire Defensible Inspection","Applied",null,null)) {
 	vCancelFlag = true;
 	vString = vString + "Fire Sprinkler Inspection has not been met<br>";
 	}
-vString += "<br><br>";
+vString += "<br>";
 
 logDebug("End of BuildingCheckConditions");
