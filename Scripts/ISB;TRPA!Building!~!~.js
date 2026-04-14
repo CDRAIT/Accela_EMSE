@@ -44,21 +44,24 @@ if (inspType == "600" ||
 
 //#010
 if(balanceDue > 0){
-    vString += "<font size = 4 color=ff000><b>Balance Due:</b></font><br>There is a balance due of $" + balanceDue;    
+    vString += "<font size = 4 color=ff000><b>Balance Due:</b></font><br>There is a balance due of $";
+    vString += balanceDue; 
     vString += " for this Building Permit. A final inspection cannot be scheduled.<br><br>";
     vCancelFlag = true;
 }
 
 //#016
 if(feeGetTotByDateRange(dateAdd(null,-730),dateAdd(null,0),"NEW") > 0 ){
-    vString += "<font size = 4 color=ff000><b>Assessed Fees:</b></font><br>There are uninvoiced assessed fees in the amount of $"+ feeGetTotByDateRange(dateAdd(null,-730),dateAdd(null,0),"NEW");    
+    vString += "<font size = 4 color=ff000><b>Assessed Fees:</b></font><br>There are uninvoiced assessed fees in the amount of $";
+    vString += feeGetTotByDateRange(dateAdd(null,-730),dateAdd(null,0),"NEW");
     vString +=  " for this Building Permit.  No additional inspections can be scheduled until the fees are assessed and paid.<br><br>";
     vCancelFlag = true;
 }
 
 //#090
 if(capStatus != "Inspection Request Received" && capStatus != "Issued" && capStatus != "Re-Issue" && capStatus != "OPEN" && capStatus != "Revisions"){
-    vString += "<font size = 4 color=ff000><b>Inspections cannot be scheduled</b></font><br>The current status is: " + capStatus;    
+    vString += "<font size = 4 color=ff000><b>Inspections cannot be scheduled</b></font><br>The current status is: ";
+    vString += capStatus;
     vString += " for this Building Permit. All building permts must be in either an Issued or Re-Issue status to schedule inspections.<br><br>";
     vCancelFlag = true;
 }

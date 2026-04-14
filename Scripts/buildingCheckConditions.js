@@ -237,4 +237,4 @@ if (appHasCondition("Fire Defensible Inspection","Applied",null,null)) {
 	}
 vString += "<br>";
 
-logDebug("End of BuildingCheckConditions");
+logDebug("Exiting of BuildingCheckConditions ...");
