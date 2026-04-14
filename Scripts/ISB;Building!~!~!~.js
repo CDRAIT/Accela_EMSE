@@ -36,7 +36,7 @@
 if (matches(currentUserID, "JMCKENZI", "EAFTAHI", "TDUNN")) {
     showDebug = 1;
 }
-logDebug("processing ISB:Building/~/~/~ ...");
+logDebug("Processing ISB:Building/~/~/~ ...");
 
 cancel = false;
 showMessage = false;
@@ -167,6 +167,7 @@ if (!matches(capStatus, "Inspection Request Received", "Issued", "Re-Issue", "OP
     vCancelFlag = true;
 }
 
+//Duplicate of below 
 // if ((inspType == "601 Final-Building" || inspType == "600") && balanceDue > 0) 
 // {	
 //     vString += "<font size = 4 color=ff000><b>Balance Due:</b></font><br><br>There is a balance due of $";
@@ -180,7 +181,7 @@ if (balanceDue > 0) {
     vCancelFlag = true;
 }
 
-if (feeGetTotByDateRange(dateAdd(null, -730), dateAdd(null, 0), "NEW") > 0)  //Broken link
+if (feeGetTotByDateRange(dateAdd(null, -730), dateAdd(null, 0), "NEW") > 0)  //Abe: The link below should be replaced by ACA permit link
 {
     vString += "<font size = 4 color=ff000><b>Assessed Fees:</b></font><br><br>There are uninvoiced assessed fees in the amount of $";
     vString += feeGetTotByDateRange(dateAdd(null, -730), dateAdd(null, 0), "NEW") + " for this Building Permit.";
@@ -232,7 +233,7 @@ if (isFinalInspection) {
     }
 }
 
-
+//Dublicate
 // if (inspType == "601 Final-Building" && appHasCondition("DPW - Prevent Final / Completion", "Applied", null, null)) {
 //     showMessage = true;
 //     comment("<font size = 4 color=ff000><b>A Final Building Inspection cannot be scheduled on this permit because a DPW - Prevent Final / Completion condition has not been met.</b></font><br><br>");

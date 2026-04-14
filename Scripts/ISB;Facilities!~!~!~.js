@@ -24,7 +24,7 @@ showMessage = false;
 //#100
 if(balanceDue > 0) {
     showMessage = true;
-    var vString = "<font size = 4 color=ff000><b>Balance Due:</b></font><br><br>There is a balance due of $" 
+    var vString = "<font size = 4 color=ff000><b>Balance Due:</b></font><br>There is a balance due of $" 
     vString += balanceDue; 
     vString += " for this Facilities Permit.  No additional inspections can be scheduled until the balance due it paid.<br>";
 
