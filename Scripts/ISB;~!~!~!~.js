@@ -15,7 +15,8 @@
 |         : TDunn 11/02/2024 added DPW Inspection schedule stop conditions
 |         : TDunn 01/11/2026 deployed to nonprod1
 |         : TDunn 01/11/2026 added logic to stop inspection scheduling on Revisions and Deferred Submittals		  
-|                
+|         : TDunn 03/20/2026 ?
+|         : Abe   04/10/2026 Synced the Github version with database - the Github was behind! 
 /------------------------------------------------------------------------------------------------------*/
 
 /*
@@ -23,7 +24,8 @@ if(matches(currentUserID,"JMCKENZI", "EAFTAHI","TDUNN"))
 {
 	showDebug = 1;
 }
-
+cancel = false;
+logDebug("Initial cancel setting: " + cancel);
 var varConditionStopsAllInspections = false;
 var varConditionStopsFinalInspections = false;
 
@@ -199,18 +201,33 @@ if ((inspType == "600" || inspType == "601 Final-Building" || inspType == "602 F
 // List of inspection to block:  914 TRPA Final, Final Inspection to Close Permit, 601 Final-Building.  May want to include 602 Final-Electrical, 603 Final-Plumbing, 604 Final-Mechanical
 if(matches(capStatus,"Issued - Revision Pending"))
 {
+	logDebug("1 cancel = " + cancel);
 	var blockFinalArray = new Array();
 	var commentStr = "";
 	var lkUpValue = "blockFinalFull";
 	blockFinalArray = lookup("InspectionBlockListOnRevision",lkUpValue).split(",");
 	logDebug("final array: " + blockFinalArray);
-	if(exists(inspType,blockFinalArray))
+	cflag = false;
+	logDebug("cflag = " + cflag);
+	for(tInsp in blockFinalArray)
+	{
+		cInsp = blockFinalArray[tInsp];
+		logDebug("current from list: " + cInsp);
+		if(cInsp == inspType)
+		{
+			logDebug(cInsp + " is blocked")
+			cflag = true;
+		}
+		logDebug("cflag = " + cflag);
+	}
+	if(cflag)
 	{
 		commentStr = "The " + inspType + " inspection cannot be scheduled when the Building Permt status is " + capStatus;
 		showMessage = true;
-		customComment(commentStr);
+		comment(commentStr);
 		cancel = true;
 	}
+	logDebug("2 cancel = " + cancel);
 }
 
 //Abe- 06/25/2024 - IT Request # 1485 - New Building Inspection Flags/Conditions
