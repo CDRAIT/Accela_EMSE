@@ -243,7 +243,7 @@ if (isFinalInspection) {
     // branch("ES_BLD_CHECK_CONDS") Converted branch to script called below
     include("BUILDINGCHECKCONDITIONS");
     // Line# 900 within branch("ES_BLD_CHECK_CONDS")
-    include("CHECKPARCELCONDITIONS");
+    include("BUILDINGCHECKPARCELCONDITIONS");
 }
 
 // Carry forward current rule to cancel final inspection request when Revision pending
