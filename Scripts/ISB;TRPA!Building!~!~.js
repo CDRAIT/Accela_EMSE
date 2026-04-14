@@ -109,7 +109,7 @@ if (isFinalInspection) {
     include("BUILDINGCHECKCONDITIONS");
     
     //Line# 900 within branch("ES_BLD_CHECK_CONDS")
-    include("CHECKPARCELCONDITIONS");
+    include("BUILDINGCHECKPARCELCONDITIONS");
 }
 
 
