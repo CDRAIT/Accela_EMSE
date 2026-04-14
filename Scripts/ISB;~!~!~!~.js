@@ -19,6 +19,7 @@
 |         : Abe   04/10/2026 Synced the Github version with database - the Github was behind! 
 /------------------------------------------------------------------------------------------------------*/
 
+/*
 if(matches(currentUserID,"JMCKENZI", "EAFTAHI","TDUNN"))
 {
 	showDebug = 1;
@@ -300,4 +301,6 @@ if(matches(appTypeArray[1],"Revision","Deferred Submittal"))
 	customComment(messageStr);
 	cancel = true;
 }
-logDebug("3 cancel = " + cancel);
+
+*/
+
