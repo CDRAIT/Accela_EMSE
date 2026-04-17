@@ -57,7 +57,7 @@ if(!publicUser) {
 		addFee("DPROS","ESD","FINAL",1,"N");
 	}
 	// Adding new TECH fee
-	if(matches(appTypeArray[1],"Final Subdivision Map","Grading Permit","Improvement Plan","Improvement Plan Revision","Parcel Map","Record of Survey")){
+	if(matches(appTypeArray[1],"Final Subdivision Map","Grading Permit","Improvement Plan Revision","Parcel Map","Record of Survey")){
 		updateFee("TECH","ACCOUNTING","FINAL",1,varAutoInvoiceFees);
 	}
 }
