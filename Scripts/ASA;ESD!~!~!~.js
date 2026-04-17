@@ -11,7 +11,7 @@
 |
 | Notes   : TDunn 11/19/2021 created production version 
 |         : TDunn 01/11/2022 updated to logic for adding fees on NOT publicUser
-|         
+|         : TDunn 04/16/2026 Excluded Improvement Plan from Tech fee         
 |
 /=============================================================================================*/
 showDebug = false; showMessage = false;
@@ -57,7 +57,7 @@ if(!publicUser) {
 		addFee("DPROS","ESD","FINAL",1,"N");
 	}
 	// Adding new TECH fee
-	if(matches(appTypeArray[1],"Final Subdivision Map","Grading Permit","Improvement Plan","Improvement Plan Revision","Parcel Map","Record of Survey")){
+	if(matches(appTypeArray[1],"Final Subdivision Map","Grading Permit","Improvement Plan Revision","Parcel Map","Record of Survey")){
 		updateFee("TECH","ACCOUNTING","FINAL",1,varAutoInvoiceFees);
 	}
 }
