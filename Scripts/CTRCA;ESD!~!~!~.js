@@ -11,6 +11,7 @@
 |
 | Notes   : TDunn 01/11/2022 created production version 
 | Update  : EAFTAHI 08/31/2023 create staff notification for online Submission (GP and others)
+|         : TDunn 04/16/2026 removed Improvement Plan from addition of Tech fee
 |         
 |
 /=============================================================================================*/
@@ -60,7 +61,7 @@ if (publicUser) {
     }
 
     // Adding new TECH fee
-    if (matches(appTypeArray[1], "Final Subdivision", "Grading Permit", "Improvement Plan", "Improvement Plan Revision", "Parcel Map", "Record of Survey")) {
+    if (matches(appTypeArray[1], "Final Subdivision", "Grading Permit", "Improvement Plan Revision", "Parcel Map", "Record of Survey")) {
         updateFee("TECH", "ACCOUNTING", "FINAL", 1, varAutoInvoiceFees);
     }
     
