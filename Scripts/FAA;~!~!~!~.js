@@ -17,6 +17,7 @@
 |         : TDunn 04/15/2022 added test for when no fee codes exist in exempt fees list. cleaned up some criteria logic
 |         : TDunn 07/20/2022 updated maximum tech fee value to use a lookup.
 |         : TDunn 05/16/2024 fixed calculation error for TECH-ADJ amount on exempt fees.
+|         : TDunn 04/16/2026 added excluding PW Imp Plan record 
 |
 /---------------------------------------------------------------------------------------------------------------------*/
 
