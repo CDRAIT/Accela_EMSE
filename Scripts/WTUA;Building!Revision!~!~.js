@@ -2002,7 +2002,8 @@ if(matches(appTypeArray[1],"Revision") && wfProcess == "BLD_20231116_REV")
 			if(allPreComplete)
 			{
 				updateAppStatus("Final Processing","All preissuance tasks Complete or inactive. Updated by script");
-				updateTask("Process for Issuance","Final Processing","All preissuance tasks Complete or inactive. Updated by script","",wfProcess);				
+				updateTask("Process for Issuance","Final Processing","All preissuance tasks Complete or inactive. Updated by script","",wfProcess);
+				editTaskDueDate("Process for Issuance",dateAdd(null,2,"Y"),wfProcess);			
 			}
 		}
 	}
