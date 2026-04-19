@@ -584,6 +584,7 @@ if(wfProcess == "BLD_PLNCHK_20241222")
 			if(isTaskActive("Process for Issuance"))
 			{
 				updateAppStatus("Final Processing","All preissuance tasks Complete or inactive. Updated by script");
+				editTaskDueDate("Process for Issuance",dateAdd(null,2,"Y"),wfProcess);				
 			}			
 		}
 	}
