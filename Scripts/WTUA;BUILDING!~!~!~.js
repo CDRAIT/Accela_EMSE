@@ -2040,6 +2040,7 @@ if(wfProcess == "BLD_20230501_MAIN")
 			{
 				updateAppStatus("Final Processing","All preissuance tasks Complete or inactive. Updated by script");
 				updateTask("Process for Issuance","Final Processing","All preissuance tasks Complete or inactive. Updated by script","",wfProcess);
+				editTaskDueDate("Process for Issuance",dateAdd(null,2,"Y"),wfProcess);
 			}
 		}
 	}
