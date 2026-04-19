@@ -278,7 +278,26 @@ if(matches(appTypeArray[1],"Revision") && wfProcess == "BLD_20231116_REV")
 			if(thisCheckType == "Over the Counter") pcheckType = "OTC";
 			dueDateRecType = "Res" + pcheckType;		
 		}
-	}	
+	}
+	
+	if(pappTypeArray[0] == "TRPA")
+	{
+	
+		if(pappTypeArray[2] == "Residential")
+		{
+			pcheckType = "Full";
+			if(thisCheckType == "Quick Check") pcheckType = "Quick";
+			if(thisCheckType == "Over the Counter") pcheckType = "OTC"
+			dueDateRecType = "Res" + pcheckType;			
+		}
+		if(pappTypeArray[2] == "Non-Residential")
+		{
+			pcheckType = "Full";
+			if(thisCheckType == "Quick Check") pcheckType = "Quick";
+			if(thisCheckType == "Over the Counter") pcheckType = "OTC"
+			dueDateRecType = "Com" + pcheckType;			
+		}
+	}		
 
 	if(pappTypeArray[1] == "Commercial")
 	{
