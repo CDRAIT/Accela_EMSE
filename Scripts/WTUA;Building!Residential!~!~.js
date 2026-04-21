@@ -272,7 +272,7 @@ if(matches(wfProcess,"BLD_20181201_DISTRIBUTION","BLD_20181201_MAIN","BLD_202305
 	}
 	if(matches(appTypeArray[3],"Master < 3000","Master > 3000"))
 	{
-		if(wfTask == "Inspections" && wfStatus == "Revisions" && capStatus == "Issued" && appTypeArray[3] != "Revision")
+		if(wfTask == "Inspections" && wfStatus == "Revisions" && matches(capStatus,"Issued","Approved") && appTypeArray[3] != "Revision")
 		{
 			logDebug("Inside creating revision child record");
 			var recName = "Master Plan Revision for " + capIDString;
