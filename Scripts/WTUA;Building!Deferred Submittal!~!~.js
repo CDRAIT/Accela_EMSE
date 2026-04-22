@@ -319,16 +319,6 @@ if(wfProcess == "BLD_DEFERRED_20240710")
 		{
 			if (pCapId != null) 
 			{
-				var cWorkDesc = workDescGet(capId);
-				var typeSuffix = " # ";
-				var newWorkDesc = "";
-				
-				newWorkDesc = pWorkDesc + "\n\n"
-				+ "*** " + appTypeArray[1] + typeSuffix + capIDString + " - Complete on " + dateAdd(null,0) + "\n\n" 
-				+ "Description: " + cWorkDesc + "\n\n";
-				newLength = newWorkDesc.length;
-				logDebug("new description character length: " + newLength);
-				updateWorkDesc(newWorkDesc,pCapId);
 				
 				// Determine if this on the last/only Deferred Submittal for parent permit. If true, remove capCondition
 				//-------------------------------------------------------------------------------------------------------
@@ -537,6 +527,20 @@ if(wfProcess == "BLD_DEFERRED_20240710")
 		// Generate signature requested notification
 		if(wfStatus == "Signature Requested")
 		{
+			if(pCapId != null)
+			{
+				var cWorkDesc = workDescGet(capId);
+				var typeSuffix = " # ";
+				var newWorkDesc = "";
+				
+				newWorkDesc = pWorkDesc + "\n\n"
+				+ "*** " + appTypeArray[1] + typeSuffix + capIDString + " - Complete on " + dateAdd(null,0) + "\n\n" 
+				+ "Description: " + cWorkDesc + "\n\n";
+				newLength = newWorkDesc.length;
+				logDebug("new description character length: " + newLength);
+				updateWorkDesc(newWorkDesc,pCapId);
+			}
+				
 			if(checkForContactEmail("Applicant"))
 			{
 				showMessage = true;
