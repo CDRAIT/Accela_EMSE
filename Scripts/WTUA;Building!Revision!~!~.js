@@ -2030,20 +2030,10 @@ if(matches(appTypeArray[1],"Revision") && wfProcess == "BLD_20231116_REV")
 			
 		if(wfStatus == "Approved") 
 		{
-			var cWorkDesc = workDescGet(capId);
-			var typeSuffix = " # ";
-			var newWorkDesc = "";
 			
-			newWorkDesc = pWorkDesc + "\n\n"
-			+ "*** " + appTypeArray[1] + typeSuffix + capIDString + " - Complete on " + dateAdd(null,0) + "\n\n" 
-			+ "Description: " + cWorkDesc + "\n\n";
-			newLength = newWorkDesc.length;
-			logDebug("new description character length: " + newLength);
-			updateWorkDesc(newWorkDesc,pCapId);
-			
-			logDebug("Updating app status");
+			logDebug("Updating parent app status");
 			updateAppStatus("Issued","Revision " + capIDString + " Completed. Status updated by script",pCapId);
-			logDebug("Removing prevent final condition on Issued");
+			logDebug("Removing prevent final condition on Approved");
 			removeCapCondition("Building - Prevent Final / Completion","Building Final Not Allowed until Revisions are Approved",pCapId);			
 			
 			// Initiate Move documents with target doc status to the from child to parent pCapId
@@ -2308,6 +2298,17 @@ if(matches(appTypeArray[1],"Revision") && wfProcess == "BLD_20231116_REV")
 		// Generate signature requested notification
 		if(wfStatus == "Signature Requested")
 		{
+			var cWorkDesc = workDescGet(capId);
+			var typeSuffix = " # ";
+			var newWorkDesc = "";
+			
+			newWorkDesc = pWorkDesc + "\n\n"
+			+ "*** " + appTypeArray[1] + typeSuffix + capIDString + " - Complete on " + dateAdd(null,0) + "\n\n" 
+			+ "Description: " + cWorkDesc + "\n\n";
+			newLength = newWorkDesc.length;
+			logDebug("new description character length: " + newLength);
+			updateWorkDesc(newWorkDesc,pCapId);
+			
 			if(checkForContactEmail("Applicant"))
 			{
 				showMessage = true;
