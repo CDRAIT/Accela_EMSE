@@ -174,7 +174,7 @@ if (wfProcess == "CODE_ENF") { //New Workflow
 
     if (wfTask == "Notice of Nuisance") {
         if (wfStatus == "Notice of Nuisance") {
-            editAppSpecific("Nuisance Letter Issuance Date", "wfDateMMDDYYYY");
+            editAppSpecific("Nuisance Letter Issuance Date", wfDateMMDDYYYY);
             //Create Nuisance Letter (11)
             reportName = "Notice of Nuisance";
             addParameter(emailParams, "$$emailSubject$$", "NOTICE OF NUISANCE");
@@ -219,7 +219,7 @@ if (wfProcess == "CODE_ENF") { //New Workflow
         if (wfStatus == "Abatement Upheld") {
             //Reinspection Email to staff (14) - or Create an inspection 
             //BatchJob - save the WFdate in the ASI field
-            editAppSpecific("Nuisance Abatement Upheld Date", "wfDateMMDDYYYY");
+            editAppSpecific("Nuisance Abatement Upheld Date", wfDateMMDDYYYY);
         }
 
         if (wfStatus == "Complied" || wfStatus == "Dismissed") {
@@ -280,7 +280,7 @@ if (wfProcess == "CODE_ENF") { //New Workflow
             addParameter(emailParams, "$$emailSubject$$", "CITATION LETTER");
             sendNotice2Recipients("Citation_Letter");
 
-            editAppSpecific("Citation Issuance Date", "wfDateMMDDYYYY");
+            editAppSpecific("Citation Issuance Date", wfDateMMDDYYYY);
         }
 
         //First Revision updates
@@ -326,7 +326,7 @@ if (wfProcess == "CODE_ENF") { //New Workflow
         }
         if (wfStatus == "Citation Upheld") {
             //save the wfdate in an ASI for Batchjob
-            editAppSpecific("Citation Upheld Date", "wfDateMMDDYYYY");
+            editAppSpecific("Citation Upheld Date", wfDateMMDDYYYY);
             //Create fork Manually
             activateTask("Enforcement Action");
 
@@ -354,7 +354,7 @@ if (wfProcess == "CODE_ENF") { //New Workflow
             sendNotice2Recipients("Invoice_Cover_Letter");
 
             //Eamil Fines Due to Staff (17) - Batchjob
-            editAppSpecific("First Payment Request Date","wfDateMMDDYYYY");
+            editAppSpecific("First Payment Request Date", wfDateMMDDYYYY);
         }
         if (wfStatus == "Subsequent Payment Request") {
             //Invoice Cover Letter, 2nd (18)
@@ -363,7 +363,7 @@ if (wfProcess == "CODE_ENF") { //New Workflow
             sendNotice2Recipients("Second_Invoice_Cover_Letter");
 
             //Eamil Fines Due to Staff (17) - batchjob
-            editAppSpecific("Subsequent Payment Request Date","wfDateMMDDYYYY");
+            editAppSpecific("Subsequent Payment Request Date", wfDateMMDDYYYY);
         }
 
         if (!(isCitationActive || isEnfActive || isNuisanceActive)) {
