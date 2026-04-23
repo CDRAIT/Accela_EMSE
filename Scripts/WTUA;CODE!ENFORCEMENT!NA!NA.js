@@ -28,9 +28,7 @@ var varAInfo = new Array();
 //To append wf process code.wftask. to TSI field label
 useTaskSpecificGroupName = true;
 loadTaskSpecific(varAInfo);
-
 if (wfProcess == "CODE_ENF") { //New Workflow
-
     var reportParams = aa.util.newHashMap();
     var emailParams = aa.util.newHashtable();
     var emailFrom = defaultFrom;
@@ -41,12 +39,28 @@ if (wfProcess == "CODE_ENF") { //New Workflow
     var reportName = "";
     var emailSubject = "";    //$$emailSubject$$
     var reportModule = "Code";
-	var reportFile = null;
-
+    var reportFile = null;
     var refAgenciesStdChoice = "SDL: CE_Ref_Agencies";
-    
+    //To control appStatus
+    var isCitationActive = false;
+    var isNuisanceActive = false;
+    var isEnfActive = false;
+    var isFineProActive = false;
 
-    addParameter(reportParams,"altID",capIDString);
+    if (isTaskActive("Enforcement Action")) { isEnfActive = true; }
+
+    if ((isTaskActive("Notice of Nuisance") || isTaskActive("Nuisance Outcome") ||
+        isTaskActive("Abatement Hearing") || isTaskActive("Reinspection Outcome") ||
+        isTaskActive("Abatement Processing") && !isEnfActive)) {
+        isNuisanceActive = true;
+    }
+    if ((isTaskActive("Citation") || isTaskActive("Appeal") || isTaskActive("Administrative Hearing")) && !isEnfActive) {
+        isCitationActive = true;
+    }
+
+    if (isTaskActive("Fine Processing") && !(isCitationActive || isEnfActive || isNuisanceActive)) { isFineProActive = true; }
+
+    addParameter(reportParams, "altID", capIDString);
 
     //preparing Email Parameters
     getRecordParams4Notification(emailParams);   //$$altID$$, $$capName$$, $$recordTypeAlias$$, $$capStatus$$, $$fileDate$$, $$balanceDue$$, $$workDesc$$
@@ -56,17 +70,17 @@ if (wfProcess == "CODE_ENF") { //New Workflow
     addParameter(emailParams, "$$compEmail$$", getAppSpecific("Complaintant Email"));
 
 
-    //assigns the record to the current user regardless of the tasks
-    if (matches(wfStatus, "Unfounded", "Referred & Closed", "Duplicate", "Withdrawn")) {
-        assignCap(currentUserID);
-    }
+    // Assigns record to the current user
+    if (matches(wfTask, "Complaint Received", "Investigation"))
+        if (matches(wfStatus, "Unfounded", "Referred & Closed", "Duplicate", "Withdrawn", "No Violation"))
+            assignCap(currentUserID);
 
     if (wfTask == "Complaint Received") {
         if (wfStatus == "Unfounded") {
             //Send Unfounded Letter to Applicant (2)
             emailTo = emailParams.get("$$compEmail$$");
             addParameter(emailParams, "$$emailSubject$$", "COMPLAINT OUTCOME");
-            logDebug("*** Complainant Email is : " + emailParams.get("$$compEmail$$"));
+            logDebug("Complainant Email is : " + emailParams.get("$$compEmail$$"));
             reportName = "Complaint Unfounded Letter";
             reportFile = generateReportTPS_CustomFileName(reportName, reportParams, reportModule, "Complaint_Outcome_Case# " + capIDString + ".pdf");
             if (!isBlank(emailTo))
@@ -75,14 +89,11 @@ if (wfProcess == "CODE_ENF") { //New Workflow
         }
 
         if (wfStatus == "Referred & Closed" || wfStatus == "Referred & Investigation") {
-            var agencies = getCodeReferralAgencyArray();
-
             //(1) Send Referral Email to Agencies (4)
             emailTemplate = "CE_REFERRAL_AGENCIES_NOTIFICTION";
-            agencies.forEach(function (item) {
-                emailTo += lookup(refAgenciesStdChoice, item) + ';';
-            });
-            if (varAInfo[wfProcess + "." + wfTask + "." + "Other"] == "CHECKED"){
+            emailTo += getRefAgncyContact();
+
+            if (varAInfo[wfProcess + "." + wfTask + "." + "Other"] == "CHECKED") {
                 logDebug("Other Agency Email: " + varAInfo[wfProcess + "." + wfTask + "." + "Other Email"]);
                 emailTo += varAInfo[wfProcess + "." + wfTask + "." + "Other Email"] + ";";
             }
@@ -106,14 +117,15 @@ if (wfProcess == "CODE_ENF") { //New Workflow
         }
     }
 
-    if (wfTask == "Investigation") { 
+    if (wfTask == "Investigation") {
         if (wfStatus == "Referred & Closed" || wfStatus == "Referred & Violation") {
-            var agencies = getCodeReferralAgencyArray();
+            //var agencies = getCodeReferralAgencyArray();
             //send Referral Email to Agencies (4)
+            emailTo += getRefAgncyContact();
             emailTemplate = "CE_REFERRAL_AGENCIES_NOTIFICTION";
-            agencies.forEach(function (item) {
-                emailTo += lookup(refAgenciesStdChoice, item) + ';';
-            });
+            // agencies.forEach(function (item) {
+            //     emailTo += lookup(refAgenciesStdChoice, item) + ';';
+            // });
             if (varAInfo[wfProcess + "." + wfTask + "." + "Other"] == "CHECKED")
                 emailTo += varAInfo[wfProcess + "." + wfTask + "." + "Other Email"] + ";";
             var sendResult = sendNotification(emailFrom, emailTo, emailCc, emailTemplate, emailParams, null);
@@ -133,6 +145,7 @@ if (wfProcess == "CODE_ENF") { //New Workflow
 
     if (wfTask == "Enforcement Action") {
         if (wfStatus == "NOV Mailed") {
+
             //Create and send NOV Letter (6)
             reportName = "Complaint Notice of Violation";
             addParameter(emailParams, "$$emailSubject$$", "NOTICE OF VIOLATION");
@@ -141,40 +154,147 @@ if (wfProcess == "CODE_ENF") { //New Workflow
         if (wfStatus == "Citation & Notice of Nuisance") {
             //Create the fork manually
             activateTask("Citation");
-            activateTask("Nuisance Outcome");
+            activateTask("Notice of Nuisance");
             closeTask("Enforcement Action", "Citation & Notice of Nuisance", "Closed by Script", "Forked by Script");
         }
-        if (wfStatus == "Notice of Nuisance" || wfStatus == "Citation & Notice of Nuisance") {
+        if ((wfStatus == "Citation" && isNuisanceActive) ||
+            (wfStatus == "Notice of Nuisance" && isCitationActive)) {
+            updateAppStatus("Citation & Nuisance", "Updated by WTUA script");
+        }
+        if (wfStatus == "Complied Voluntarily") {
+            if (isFineProActive) updateAppStatus("Fine Processing", "Updated by WTUA Script");
+            if (isCitationActive) updateAppStatus("Citation", "Updated by WTUA Script");
+            if (isNuisanceActive) updateAppStatus("Nuisance", "Updated by WTUA Script");
+            if (!(isCitationActive || isFineProActive || isFineProActive)) {
+                updateAppStatus("Voluntarily Complied", "Updated by WTUA script");
+                closeCap(currentUserID);
+            }
+        }
+    }
+
+    if (wfTask == "Notice of Nuisance") {
+        if (wfStatus == "Notice of Nuisance") {
+            editAppSpecific("Nuisance Letter Issuance Date", "wfDateMMDDYYYY");
             //Create Nuisance Letter (11)
             reportName = "Notice of Nuisance";
             addParameter(emailParams, "$$emailSubject$$", "NOTICE OF NUISANCE");
             sendNotice2Recipients("Nuisance_Notice");
+
+        }
+        if (wfStatus == "Complied") {
+            if (isCitationActive) updateAppStatus('Citation', 'Updated by WTUA script');
+            if (isFineProActive) updateAppStatus("Fine Processing", "upodated by WTUA script");
+            if (!(isCitationActive || isFineProActive || isEnfActive || isNuisanceActive)) {
+                updateAppStatus("Complied", "Updated by WTUA script");
+                closeCap(currentUserID);
+            }
+        }
+    }
+
+    if (wfTask == "Nuisance Outcome") {
+        if (wfStatus == "Complied") {
+            if (isCitationActive) updateAppStatus("Citation", "Updated by WTUA Script");
+            if (isFineProActive) updateAppStatus("Fine Processing", "Updated by WTUA Script");
+            if (!(isCitationActive || isFineProActive || isEnfActive || isNuisanceActive)) {
+                updateAppStatus("Complied", "Updated by WTUA script");
+                closeCap(currentUserID);
+            }
+        }
+    }
+
+    if (wfTask == "Abatement Hearing") {
+        if (matches(wfStatus, "Pending Hearing", "Continued")) {
+            //Nuicance Abatement Letter (13)
+            reportName = "Abatement Hearing Letter";
+            addParameter(emailParams, "$$emailSubject$$", "NOTICE OF NUISANCE ABATEMENT");
+            emailTo = emailParams.get("$$ownerEmail$$");
+            reportFile = generateReportTPS_CustomFileName(reportName, reportParams, reportModule, "Notice_of_Nuisance_Abatement_Case# " + capIDString + ".pdf");
+            if (!isBlank(emailTo))
+                if (emailTo.indexOf('@') != -1) {
+                    //send email with report attached
+                    var sendResult = sendNotification(emailFrom, emailTo, emailCc, generalEmailTemplate, emailParams, new Array(reportFile));
+                }
+        }
+
+        if (wfStatus == "Abatement Upheld") {
+            //Reinspection Email to staff (14) - or Create an inspection 
+            //BatchJob - save the WFdate in the ASI field
+            editAppSpecific("Nuisance Abatement Upheld Date", "wfDateMMDDYYYY");
+        }
+
+        if (wfStatus == "Complied" || wfStatus == "Dismissed") {
+            if (isEnfActive)
+                updateAppStatus("Enforcement Action", "Updated by WTUA Script");
+
+            if (isCitationActive)
+                updateAppStatus("Citation", "Updated by WTUA Script");
+
+            if (isFineProActive)
+                updateAppStatus("Fine Processing", "Updated by WTUA Script");
+
+            if (!(isCitationActive || isFineProActive || isEnfActive || isNuisanceActive)) {
+                if (wfStatus == "Dismissed") updateAppStatus("Dismissed", "Updated by WTUA script");
+                if (wfStatus == "Complied") updateAppStatus("Complied", "Updated by WTUA script");
+
+                closeCap(currentUserID);
+            }
+        }
+    }
+
+    if (wfTask == "Reinspection Outcome") {
+        if (wfStatus == "In Violation - Enf. & Abatement") {
+            // Create the fork manually            
+            activateTask("Enforcement Action");
+            if (isCitationActive) updateAppStatus("Enforcement & Citation", "Updated by WTUA Script");
+        }
+
+        if (wfStatus == "Complied") {
+            if (isEnfActive) updateAppStatus("Enforcement Action", "Updated by WTUA Script");
+            if (isCitationActive) updateAppStatus("Citation", "Updated by WTUA Script");
+            if (isFineProActive) updateAppStatus("Fine Processing", "Updated by WTUA Script");
+            if(!(isCitationActive||isEnfActive||isFineProActive)){
+                updateAppStatus("Complied", "updated by WTUA script");
+                closeCap(currentUserID);
+            }
+        }
+    }
+
+    if (wfTask == "Abatement Processing") {
+        if (wfStatus == "Abatement Complete")
+            if (isCitationActive) updateAppStatus("Citation", "Updated by WTUA Script");
+
+        if (wfStatus == "Complied") {
+            if (isCitationActive) updateAppStatus("Citation", "Updated by WTUA Script");
+            if (isFineProActive) updateAppStatus("Fine Processing", "Updated by WTUA Script");
+            if(!(isCitationActive||isEnfActive||isFineProActive)){
+                updateAppStatus("Complied", "Updated by WTUA script");
+                closeCap(currentUserID);
+            }
         }
     }
 
     if (wfTask == "Citation") {
         if (wfStatus == "Citation") {
             // Create and send Citation Letter (7)
-            var citationSeq = getAppSpecific("Number_of_Citations");
-            var seqString = "";
-            if(citationSeq == 1)
-                seqString = "First ";
-            else if(citationSeq == 2)
-                seqString = "Second ";
-            else if(citationSeq == 3)
-                seqString = "Third ";    
-
             reportName = "Complaint Citation Letter";
-            addParameter(emailParams, "$$emailSubject$$", seqString + "CITATION LETTER");
-            sendNotice2Recipients(seqString + "Citation_Letter");
+            addParameter(emailParams, "$$emailSubject$$", "CITATION LETTER");
+            sendNotice2Recipients("Citation_Letter");
+
+            editAppSpecific("Citation Issuance Date", "wfDateMMDDYYYY");
         }
 
         //First Revision updates
         if (wfStatus == "Notice of Nuisance") {
+            //updated in the last revision Apr 4th 2026
             //Create Nuisance Letter (11)
-            reportName = "Notice of Nuisance";
-            addParameter(emailParams, "$$emailSubject$$", "NOTICE OF NUISANCE");
-            sendNotice2Recipients("Nuisance_Notice");
+            // reportName = "Notice of Nuisance";
+            // addParameter(emailParams, "$$emailSubject$$", "NOTICE OF NUISANCE");
+            // sendNotice2Recipients("Nuisance_Notice");
+        }
+
+        if (wfStatus == "Complied") {
+            if (isNuisanceActive) updateAppStatus("Nuisance", "Updated by WTUA Script");
+            if (isFineProActive) updateAppStatus("Fine Processing", "Updated by WTUA Script");
         }
     }
 
@@ -182,7 +302,7 @@ if (wfProcess == "CODE_ENF") { //New Workflow
         if (wfStatus == "No Appeal") {
             //Create the fork manually
             activateTask("Citation");
-            updateAppStatus("Citation", "Updated by WTUA EMSE Event");
+            updateAppStatus("Citation", "Updated by WTUA Script");
         }
     }
 
@@ -203,48 +323,38 @@ if (wfProcess == "CODE_ENF") { //New Workflow
                     //send email with report attached
                     var sendResult = sendNotification(emailFrom, emailTo, emailCc, generalEmailTemplate, emailParams, new Array(reportFile));
                 }
-        }        
+        }
         if (wfStatus == "Citation Upheld") {
-            //save the wfdate in an ASI for - Batchjob
-
+            //save the wfdate in an ASI for Batchjob
+            editAppSpecific("Citation Upheld Date", "wfDateMMDDYYYY");
             //Create fork Manually
             activateTask("Enforcement Action");
-        }
-    }
 
-    if (wfTask == "Abatement Hearing") {
-        if (matches(wfStatus, "Pending Hearing", "Continued")) {
-            //Nuicance Abatement Letter (13)
-            reportName = "Abatement Hearing Letter";
-            addParameter(emailParams, "$$emailSubject$$", "NOTICE OF NUISANCE ABATEMENT");
-            emailTo = emailParams.get("$$ownerEmail$$");
-            reportFile = generateReportTPS_CustomFileName(reportName, reportParams, reportModule, "Notice_of_Nuisance_Abatement_Case# " + capIDString + ".pdf");
-            if (!isBlank(emailTo))
-                if (emailTo.indexOf('@') != -1) {
-                    //send email with report attached
-                    var sendResult = sendNotification(emailFrom, emailTo, emailCc, generalEmailTemplate, emailParams, new Array(reportFile));
-                }
+            if (isNuisanceActive)
+                updateAppStatus("Enforcement & Nuisance", "Updated by WTUA Script");
         }
-        if (wfStatus == "Abatement Upheld") {
-            //Reinspection Email to staff (14) - or Create an inspection 
-            //BatchJob - save the WFdate in the ASI field
-        }
-    }
 
-    if (wfTask == "Reinspection Outcome") {
-        if (wfStatus == "In Violation - Enforcement") {
-            // Create the fork manually            
-            activateTask("Enforcement Action");
+        if (wfStatus == "Complied" || wfStatus == "Dismissed") {
+            if (isNuisanceActive) updateAppStatus("Nuisance", "Updatede by WTUA Script");
+            if (isFineProActive) updateAppStatus("Fine Processing", "Updated by WTUA Script");
         }
-    }
 
+        if (wfStatus == "Dismissed")
+            if (!(isCitationActive || isEnfActive || isFineProActive || isNuisanceActive)) {
+                updateAppStatus("Dismissed", "Updated by WTUA Script");
+                closeCap(currentUserID)
+            }
+    }
+    
     if (wfTask == "Fine Processing") {
-        if (wfStatus == "First Payment Request") {
+        if (wfStatus == "Request for Payment") {
             //Create Invoice Cover Letter (16)
             reportName = "Invoice Cover Letter";
             addParameter(emailParams, "$$emailSubject$$", "INVOICE LETTER");
             sendNotice2Recipients("Invoice_Cover_Letter");
+
             //Eamil Fines Due to Staff (17) - Batchjob
+            editAppSpecific("First Payment Request Date","wfDateMMDDYYYY");
         }
         if (wfStatus == "Subsequent Payment Request") {
             //Invoice Cover Letter, 2nd (18)
@@ -253,27 +363,29 @@ if (wfProcess == "CODE_ENF") { //New Workflow
             sendNotice2Recipients("Second_Invoice_Cover_Letter");
 
             //Eamil Fines Due to Staff (17) - batchjob
+            editAppSpecific("Subsequent Payment Request Date","wfDateMMDDYYYY");
+        }
+
+        if (!(isCitationActive || isEnfActive || isNuisanceActive)) {
+            if (wfStatus == "Fines Paid")
+                updateAppStatus("Fines Paid", "Updated by WTUA Script");
+            if (wfStatus == "Secured Lien Filed")
+                updateAppStatus("Lien Filed", "Updated by WTUA Script");
+            if (wfStatus == "Simple Lien Resolved")
+                updateAppStatus("Lien Resolved", "Updated by WTUA Script");
         }
     }
 
-    /** Fisrt Revision Updates
-     * 
-     * Record Status should only reflect 'Fine Processing'
-     * if that is the only task remaining active.
-     */
+    // Record Status should only reflect 'Fine Processing' if that is the only task remaining active.     
     if ((wfTask == "Citation" && wfStatus == "Complied") ||
         (wfTask == "Appeal" && wfStatus == "No Appeal") ||
         (wfTask == "Administrative Hearing" && matches(wfStatus, "Citation Upheld", "Complied")) ||
-        (wfTask == "Abatement Processing" && wfStatus == "Abatement Complete")
-    ) {
-        if (!activeTasksCheckExcept("Fine Processing")) {
-            updateAppStatus("Fine Processing", "Updated by WTUA EMSE Event");
-        }
+        (wfTask == "Abatement Processing" && wfStatus == "Abatement Complete")) {
         //Send Process Fine email to Staff (15)    
         emailTemplate = "CE_STAFF_NOTIFICATION";
-        emailCc = (getAppSpecific("Project Office") == "Auburn") ? "CodeEnforce@placer.ca.gov" : "CodeEnforceTahoe@placer.ca.gov";
-        if(getAssignedToStaff())
-            emailTo = getUserEmail(getAssignedToStaff());
+        emailTo = (getAppSpecific("Project Office") == "Auburn") ? "CodeEnforce@placer.ca.gov" : "CodeEnforceTahoe@placer.ca.gov";
+        if (getAssignedToStaff())
+            emailCc = getUserEmail(getAssignedToStaff());
         var emailContentStr = "The above referenced case is ready for fee processing. Please generate and send the invoice to request payment.";
         addParameter(emailParams, "$$emailSubject$$", "PROCESS INVOICE");
         addParameter(emailParams, "$$contentString$$", emailContentStr);
@@ -281,84 +393,22 @@ if (wfProcess == "CODE_ENF") { //New Workflow
         if (!isBlank(emailTo))
             if (emailTo.indexOf('@') != -1)
                 var sendResult = sendNotification(emailFrom, emailTo, emailCc, emailTemplate, emailParams, null);
-    }
-
-    //Close cap after "Complied" on some tasks- Bcoz there r some exceptions!
-    if (matches(wfTask, "Nuisance Outcome", "Abatement Hearing", "Reinspection Outcome", "Abatement Processing") && wfStatus == "Complied") {
-        closeCap(currentUserID);
-    }
+    }    
 }
 
 /********************************* 
  Local Functions used here only
 *********************************/
+function getRefAgncyContact() {
+    var emailAddr = '';
+    var varAgncies = getStandardChoiceArray(refAgenciesStdChoice);
+    for (each in varAgncies)
+        if (varAgncies[each]["active"] == "A")
+            if (varAInfo[wfProcess + "." + wfTask + "." + varAgncies[each]["value"]] == "CHECKED")
+                emailAddr += varAgncies[each]["valueDesc"] + ";";
 
-/**
- * 
- * Returns True if finds an active task, ignores 'wfstr' task
- * @param {*} wfstr String; Exception task Name
- * @returns Boolean
- */
-function activeTasksCheckExcept(wfstr) {
-    var workflowResult = aa.workflow.getTasks(capId);
-    if (workflowResult.getSuccess())
-        wfObj = workflowResult.getOutput();
-    else {
-        logDebug("**ERROR: Failed to get workflow object: " + workflowResult.getErrorMessage());
-        return false;
-    }
-
-    for (i in wfObj) {
-        fTask = wfObj[i];
-        if (fTask.getTaskDescription().toUpperCase().equals(wfstr.toUpperCase()))
-            continue;
-        else (fTask.getActiveFlag().equals("Y"))
-        return true;
-    }
-
-    return false;
+    return emailAddr;
 }
-
-function getCodeReferralAgencyArray() {
-    var agencies = new Array("Anim Ctrl",
-        "APCD",
-        "Aub Code",
-        "BLD",
-        "CalFire",
-        "CHP",
-        "Colfax Code",
-        "DFW",
-        "DFW",
-        "DPW",
-        "EH",
-        "ESD",
-        "FFPD",
-        "Loomis Code",
-        "Mosquito Vector",
-        "NID",
-        "NTFPD",
-        "OVFD",
-        "PCWA",
-        "PLN",
-        "PNPF",
-        "Roads",
-        "Rocklin Code",
-        "Roseville Code",
-        "RPD",
-        "PYR",
-        "Sheriff",
-        "SPF",
-        "Stormwater",
-        "TFPD");
-
-    var checkedAgencies = new Array();
-    for (each in agencies) {
-        if (varAInfo[wfProcess + "." + wfTask + "." + agencies[each]] == "CHECKED")
-            checkedAgencies.push(agencies[each]);
-    }
-    return checkedAgencies;
-}
-
 
 /**
  * Gets the checked recepients and send email with attached report
@@ -393,10 +443,10 @@ function sendNotice2Recipients(fileName) {
             }
             if (!isBlank(emailTo))
                 if (emailTo.indexOf('@') != -1) {
-                    //send email with report attached
-                    var sendResult = sendNotification(emailFrom, emailTo, emailCc, generalEmailTemplate, emailParams, new Array(reportFile));
-                    //logDebug(sendResult);
+
+                    //Revision Apr 7th, 2026
+                    if (!matches(wfStatus, "Request for Payment", "Subsequent Payment Request"))
+                        var sendResult = sendNotification(emailFrom, emailTo, emailCc, generalEmailTemplate, emailParams, new Array(reportFile));
                 }
         }
 }
-

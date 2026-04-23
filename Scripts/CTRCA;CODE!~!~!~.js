@@ -19,6 +19,7 @@ if (publicUser) {
 
     editAppSpecific("Application Received", "Online");    
 
+    //Confirm this with Kayla later
     var notificationTemplate = "STAFF_NEW_ONLINE_CASE_SUBMITTED_CODE"; /* This is for Staff notice */
     var complainantName = "";
     var complainantEmail = "";
@@ -36,6 +37,9 @@ if (publicUser) {
         complainantName = getAppSpecific("Complaintant");
         complainantEmail = getAppSpecific("Complaintant Email");
         complainantPhone = getAppSpecific("Complaintant Phone");
+
+        //Revision Apr 7th, 2026
+        sendAcknowledgementLtr2Applicant();
     }
 
     if (appTypeArray[1] == "Vehicle Abatement") {

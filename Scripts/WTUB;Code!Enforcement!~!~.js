@@ -14,19 +14,22 @@
 |
 /--------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 
+showMessage = false;
+showDebug = false;
+
 if (currentUserID == "EAFTAHI") { showDebug = 1; }
 logDebug("In the WTUB:Code/Enforcement/*/* ...");
-showMessage = false;
 
-if (wfTask == "Citation") {
-    if (wfStatus == "Citation") {
-        var vCitationSeq = getAppSpecific("Number_of_Citations");
-        if (vCitationSeq + 1 < 4)
-            editAppSpecific("Number_of_Citations", vCitationSeq + 1);
-        else {
-            showMessage = true;
-            customComment("Error - Three citations already created to this complaint!");
-            cancle = true;
-        }
-    }
-}
+//Revision Apr 4th, 2026
+// if (wfTask == "Citation") {
+//     if (wfStatus == "Citation") {
+//         var vCitationSeq = getAppSpecific("Number_of_Citations");
+//         if (vCitationSeq + 1 < 4)
+//             editAppSpecific("Number_of_Citations", vCitationSeq + 1);
+//         else {
+//             showMessage = true;
+//             customComment("Error - Three citations already created to this complaint!");
+//             cancle = true;
+//         }
+//     }
+// }
