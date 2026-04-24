@@ -1056,7 +1056,10 @@ if(wfProcess == "BLD_20230501_MAIN")
 		activateTask("Building Plan Check",wfProcess);
 		assignThisTask(thisTask,wfProcess);
 		editTaskDueDate(thisTask,dateAdd(null,addNumDays,"Y"));
-		
+        if(isTaskStatus(thisTask,"Corrections Required") || isTaskStatus(thisTask,"Approved Pending Resubmittal"))
+		{
+			updateTask(thisTask,"Resubmittal Received","",""); 
+		}		
 		if(matches(AInfo["Scope of Work"],"SFD Production") && !isTaskActive("Sewer Permit Issuance") && !isTaskStatus("Sewer Permit Issuance","Complete"))
 		{
 			activateTask("Sewer Permit Issuance",wfProcess);
@@ -2040,6 +2043,7 @@ if(wfProcess == "BLD_20230501_MAIN")
 			{
 				updateAppStatus("Final Processing","All preissuance tasks Complete or inactive. Updated by script");
 				updateTask("Process for Issuance","Final Processing","All preissuance tasks Complete or inactive. Updated by script","",wfProcess);
+				editTaskDueDate("Process for Issuance",dateAdd(null,2,"Y"),wfProcess);
 			}
 		}
 	}

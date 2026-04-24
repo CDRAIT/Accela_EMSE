@@ -18,6 +18,7 @@ var documentOnly = false; 			// Document Only -- displays hierarchy of std choic
 /*------------------------------------------------------------------------------------------------------/
 | END: USER CONFIGURABLE PARAMETERS
 /------------------------------------------------------------------------------------------------------*/
+
 /*------------------------------------------------------------------------------------------------------/
 | START: Batch specific variables
 /------------------------------------------------------------------------------------------------------*/
@@ -30,40 +31,51 @@ var batchStartTime = batchStartDate.getTime();                                  
 var timeExpired = false;                                                                // Variable to identify if batch script has timed out. Defaulted to "false".
 var systemUserObj = aa.person.getUser("ADMIN").getOutput();
 var useAppSpecificGroupName = false;                                                    // Use Group name when populating App Specific Info Values
-var senderEmailAddr = "pcapcd@placer.ca.gov";                                          // Email address of the sender
-var emailAddress = "rmoore@placer.ca.gov";    			                                // Email address of the person who will receive the batch script log information
-var emailAddress2 = "";                                             					// CC email address of the person who will receive the batch script log information
+var senderEmailAddr = "placercounty_noreply@accela.com";                                          // Email address of the sender
+var emailAddress = "rmoore@placer.ca.gov";                                    			  // Email address of the person who will receive the batch script log information
+var emailAddress2 = "";                                                                 // CC email address of the person who will receive the batch script log information
 var emailText = "";                                                                     // Email body
+var appdate1 = aa.date.getCurrentDate();
+var emailcount = 0;
 //Parameter variables
 var paramsOK = true;
+
 /*------------------------------------------------------------------------------------------------------/
 | END: Batch Specific Variables
 /------------------------------------------------------------------------------------------------------*/
+
 /*------------------------------------------------------------------------------------------------------/
 | <===========Main=Loop================>
 |
 /------------------------------------------------------------------------------------------------------*/
+
 if (paramsOK) {
-    logMessage("START", "Start of Sending of Throughput Batch Job.");
+    logMessage("START", "Start of Sending Throughput Late Batch Job.");
 
     var licAboutToExpCnt = aboutExpLics();
-
     logMessage("INFO", "Number of records processed: " + licAboutToExpCnt + ".");
-    logMessage("END", "End of Sending of Throughput Batch Job: Elapsed Time : " + elapsed() + " Seconds.");
+	logMessage("INFO", "Number of emails sent: " + emailcount + ".");
+    logMessage("END", "End of Sending Throughput Late Batch Job: Elapsed Time : " + elapsed() + " Seconds.");
 }
 
 if (emailAddress.length)
-    aa.sendMail(senderEmailAddr, emailAddress, emailAddress2, batchJobName + " Results for Sending of Throughput", emailText);
+    aa.sendMail(senderEmailAddr, emailAddress, emailAddress2, batchJobName + " Results for Sending Throughput Late", emailText);
 /*------------------------------------------------------------------------------------------------------/
 | <===========END=Main=Loop================>
 /------------------------------------------------------------------------------------------------------*/
+
 /*------------------------------------------------------------------------------------------------------/
 | <===========External Functions (used by Action entries)
 /------------------------------------------------------------------------------------------------------*/
 function aboutExpLics() {
-    var capCount = 0; 
-	var CAPIDS = [];
-    var expResult1 = aa.cap.getCapIDsByAppSpecificInfoField("Quarter Billing","1st qtr").getOutput();
+ var capCount = 0;
+
+
+	var CAPIDS = []
+	var FACIDS = [];
+		var CAPIDS = []
+	var expResult1 = aa.cap.getCapIDsByAppSpecificInfoField("Quarter Billing","test qtr").getOutput();
+//    var expResult1 = aa.cap.getCapIDsByAppSpecificInfoField("Quarter Billing","1st qtr").getOutput();
 //	var expResult1 = aa.cap.getCapIDsByAppSpecificInfoField("Quarter Billing","2nd qtr").getOutput();
 //	var expResult1 = aa.cap.getCapIDsByAppSpecificInfoField("Quarter Billing","3rd qtr").getOutput();
 //	var expResult1 = aa.cap.getCapIDsByAppSpecificInfoField("Quarter Billing","4th qtr").getOutput();
@@ -72,104 +84,43 @@ for ( i in expResult1)
 {
 CAPIDS.push(expResult1[i])
 }
-//for ( i in expResult2)
-//{
-//CAPIDS.push(expResult2[i])
-//}
-//for ( i in expResult3)
-//{
-//CAPIDS.push(expResult3[i])
-//}
-//for ( i in expResult4)
-//{
-//CAPIDS.push(expResult4[i])
-//}
-  for (x in CAPIDS) // for each b1expiration (effectively, each license app) 
-    {
-       var capId = CAPIDS[x].getCapID();
-	   var ICContact = getContactEmailByContactType("Throughput",capId);
-       var ROContact = getContactEmailByContactType("Responsible Official",capId);
-	   var Thru = getAppSpecific("Throughput Sent",capId);
-  	   var Thrureceived = getAppSpecific("Throughput Received",capId);
-	   var Thruwarning = getAppSpecific("Throughput Warning Sent",capId);
-	   var cap = aa.cap.getCap(capId).getOutput();
-	   var capstatus = cap.getCapStatus();
-	   var FACcapId = getCapId(CAPIDS[x].getID1(), CAPIDS[x].getID2(), CAPIDS[x].getID3());
-	   var tempcapid =  aa.cap.getCap(FACcapId).getOutput();
-	   var customID = FACcapId.getCustomID();
- 	   var FacAppName = String(tempcapid.getSpecialText());
-	   var temail = "rmoore@placer.ca.gov";
-	   var childcount = getAppSpecific("ChildCount",capId)   ; //getChildrencount("AirQuality/*/Permit to Operate/*",FACcapId);
 
-	   
-	   
-	if((ICContact != "" && ROContact != "") && capstatus  == "Active" && Thru == "CHECKED" && childcount >=1 && Thru == "CHECKED" && (Thrureceived == null || Thrureceived == "UNCHECKED") && (Thruwarning == "UNCHECKED" || Thruwarning == null))
-	   {
-	   temail = ICContact + ";" + ROContact;
-	   	   		 paramMap = aa.util.newHashMap();
-				 paramMap.put("FacNumber",String(customID)); 
-				 emailParameters = aa.util.newHashtable();
-				 addParameter(emailParameters,"$$FACILITYNAME$$",FacAppName); //Email Notification 
-			     report = generateReport("Throughput Warning",paramMap,"AirQuality",capId);
-		         logDebug("DEBUG: send email Report 1" + report);
-				 sendtest = sendNotification("pcapcd@placer.ca.gov",temail,"rmoore@placer.ca.gov","AQ_THROUGHPUT_WARNING",emailParameters,new Array(report),capId);
-				 logDebug("DEBUG: Found Facility CustomID = " + customID + ".  Email address for Contact = " + temail);
-				 if (sendtest == "true")
-				 {
-					editAppSpecific("Throughput Warning Sent","CHECKED",capId);
-				 }
-	   }
-	   if((ICContact != "" && ROContact == "") && capstatus  == "Active" && Thru == "CHECKED" && childcount >=1 && Thru == "CHECKED" && (Thrureceived == null || Thrureceived == "UNCHECKED") && (Thruwarning == "UNCHECKED" || Thruwarning == null))
-	   {
-	   temail = ICContact;
-	   	   	   	 paramMap = aa.util.newHashMap();
-				 paramMap.put("FacNumber",String(customID)); //        ?????????????????
-				 emailParameters = aa.util.newHashtable();
-				 addParameter(emailParameters,"$$FACILITYNAME$$",FacAppName); //Email Notification 
-		//		 addParameter(emailParameters,"$$FACILITYNAME$$",customID); //Email Notification 1
-				 report = generateReport("Throughput Warning",paramMap,"AirQuality",capId);
-				 sendtest = sendNotification("pcapcd@placer.ca.gov",temail,"rmoore@placer.ca.gov","AQ_THROUGHPUT_WARNING",emailParameters,new Array(report),capId);
-				 if (sendtest == "true")
-				 {
-					editAppSpecific("Throughput Warning Sent","CHECKED",capId);
-				 }
-	   }
-	   if((ICContact == "" && ROContact != "")  && capstatus  == "Active" && Thru == "CHECKED" && childcount >=1 && Thru == "CHECKED" && (Thrureceived == null || Thrureceived == "UNCHECKED") && (Thruwarning == "UNCHECKED" || Thruwarning == null))
-	   {
-	   temail = ROContact;
-	   	   	   	 paramMap = aa.util.newHashMap();
-				 paramMap.put("FacNumber",String(customID)); //        ?????????????????
-				 emailParameters = aa.util.newHashtable();
-				 addParameter(emailParameters,"$$FACILITYNAME$$",FacAppName); //Email Notification 
-			//	 addParameter(emailParameters,"$$FACILITYNAME$$",customID); //Email Notification 1
-				 report = generateReport("Throughput Warning",paramMap,"AirQuality",capId);
-				 sendtest = sendNotification("pcapcd@placer.ca.gov",temail,"rmoore@placer.ca.gov","AQ_THROUGHPUT_WARNING",emailParameters,new Array(report),capId);
-				 if (sendtest == "true")
-				 {
-					editAppSpecific("Throughput Warning Sent","CHECKED",capId);
-				 }
-	   }
-	   if((ICContact == "" && ROContact == "") && capstatus  == "Active" && Thru == "CHECKED" && childcount >=1 && Thru == "CHECKED" && (Thrureceived == null || Thrureceived == "UNCHECKED") && (Thruwarning == "UNCHECKED" || Thruwarning == null))
-	   {
-	 temail = "rmoore@placer.ca.gov";
-	   	   	   	 paramMap = aa.util.newHashMap();
-				 paramMap.put("FacNumber",String(customID)); //        ?????????????????
-				 emailParameters = aa.util.newHashtable();
-				 addParameter(emailParameters,"$$FACILITYNAME$$",FacAppName); //Email Notification 
-				 report = generateReport("Throughput Warning",paramMap,"AirQuality",capId);
-				 sendtest = sendNotification("pcapcd@placer.ca.gov",temail,"rmoore@placer.ca.gov","AQ_THROUGHPUT_WARNING",emailParameters,new Array(report),capId);
-				 if (sendtest == "true")
-				 {
-					editAppSpecific("Throughput Warning Sent","CHECKED",capId);
-				 }
-	   }
-	       capCount++;
-     }
-	 
-	 
-	 
-    return capCount;
+    for (x in CAPIDS) 
+    {
+		//var capId = aa.cap.getCapID(CAPIDS[x]).getOutput(); needed if you want to specify the altIds in CAPIDS array
+		var capId = CAPIDS[x].getCapID();
+		var cap = aa.cap.getCap(capId).getOutput(); // Cap Object
+		capName = cap.getSpecialText();
+		capStatus = cap.getCapStatus();
+		capIDString = cap.getCapModel().getAltID();
+		if(capStatus != "Closed")
+		{
+//			var permitId = getParentPlacer(capId);
+	//		var facID = aa.cap.getCapID(getAppSpecific("Facility Number",permitId)).getOutput();
+
+
+			var thrucheck = getAppSpecific("Throughput Sent",capId);
+			var thrunotreceived = getAppSpecific("Throughput Received",capId);
+			var thruwarnsent = getAppSpecific("Throughput Warning Sent",capId);
+			
+			logMessage("INFO", "thrucheck: " + thrucheck + ".");
+			logMessage("INFO", "thruwarnsent: " + thruwarnsent + ".");
+
+			logMessage("INFO", "thrunotreceived: " + thrunotreceived + ".");
+			
+			if (thrucheck == "CHECKED" && (thrunotreceived != "CHECKED" || thrunotreceived == null)   && (thruwarnsent != "CHECKED" || thruwarnsent == null)        )
+			{
+				createRefContactsFromCapContactsAndLink(capId,null,null,null,true,null);
+				editAppSpecific("Throughput Warning Sent","CHECKED",capId);
+				
+			}//end of troughput sent check
+		}//end of capStatus check
+		capCount++;
+	}//end of for loop
+	return capCount;
+	
 }
+
 /*------------------------------------------------------------------------------------------------------/
 | <===========Internal Functions and Classes (Used by this script)
 /------------------------------------------------------------------------------------------------------*/
@@ -178,12 +129,296 @@ function elapsed() {
     var thisTime = thisDate.getTime();
     return ((thisTime - batchStartTime) / 1000)
 }
+
 // exists:  return true if Value is in Array
 function exists(eVal, eArray) {
     for (ii in eArray)
         if (eArray[ii] == eVal) return true;
     return false;
 }
+function createRefContactsFromCapContactsAndLink(pCapId, contactTypeArray, ignoreAttributeArray, replaceCapContact, overwriteRefContact, refContactExists)
+	{
+
+	// contactTypeArray is either null (all), or an array or contact types to process
+	//
+	// ignoreAttributeArray is either null (none), or an array of attributes to ignore when creating a REF contact
+	//
+	// replaceCapContact not implemented yet
+	//
+	// overwriteRefContact -- if true, will refresh linked ref contact with CAP contact data
+	//
+	// refContactExists is a function for REF contact comparisons.
+	//
+	// Version 2.0 Update:   This function will now check for the presence of a standard choice "REF_CONTACT_CREATION_RULES".
+	// This setting will determine if the reference contact will be created, as well as the contact type that the reference contact will
+	// be created with.  If this setting is configured, the contactTypeArray parameter will be ignored.   The "Default" in this standard
+	// choice determines the default action of all contact types.   Other types can be configured separately.
+	// Each contact type can be set to "I" (create ref as individual), "O" (create ref as organization),
+	// "F" (follow the indiv/org flag on the cap contact), "D" (Do not create a ref contact), and "U" (create ref using transaction contact type).
+
+	var standardChoiceForBusinessRules = "REF_CONTACT_CREATION_RULES";
+	var ingoreArray = new Array();
+	if (arguments.length > 1) ignoreArray = arguments[1];
+	var defaultContactFlag = lookup(standardChoiceForBusinessRules,"Default");
+	var c = aa.people.getCapContactByCapID(pCapId).getOutput()
+	var cCopy = aa.people.getCapContactByCapID(pCapId).getOutput()  // must have two working datasets
+	for (var i in c)
+	   {
+	   var ruleForRefContactType = "U"; // default behavior is create the ref contact using transaction contact type
+	   var con = c[i];
+	   var p = con.getPeople();
+	   var contactFlagForType = lookup(standardChoiceForBusinessRules,p.getContactType());
+	   if (!defaultContactFlag && !contactFlagForType) // standard choice not used for rules, check the array passed
+	   	{
+	   	if (contactTypeArray && !exists(p.getContactType(),contactTypeArray))
+			continue;  // not in the contact type list.  Move along.
+		}
+	   if (!contactFlagForType && defaultContactFlag) // explicit contact type not used, use the default
+	   	{
+	   	ruleForRefContactType = defaultContactFlag;
+	   	}
+	   if (contactFlagForType) // explicit contact type is indicated
+	   	{
+	   	ruleForRefContactType = contactFlagForType;
+	   	}
+	   if (ruleForRefContactType.equals("D"))
+	   	continue;
+	   var refContactType = "";
+	   switch(ruleForRefContactType)
+	   	{
+		   case "U":
+		     refContactType = p.getContactType();
+		     break;
+		   case "I":
+		     refContactType = "Individual";
+		     break;
+		   case "O":
+		     refContactType = "Organization";
+		     break;
+		   case "F":
+		     if (p.getContactTypeFlag() && p.getContactTypeFlag().equals("organization"))
+		     	refContactType = "Organization";
+		     else
+		     	refContactType = "Individual";
+		     break;
+		}
+		
+		//Invoice Contact
+		//Facility
+		//Responsible Official
+		//Throughput
+		//Inspection Contact
+		//Company
+		//Preparer
+
+	   var refContactNum = con.getCapContactModel().getRefContactNumber();
+
+	   if (refContactNum)  // This is a reference contact.   Let's refresh or overwrite as requested in parms.
+	   	{
+	   	if (overwriteRefContact)
+	   		{
+	   		p.setContactSeqNumber(refContactNum);  // set the ref seq# to refresh
+	   		p.setContactType(refContactType);
+	   						var a = p.getAttributes();
+							if (a)
+								{
+								var ai = a.iterator();
+								while (ai.hasNext())
+									{
+									var xx = ai.next();
+									xx.setContactNo(refContactNum);
+									}
+					}
+	   		var r = aa.people.editPeopleWithAttribute(p,p.getAttributes());
+			if (!r.getSuccess())
+				logDebug("WARNING: couldn't refresh reference people : " + r.getErrorMessage());
+			else
+				logDebug("Successfully refreshed ref contact #" + refContactNum + " with CAP contact data");
+			    fileNames = [];
+				emailParameters = aa.util.newHashtable();
+				addParameter(emailParameters,"$$FACILITY_NAME$$",capName);
+				addParameter(emailParameters,"$$USERNAME$$",con.getEmail());
+				addParameter(emailParameters,"$$TP_YEAR$$",String(appdate1.getYear()-1));
+				addParameter(emailParameters,"$$TP_YEAR$$",String(appdate1.getYear()-1));
+				addParameter(emailParameters,"$$TP_YEAR$$",String(appdate1.getYear()-1));
+				addParameter(emailParameters,"$$CUR_YEAR$$",String(appdate1.getYear()));
+				addParameter(emailParameters,"$$CUR_YEAR$$",String(appdate1.getYear()));
+				addParameter(emailParameters,"$$CUR_YEAR$$",String(appdate1.getYear()));
+				sendtest = sendNotification(senderEmailAddr,con.getEmail(),"","AQ_THROUGHPUT_LATE",emailParameters,fileNames,pCapId);
+			}
+	   	if (replaceCapContact)
+	   		{
+				// To Be Implemented later.   Is there a use case?
+			}
+
+	   	}
+	   	else  // user entered the contact freehand.   Let's create or link to ref contact.
+	   	{
+			var ccmSeq = p.getContactSeqNumber();
+			var existingContact = false; //refContactExists(p);  // Call the custom function to see if the REF contact exists
+			var p = cCopy[i].getPeople();  // get a fresh version, had to mangle the first for the search
+			if (existingContact)  // we found a match with our custom function.  Use this one.
+				{
+					refPeopleId = existingContact;
+				}
+			else  // did not find a match, let's create one
+				{
+				var a = p.getAttributes();
+				if (a)
+					{
+					//
+					// Clear unwanted attributes
+					var ai = a.iterator();
+					while (ai.hasNext())
+						{
+						var xx = ai.next();
+						if (ignoreAttributeArray && exists(xx.getAttributeName().toUpperCase(),ignoreAttributeArray))
+							ai.remove();
+						}
+					}
+
+				p.setContactType(refContactType);
+				var r = aa.people.createPeopleWithAttribute(p,a);
+				if (!r.getSuccess())
+					{logDebug("WARNING: couldn't create reference people : " + r.getErrorMessage()); continue; }
+
+				//
+				// createPeople is nice and updates the sequence number to the ref seq
+				//
+				var p = cCopy[i].getPeople();
+				var refPeopleId = p.getContactSeqNumber();
+				logDebug("Successfully created reference contact #" + refPeopleId);
+				// Need to link to an existing public user.
+			    var getUserResult = aa.publicUser.getPublicUserByEmail(con.getEmail())
+			    if (getUserResult.getSuccess() && getUserResult.getOutput()) {
+			        var userModel = getUserResult.getOutput();
+			        logDebug("createRefContactsFromCapContactsAndLink: Found an existing public user: " + userModel.getUserID());
+					if (refPeopleId)	{
+						logDebug("createRefContactsFromCapContactsAndLink: Linking this public user with new reference contact : " + refPeopleId);
+						aa.licenseScript.associateContactWithPublicUser(userModel.getUserSeqNum(), refPeopleId);
+						}
+					}
+					else
+					{
+					createPublicUserFromContact(pCapId,"Throughput", refPeopleId);
+					}
+				}
+
+			//
+			// now that we have the reference Id, we can link back to reference
+			//
+
+		    var ccm = aa.people.getCapContactByPK(pCapId,ccmSeq).getOutput().getCapContactModel();
+
+		    ccm.setRefContactNumber(refPeopleId);
+		    r = aa.people.editCapContact(ccm);
+
+		    if (!r.getSuccess())
+				{ logDebug("WARNING: error updating cap contact model : " + r.getErrorMessage()); }
+			else
+				{ logDebug("Successfully linked ref contact " + refPeopleId + " to cap contact " + ccmSeq);}
+
+
+	    }  // end if user hand entered contact
+	}  // end for each CAP contact
+} 
+function createPublicUserFromContact(capId,contactType,refContactNum)   
+{
+    var contact;
+    var userModel;
+
+    var capContactResult = aa.people.getCapContactByCapID(capId);
+    if (capContactResult.getSuccess()) {
+		var Contacts = capContactResult.getOutput();
+        for (yy in Contacts) {
+            if (contactType.equals(Contacts[yy].getCapContactModel().getPeople().getContactType()))
+				contact = Contacts[yy];
+        }
+    }
+    
+    if (!contact)
+    { logDebug("Couldn't create public user for " + contactType + ", no such contact"); return false; }
+
+    if (!contact.getEmail())
+    { logDebug("Couldn't create public user for " + contactType + ", no email address"); return false; }
+
+    // check to see if public user exists already based on email address
+    var getUserResult = aa.publicUser.getPublicUserByEmail(contact.getEmail())
+    if (getUserResult.getSuccess() && getUserResult.getOutput()) {
+        userModel = getUserResult.getOutput();
+        logDebug("CreatePublicUserFromContact: Found an existing public user: " + userModel.getUserID());
+	}
+
+    if (!userModel) // create one
+    	{
+	    logDebug("CreatePublicUserFromContact: creating new user based on email address: " + contact.getEmail()); 
+	    var publicUser = aa.publicUser.getPublicUserModel();
+	    publicUser.setFirstName(contact.getFirstName());
+	    publicUser.setLastName(contact.getLastName());
+	    publicUser.setEmail(contact.getEmail());
+	    publicUser.setUserID(contact.getEmail());
+	    publicUser.setPassword("e8248cbe79a288ffec75d7300ad2e07172f487f6"); //password : 1111111111
+	    publicUser.setAuditID("PublicUser");
+	    publicUser.setAuditStatus("A");
+	    publicUser.setCellPhone(contact.getCapContactModel().getPeople().getPhone2());
+		publicUser.setNeedChangePassword("Y");
+
+	    var result = aa.publicUser.createPublicUser(publicUser);
+	    if (result.getSuccess()) {
+		logDebug("Created public user " + contact.getEmail() + "  sucessfully.");
+		var userSeqNum = result.getOutput();
+		var userModel = aa.publicUser.getPublicUser(userSeqNum).getOutput()
+
+		// create for agency
+		aa.publicUser.createPublicUserForAgency(userModel);
+
+		// activate for agency
+		var userPinBiz = aa.proxyInvoker.newInstance("com.accela.pa.pin.UserPINBusiness").getOutput()
+			userPinBiz.updateActiveStatusAndLicenseIssueDate4PublicUser("PLACERCO",userSeqNum,"ADMIN");
+
+			// reset password
+			var resetPasswordResult = aa.publicUser.resetPassword(contact.getEmail());
+			if (resetPasswordResult.getSuccess()) {
+				var resetPassword = resetPasswordResult.getOutput();
+				userModel.setPassword(resetPassword);
+				logDebug("Reset password for " + contact.getEmail() + "  sucessfully.");
+			} else {
+				logDebug("**ERROR: Reset password for  " + contact.getEmail() + "  failure:" + resetPasswordResult.getErrorMessage());
+			}
+				fileNames = [];
+				emailParameters = aa.util.newHashtable();
+				addParameter(emailParameters,"$$FACILITY_NAME$$",capName);
+				addParameter(emailParameters,"$$USERNAME$$",userModel.getUserID());
+				addParameter(emailParameters,"$$TP_YEAR$$",String(appdate1.getYear()-1));
+
+
+
+
+				sendtest = sendNotification(senderEmailAddr,userModel.getEmail(),"","AQ_PUBLIC_USER",emailParameters,fileNames,capId);
+
+		// send Activate email
+		//aa.publicUser.sendActivateEmail(userModel, true, true);
+
+		// send another email
+		//aa.publicUser.sendPasswordEmail(userModel);
+	    }
+    	else {
+    	    logDebug("**Warning creating public user " + contact.getEmail() + "  failure: " + result.getErrorMessage()); return null;
+    	}
+    }
+
+//  Now that we have a public user let's connect to the reference contact		
+	
+if (refContactNum)
+	{
+	logDebug("CreatePublicUserFromContact: Linking this public user with reference contact : " + refContactNum);
+	aa.licenseScript.associateContactWithPublicUser(userModel.getUserSeqNum(), refContactNum);
+	}
+	
+
+return userModel; // send back the new or existing public user
+}
+
 function dateAdd(td, amt)
 // perform date arithmetic on a string
 // td can be "mm/dd/yyyy" (or any string that will convert to JS date)
@@ -194,6 +429,7 @@ function dateAdd(td, amt)
     var useWorking = false;
     if (arguments.length == 3)
         useWorking = true;
+
     if (!td)
         dDate = new Date();
     else
@@ -319,7 +555,7 @@ function getContactEmailByContactType(pContactType,capid)
 			if(contactTypeForCompare == pContactType)
 			{
 				contactEmailToReturn = capContactArray[yy].getPeople().email;
-//				logDebug("DEBUG: Found Contact with Type = " + pContactType + ".  Email address for Contact = " + contactEmailToReturn);
+				//logDebug("DEBUG: Found Contact with Type = " + pContactType + ".  Email address for Contact = " + contactEmailToReturn);
 				break;
 			}
 		}
@@ -330,7 +566,7 @@ function getContactEmailByContactType(pContactType,capid)
 		contactEmailToReturn = "";
 	}
 	
-//	logDebug("Returning contact email address: " + contactEmailToReturn);
+	//logDebug("Returning contact email address: " + contactEmailToReturn);
 	return contactEmailToReturn;
 }	
 function getinvoicebalance(InvNbr,capId)
@@ -440,6 +676,7 @@ function sendNotification(emailFrom,emailTo,emailCC,templateName,params,reportFi
 	if(result.getSuccess())
 	{
 		logDebug("Sent email successfully to " + emailTo + "!");
+		emailcount++;
 		return true;
 	}
 	else
@@ -1039,3 +1276,45 @@ function addToASITable(tableName,tableValues,capId)
 	else
 		logDebug("Successfully added record to ASI Table: " + tableName);
 	}
+function getlatefeebalance(capid)
+{
+var balance = 0;
+var feeResult = aa.fee.getFeeItems(capid,"AQ_LATEFEES","INVOICED").getOutput();
+	for (x in feeResult)
+	{
+	balance += feeResult[x].getFee()
+	}
+return balance;	
+}	
+function getLatestInvoiceNumber(capid)
+{
+	var invoices = aa.finance.getInvoiceByCapID(capid,null).getOutput();
+	var invoice = [];
+	for(x in invoices)
+	{
+	invoice.push(invoices[x].getInvNbr())
+	}
+	return Math.max.apply(null, invoice)
+}
+function getlatefeebalance(capid)
+{
+var balance = 0;
+var feeResult = aa.fee.getFeeItems(capid,"AQ_LATEFEES","INVOICED").getOutput();
+	for (x in feeResult)
+	{
+	balance += feeResult[x].getFee()
+	}
+return balance;	
+}
+
+function getLatestInvoiceNumber(capid)
+{
+	var invoices = aa.finance.getInvoiceByCapID(capid,null).getOutput();
+	var invoice = [];
+	for(x in invoices)
+	{
+	invoice.push(invoices[x].getInvNbr())
+	}
+	return Math.max.apply(null, invoice)
+}
+

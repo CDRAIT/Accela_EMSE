@@ -53,6 +53,7 @@
 |         : TDunn 01/22/2026 added test for null for FIREINSP parcel attributes
 |         : TDunn 03/05/2026 added Approval Notification to applicant, Owner
 |         : TDunn 03/19/2026 deployed to production
+|         : TDunn 04/17/2026 added review due date logic for TRPA revisions
 | 
 /---------------------------------------------------------------------------------------------------------------------------------*/
 
@@ -278,7 +279,26 @@ if(matches(appTypeArray[1],"Revision") && wfProcess == "BLD_20231116_REV")
 			if(thisCheckType == "Over the Counter") pcheckType = "OTC";
 			dueDateRecType = "Res" + pcheckType;		
 		}
-	}	
+	}
+	
+	if(pappTypeArray[0] == "TRPA")
+	{
+	
+		if(pappTypeArray[2] == "Residential")
+		{
+			pcheckType = "Full";
+			if(thisCheckType == "Quick Check") pcheckType = "Quick";
+			if(thisCheckType == "Over the Counter") pcheckType = "OTC"
+			dueDateRecType = "Res" + pcheckType;			
+		}
+		if(pappTypeArray[2] == "Non-Residential")
+		{
+			pcheckType = "Full";
+			if(thisCheckType == "Quick Check") pcheckType = "Quick";
+			if(thisCheckType == "Over the Counter") pcheckType = "OTC"
+			dueDateRecType = "Com" + pcheckType;			
+		}
+	}		
 
 	if(pappTypeArray[1] == "Commercial")
 	{
@@ -1982,7 +2002,8 @@ if(matches(appTypeArray[1],"Revision") && wfProcess == "BLD_20231116_REV")
 			if(allPreComplete)
 			{
 				updateAppStatus("Final Processing","All preissuance tasks Complete or inactive. Updated by script");
-				updateTask("Process for Issuance","Final Processing","All preissuance tasks Complete or inactive. Updated by script","",wfProcess);				
+				updateTask("Process for Issuance","Final Processing","All preissuance tasks Complete or inactive. Updated by script","",wfProcess);
+				editTaskDueDate("Process for Issuance",dateAdd(null,2,"Y"),wfProcess);			
 			}
 		}
 	}
@@ -2009,20 +2030,10 @@ if(matches(appTypeArray[1],"Revision") && wfProcess == "BLD_20231116_REV")
 			
 		if(wfStatus == "Approved") 
 		{
-			var cWorkDesc = workDescGet(capId);
-			var typeSuffix = " # ";
-			var newWorkDesc = "";
 			
-			newWorkDesc = pWorkDesc + "\n\n"
-			+ "*** " + appTypeArray[1] + typeSuffix + capIDString + " - Complete on " + dateAdd(null,0) + "\n\n" 
-			+ "Description: " + cWorkDesc + "\n\n";
-			newLength = newWorkDesc.length;
-			logDebug("new description character length: " + newLength);
-			updateWorkDesc(newWorkDesc,pCapId);
-			
-			logDebug("Updating app status");
+			logDebug("Updating parent app status");
 			updateAppStatus("Issued","Revision " + capIDString + " Completed. Status updated by script",pCapId);
-			logDebug("Removing prevent final condition on Issued");
+			logDebug("Removing prevent final condition on Approved");
 			removeCapCondition("Building - Prevent Final / Completion","Building Final Not Allowed until Revisions are Approved",pCapId);			
 			
 			// Initiate Move documents with target doc status to the from child to parent pCapId
@@ -2287,6 +2298,17 @@ if(matches(appTypeArray[1],"Revision") && wfProcess == "BLD_20231116_REV")
 		// Generate signature requested notification
 		if(wfStatus == "Signature Requested")
 		{
+			var cWorkDesc = workDescGet(capId);
+			var typeSuffix = " # ";
+			var newWorkDesc = "";
+			
+			newWorkDesc = pWorkDesc + "\n\n"
+			+ "*** " + appTypeArray[1] + typeSuffix + capIDString + " - Complete on " + dateAdd(null,0) + "\n\n" 
+			+ "Description: " + cWorkDesc + "\n\n";
+			newLength = newWorkDesc.length;
+			logDebug("new description character length: " + newLength);
+			updateWorkDesc(newWorkDesc,pCapId);
+			
 			if(checkForContactEmail("Applicant"))
 			{
 				showMessage = true;
