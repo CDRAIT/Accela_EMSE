@@ -109,5 +109,6 @@
 |   09/18/2025 RMoore >> removed functions, main function copytoxics, copies toxics table from record to another
 |   01/02/2026 TDunn >> Rebuilt Includes_custom in prod from nonprod1
 |   01/11/2026 TDunn >> added custom function createCollectionOfParcels
+|   04/27/2026 Abe   >> Added parcelConditionExists_PCO() for PCCP parcel conditions 
 |
 /---------------------------------------------------------------------------------------------------------------------------------------------------------*/

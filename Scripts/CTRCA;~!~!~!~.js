@@ -11,6 +11,7 @@
 |
 | Notes   : Abe   01/26/2026 created 3.0 version
 |         : Abe   01/26/2026 Added IT Request# 2584 - Notification sent for parecels with "PCCP Application Required" condition when converting from temp to real
+|         : Abe   04/272026  uodated Item# 2584 and added parcelConditionExists_PCO()
 |
 /======================================================================================================*/
 logDebug("Running CTRCA:*/*/*/* ...");
@@ -18,7 +19,7 @@ logDebug("Running CTRCA:*/*/*/* ...");
 if (publicUser) {
     //IT Request# 2584
 
-    if (getParcelConditions("PCCP - Prevent Issuance / Approval", "Applied", "PCCP Application Required", "Notice").length > 0) {
+    if (parcelConditionExists_PCO("PCCP-General Condition", "PCCP Authorization Required", "Applied")) {
 
         var emailTemplate = "PCCP_APPLICATION_REQUIRED_NOTICE";
         var emailTo = "";
