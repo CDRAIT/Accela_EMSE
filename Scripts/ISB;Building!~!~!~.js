@@ -30,7 +30,10 @@
 |         : TDunn 01/11/2026 deployed to nonprod1
 |         : TDunn 01/11/2026 added logic to stop inspection scheduling on Revisions and Deferred Submittals		  
 |         : TDunn 03/20/2026 ?
-|         : Abe   04/10/2026 Synced the Github version with database - the Github was behind! 
+|         : Abe   04/10/2026 Synced the Github version with database - the Github was behind!
+|         : Abe   05/13/2026 added 515 ESS to the "Final Inspection" list - IT REQUEST# 3465
+|
+|
 /------------------------------------------------------------------------------------------------------*/
 
 if (matches(currentUserID, "JMCKENZI", "EAFTAHI", "TDUNN")) {
@@ -54,6 +57,7 @@ if (inspType == "600" ||
     inspType == "606 Agriculture Setback Final" ||
     inspType == "608 Temporary C of O" ||
     inspType == "513 Solar Panel-Final" ||
+    inspType == "515 ESS" ||
     inspType == "905 Manufactured Home-Final") {
 
     isFinalInspection = true;
