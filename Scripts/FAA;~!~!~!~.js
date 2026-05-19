@@ -41,7 +41,7 @@ var maxFeeAdj = (maxFee * 1) - .1;
 logDebug("Current Tech fee maximum amount is " + maxFee);
 
 // Test for exempt record types
-if(!matches(appTypeArray[1],"Improvement Plan") || (appTypeArray[1] == "Improvement Plan" && !matches(AInfo["Improvement Plan Type"],"Utility","BFAT")))
+if(!matches(appTypeArray[1],"Improvement Plan") || (appTypeArray[1] == "Improvement Plan" && matches(AInfo["Improvement Plan Type"],"Utility","BFAT")))
 {
 	// Test for TECH exempt fees 
 	//=============================
