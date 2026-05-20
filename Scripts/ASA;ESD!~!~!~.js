@@ -11,7 +11,8 @@
 |
 | Notes   : TDunn 11/19/2021 created production version 
 |         : TDunn 01/11/2022 updated to logic for adding fees on NOT publicUser
-|         : TDunn 04/16/2026 Excluded Improvement Plan from Tech fee         
+|         : TDunn 04/16/2026 Excluded Improvement Plan from Tech fee 
+|         : TDunn 05/19/2026 added Improvement Plan Type as part of exclusion rule Imp Plan records
 |
 /=============================================================================================*/
 showDebug = false; showMessage = false;
@@ -58,6 +59,9 @@ if(!publicUser) {
 	}
 	// Adding new TECH fee
 	if(matches(appTypeArray[1],"Final Subdivision Map","Grading Permit","Improvement Plan Revision","Parcel Map","Record of Survey")){
+		updateFee("TECH","ACCOUNTING","FINAL",1,varAutoInvoiceFees);
+	}
+	if(appTypeArray[1] == "Improvement Plan" && matches(AInfo["Improvement Plan Type"],"Utility","BFAT")){
 		updateFee("TECH","ACCOUNTING","FINAL",1,varAutoInvoiceFees);
 	}
 }
