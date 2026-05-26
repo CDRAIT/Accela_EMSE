@@ -20,6 +20,8 @@
 | Updates: TDunn 12/27/2023 
 |          TDunn 01/23/2024 updated call for Prime LP
 |          TDunn 02/01/2024 updated LP email rules, added numDays loop to run batch twice against multiple expiration dates
+|          TDunn 05/26/2026 added new exclude statuses for Pending Revision and Awaiting Signature
+|                           added 'INCLUDES_CUSTOM_GLOBALS'
 |
 /------------------------------------------------------------------------------------------------------*/
 /*------------------------------------------------------------------------------------------------------/
@@ -32,6 +34,7 @@ var documentOnly = false;
 eval(getScriptText("INCLUDES_ACCELA_FUNCTIONS", "PLACERCO", useCustomScriptFile));
 eval(getScriptText("INCLUDES_ACCELA_GLOBALS", "PLACERCO", useCustomScriptFile));
 eval(getScriptText("INCLUDES_CUSTOM", "PLACERCO", useCustomScriptFile));
+eval(getScriptText("INCLUDES_CUSTOM_GLOBALS", "PLACERCO", useCustomScriptFile));
 
 if (documentOnly) {
     doStandardChoiceActions(controlString, false, 0);
@@ -97,7 +100,7 @@ var paramsAppGroup = "TRPA";
 var paramsAppPerTypeArray = new Array("Building");
 var paramsAppSubTypeArray = new Array("Residential", "Non-Residential");
 var paramsAppPerCategory = new Array("Project","Qualified Exempt","TRPA Review at TRPA")
-var paramsAppStatusArray = new Array("Expired", "Construction Complete", "Void", "Withdrawn", "DONE", "CANC", "Issued");
+var paramsAppStatusArray = new Array("Expired", "Construction Complete", "Void", "Withdrawn", "DONE", "CANC", "Issued", "Issued - Awaiting Signature", "Issued - Revision Pending");
 // Parameter variables data
 var startDate = 60;
 var endDate = 60;
