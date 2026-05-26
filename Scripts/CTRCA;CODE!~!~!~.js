@@ -29,6 +29,7 @@ if (publicUser) {
     var sendFrom = defaultFrom;
     var toEmail = "";
     var ccEmail = "";
+    var sendStaffNotification = false;
 
     toEmail = (getAppSpecific("Project Office") == "Tahoe") ? "codeCompTahoe@placer.ca.gov" : "codeComp@placer.ca.gov";
 
@@ -68,6 +69,7 @@ if (publicUser) {
             }
             editAppSpecific("Number of Vehicles", (vIndex - 1));
         }
+        sendStaffNotification = true;
     }
 
 
@@ -89,6 +91,7 @@ if (publicUser) {
 
     //"$$addressLine$$", "$$parcelNumber$$", "$$ownerFullName$$" ,"$$ownerPhone$$" 
     getAPOParams4Notification(emailParams);
-    var sendResult= sendNotification(sendFrom, toEmail, ccEmail, notificationTemplate, emailParams, null);
-    //sendResult = aa.sendMail(defaultFrom,"eaftahi@placer.ca.gov", "", "C_VA CTRCA Debug ", debug);
+    if(sendStaffNotification)
+        var sendResult= sendNotification(sendFrom, toEmail, ccEmail, notificationTemplate, emailParams, null);
+        //sendResult = aa.sendMail(defaultFrom,"eaftahi@placer.ca.gov", "", "C_VA CTRCA Debug ", debug);
 }

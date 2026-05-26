@@ -12,6 +12,9 @@
 |           EAFTAHI 10/01/2025 Added IT Request# 1675 - New Code Compliance WF
 |           EAFTAHI 02/05/2026 Added Fisrt Revision outputs to the script
 |           Abe     04/23/2026 added 2nd to 4th revision 
+|           Abe     05/21/2026 added revision dated May 12, 2026 - removed all the codes regarding to appStatus manipulation
+|                              so that only record status (after Enforcement Action) will be "Enforcement" and "Fine Processing"
+|
 |
 /--------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 
@@ -43,23 +46,28 @@ if (wfProcess == "CODE_ENF") { //New Workflow
     var reportFile = null;
     var refAgenciesStdChoice = "SDL: CE_Ref_Agencies";
     //To control appStatus
-    var isCitationActive = false;
-    var isNuisanceActive = false;
+    //commented - Revision 5/12/2026
+    //var isCitationActive = false;
+    //var isNuisanceActive = false;
     var isEnfActive = false;
-    var isFineProActive = false;
+    var isFineProcActive = false;
 
-    if (isTaskActive("Enforcement Action")) { isEnfActive = true; }
 
+    //commented - Revision 5/12/2026
     if ((isTaskActive("Notice of Nuisance") || isTaskActive("Nuisance Outcome") ||
         isTaskActive("Abatement Hearing") || isTaskActive("Reinspection Outcome") ||
-        isTaskActive("Abatement Processing") && !isEnfActive)) {
+        isTaskActive("Abatement Processing"))) {
         isNuisanceActive = true;
     }
-    if ((isTaskActive("Citation") || isTaskActive("Appeal") || isTaskActive("Administrative Hearing")) && !isEnfActive) {
+    if ((isTaskActive("Citation") || isTaskActive("Appeal") || isTaskActive("Administrative Hearing"))) {
         isCitationActive = true;
     }
 
-    if (isTaskActive("Fine Processing") && !(isCitationActive || isEnfActive || isNuisanceActive)) { isFineProActive = true; }
+    if (isTaskActive("Enforcement Action") || isCitationActive || isNuisanceActive) { isEnfActive = true; }
+
+
+    //if (isTaskActive("Fine Processing") && !(isCitationActive || isEnfActive || isNuisanceActive)) { isFineProcActive = true; }    
+    if (isTaskActive("Fine Processing") && !(isEnfActive)) { isFineProcActive = true; }
 
     addParameter(reportParams, "altID", capIDString);
 
@@ -70,11 +78,14 @@ if (wfProcess == "CODE_ENF") { //New Workflow
     addParameter(emailParams, "$$compPhone$$", getAppSpecific("Complaintant Phone"));
     addParameter(emailParams, "$$compEmail$$", getAppSpecific("Complaintant Email"));
 
-
     // Assigns record to the current user
     if (matches(wfTask, "Complaint Received", "Investigation"))
         if (matches(wfStatus, "Unfounded", "Referred & Closed", "Duplicate", "Withdrawn", "No Violation"))
-            assignCap(currentUserID);
+        {
+            assignCap(currentUserID);             
+             closeCap(currentUserID);
+        }
+            
 
     if (wfTask == "Complaint Received") {
         if (wfStatus == "Unfounded") {
@@ -146,27 +157,23 @@ if (wfProcess == "CODE_ENF") { //New Workflow
 
     if (wfTask == "Enforcement Action") {
         if (wfStatus == "NOV Mailed") {
-
             //Create and send NOV Letter (6)
             reportName = "Complaint Notice of Violation";
             addParameter(emailParams, "$$emailSubject$$", "NOTICE OF VIOLATION");
             sendNotice2Recipients("Notice_of_Violation");
         }
+
         if (wfStatus == "Citation & Notice of Nuisance") {
             //Create the fork manually
             activateTask("Citation");
             activateTask("Notice of Nuisance");
             closeTask("Enforcement Action", "Citation & Notice of Nuisance", "Closed by Script", "Forked by Script");
         }
-        if ((wfStatus == "Citation" && isNuisanceActive) ||
-            (wfStatus == "Notice of Nuisance" && isCitationActive)) {
-            updateAppStatus("Citation & Nuisance", "Updated by WTUA script");
-        }
+        
         if (wfStatus == "Complied Voluntarily") {
-            if (isFineProActive) updateAppStatus("Fine Processing", "Updated by WTUA Script");
-            if (isCitationActive) updateAppStatus("Citation", "Updated by WTUA Script");
-            if (isNuisanceActive) updateAppStatus("Nuisance", "Updated by WTUA Script");
-            if (!(isCitationActive || isFineProActive || isFineProActive)) {
+            if (isEnfActive) updateAppStatus("Enforcement Action", "Updated by WTUA Script");
+            else if (isFineProcActive) updateAppStatus("Fine Processing", "Updated by WTUA Script");
+            else {
                 updateAppStatus("Voluntarily Complied", "Updated by WTUA script");
                 closeCap(currentUserID);
             }
@@ -180,12 +187,12 @@ if (wfProcess == "CODE_ENF") { //New Workflow
             reportName = "Notice of Nuisance";
             addParameter(emailParams, "$$emailSubject$$", "NOTICE OF NUISANCE");
             sendNotice2Recipients("Nuisance_Notice");
-
         }
+
         if (wfStatus == "Complied") {
-            if (isCitationActive) updateAppStatus('Citation', 'Updated by WTUA script');
-            if (isFineProActive) updateAppStatus("Fine Processing", "upodated by WTUA script");
-            if (!(isCitationActive || isFineProActive || isEnfActive || isNuisanceActive)) {
+            if (isEnfActive) updateAppStatus("Enforcement Action", "Updated by WTUA script");
+            else if (isFineProcActive) updateAppStatus("Fine Processing", "Updated by WTUA script");
+            else {
                 updateAppStatus("Complied", "Updated by WTUA script");
                 closeCap(currentUserID);
             }
@@ -194,9 +201,10 @@ if (wfProcess == "CODE_ENF") { //New Workflow
 
     if (wfTask == "Nuisance Outcome") {
         if (wfStatus == "Complied") {
-            if (isCitationActive) updateAppStatus("Citation", "Updated by WTUA Script");
-            if (isFineProActive) updateAppStatus("Fine Processing", "Updated by WTUA Script");
-            if (!(isCitationActive || isFineProActive || isEnfActive || isNuisanceActive)) {
+            if (isEnfActive) updateAppStatus("Enforcement Action", "Updated by WTUA Script");
+
+            else if (isFineProcActive) updateAppStatus("Fine Processing", "Updated by WTUA Script");
+            else {
                 updateAppStatus("Complied", "Updated by WTUA script");
                 closeCap(currentUserID);
             }
@@ -226,17 +234,11 @@ if (wfProcess == "CODE_ENF") { //New Workflow
         if (wfStatus == "Complied" || wfStatus == "Dismissed") {
             if (isEnfActive)
                 updateAppStatus("Enforcement Action", "Updated by WTUA Script");
-
-            if (isCitationActive)
-                updateAppStatus("Citation", "Updated by WTUA Script");
-
-            if (isFineProActive)
+            else if (isFineProcActive)
                 updateAppStatus("Fine Processing", "Updated by WTUA Script");
-
-            if (!(isCitationActive || isFineProActive || isEnfActive || isNuisanceActive)) {
+            else {
                 if (wfStatus == "Dismissed") updateAppStatus("Dismissed", "Updated by WTUA script");
                 if (wfStatus == "Complied") updateAppStatus("Complied", "Updated by WTUA script");
-
                 closeCap(currentUserID);
             }
         }
@@ -246,14 +248,12 @@ if (wfProcess == "CODE_ENF") { //New Workflow
         if (wfStatus == "In Violation - Enf. & Abatement") {
             // Create the fork manually            
             activateTask("Enforcement Action");
-            if (isCitationActive) updateAppStatus("Enforcement & Citation", "Updated by WTUA Script");
         }
 
         if (wfStatus == "Complied") {
             if (isEnfActive) updateAppStatus("Enforcement Action", "Updated by WTUA Script");
-            if (isCitationActive) updateAppStatus("Citation", "Updated by WTUA Script");
-            if (isFineProActive) updateAppStatus("Fine Processing", "Updated by WTUA Script");
-            if(!(isCitationActive||isEnfActive||isFineProActive)){
+            else if (isFineProcActive) updateAppStatus("Fine Processing", "Updated by WTUA Script");
+            else {
                 updateAppStatus("Complied", "updated by WTUA script");
                 closeCap(currentUserID);
             }
@@ -262,12 +262,12 @@ if (wfProcess == "CODE_ENF") { //New Workflow
 
     if (wfTask == "Abatement Processing") {
         if (wfStatus == "Abatement Complete")
-            if (isCitationActive) updateAppStatus("Citation", "Updated by WTUA Script");
+            if (isEnfActive) updateAppStatus("Enforcement Action", "Updated by WTUA Script");
 
         if (wfStatus == "Complied") {
-            if (isCitationActive) updateAppStatus("Citation", "Updated by WTUA Script");
-            if (isFineProActive) updateAppStatus("Fine Processing", "Updated by WTUA Script");
-            if(!(isCitationActive||isEnfActive||isFineProActive)){
+            if (isEnfActive) updateAppStatus("Enforcement Action", "Updated by WTUA Script");
+            else if (isFineProcActive) updateAppStatus("Fine Processing", "Updated by WTUA Script");
+            else {
                 updateAppStatus("Complied", "Updated by WTUA script");
                 closeCap(currentUserID);
             }
@@ -282,28 +282,17 @@ if (wfProcess == "CODE_ENF") { //New Workflow
             sendNotice2Recipients("Citation_Letter");
 
             editAppSpecific("Citation Issuance Date", wfDateMMDDYYYY);
-        }
-
-        //First Revision updates
-        if (wfStatus == "Notice of Nuisance") {
-            //updated in the last revision Apr 4th 2026
-            //Create Nuisance Letter (11)
-            // reportName = "Notice of Nuisance";
-            // addParameter(emailParams, "$$emailSubject$$", "NOTICE OF NUISANCE");
-            // sendNotice2Recipients("Nuisance_Notice");
-        }
+        }        
 
         if (wfStatus == "Complied") {
-            if (isNuisanceActive) updateAppStatus("Nuisance", "Updated by WTUA Script");
-            if (isFineProActive) updateAppStatus("Fine Processing", "Updated by WTUA Script");
+            if (isEnfActive) updateAppStatus("Enforcement Action", "Updated by WTUA Script");            
         }
     }
 
     if (wfTask == "Appeal") {
         if (wfStatus == "No Appeal") {
             //Create the fork manually
-            activateTask("Citation");
-            updateAppStatus("Citation", "Updated by WTUA Script");
+            activateTask("Citation");            
         }
     }
 
@@ -325,26 +314,26 @@ if (wfProcess == "CODE_ENF") { //New Workflow
                     var sendResult = sendNotification(emailFrom, emailTo, emailCc, generalEmailTemplate, emailParams, new Array(reportFile));
                 }
         }
+
         if (wfStatus == "Citation Upheld") {
             //save the wfdate in an ASI for Batchjob
             editAppSpecific("Citation Upheld Date", wfDateMMDDYYYY);
             //Create fork Manually
-            activateTask("Enforcement Action");
-
-            if (isNuisanceActive)
-                updateAppStatus("Enforcement & Nuisance", "Updated by WTUA Script");
+            activateTask("Fine Processing");
         }
 
-        if (wfStatus == "Complied" || wfStatus == "Dismissed") {
-            if (isNuisanceActive) updateAppStatus("Nuisance", "Updatede by WTUA Script");
-            if (isFineProActive) updateAppStatus("Fine Processing", "Updated by WTUA Script");
+        if (wfStatus == "Complied") {
+            if (isEnfActive) updateAppStatus("Enforcement Action", "Updated by WTUA Script");
         }
 
-        if (wfStatus == "Dismissed")
-            if (!(isCitationActive || isEnfActive || isFineProActive || isNuisanceActive)) {
+        if (wfStatus == "Dismissed") {
+            if (isEnfActive) updateAppStatus("Enforcement Action", "Updated by WTUA Script");
+            else if (isFineProcActive) updateAppStatus("Fine Processing", "Updated by WTUA Script");
+            else {
                 updateAppStatus("Dismissed", "Updated by WTUA Script");
                 closeCap(currentUserID)
             }
+        }
     }
     
     if (wfTask == "Fine Processing") {
@@ -367,17 +356,24 @@ if (wfProcess == "CODE_ENF") { //New Workflow
             editAppSpecific("Subsequent Payment Request Date", wfDateMMDDYYYY);
         }
 
-        if (!(isCitationActive || isEnfActive || isNuisanceActive)) {
-            if (wfStatus == "Fines Paid")
+        if (!(isEnfActive)) {
+            if (wfStatus == "Fines Paid") {
                 updateAppStatus("Fines Paid", "Updated by WTUA Script");
-            if (wfStatus == "Secured Lien Filed")
+                closeCap(currentUserID);
+            }
+            if (wfStatus == "Secured Lien Filed") {
                 updateAppStatus("Lien Filed", "Updated by WTUA Script");
-            if (wfStatus == "Simple Lien Resolved")
+                closeCap(currentUserID);
+            }
+            if (wfStatus == "Simple Lien Resolved") {
                 updateAppStatus("Lien Resolved", "Updated by WTUA Script");
+                closeCap(currentUserID);
+
+            }
         }
     }
 
-    // Record Status should only reflect 'Fine Processing' if that is the only task remaining active.     
+    //Final Revision - added on May 21, 2026 - Process Invoice email to staff when the case is ready for fee processing     
     if ((wfTask == "Citation" && wfStatus == "Complied") ||
         (wfTask == "Appeal" && wfStatus == "No Appeal") ||
         (wfTask == "Administrative Hearing" && matches(wfStatus, "Citation Upheld", "Complied")) ||
