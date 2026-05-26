@@ -19,6 +19,7 @@
 | 
 | Updates: TDunn 12/27/2023 created
 |          TDunn 02/01/2024 revised rules for Prime LP, not limited to Contractors and no LP email if no prime
+|          TDunn 05/26/2026 added INCLUDES_CUSTOM_GLOBALS and new excludes app statuses for Revisions and Awaiting Signature
 |
 /------------------------------------------------------------------------------------------------------*/
 /*------------------------------------------------------------------------------------------------------/
