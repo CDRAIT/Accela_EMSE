@@ -31,6 +31,7 @@ var documentOnly = false;
 eval(getScriptText("INCLUDES_ACCELA_FUNCTIONS", "PLACERCO", useCustomScriptFile));
 eval(getScriptText("INCLUDES_ACCELA_GLOBALS", "PLACERCO", useCustomScriptFile));
 eval(getScriptText("INCLUDES_CUSTOM", "PLACERCO", useCustomScriptFile));
+eval(getScriptText("INCLUDES_CUSTOM_GLOBALS", "PLACERCO", useCustomScriptFile));
 
 if (documentOnly) {
     doStandardChoiceActions(controlString, false, 0);
@@ -96,7 +97,7 @@ var paramsAppGroup = "TRPA";
 var paramsAppPerTypeArray = new Array("Building");
 var paramsAppSubTypeArray = new Array("Residential", "Non-Residential");
 var paramsAppPerCategory = new Array("Project","Qualified Exempt","TRPA Review at TRPA")
-var paramsAppStatusArray = new Array("Expired", "Construction Complete", "Void", "Withdrawn", "DONE", "CANC", "Issued");
+var paramsAppStatusArray = new Array("Expired", "Construction Complete", "Void", "Withdrawn", "DONE", "CANC", "Issued", "Issued - Awaiting Signature", "Issued - Revision Pending");
 // Parameter variables data
 var paramsAppSubGroupName = "EXTENSIONS AND EXPIRATION";                     	// Application Spec Info Subgroup Name that the ASI field is associated to.
 var paramsAppSpecInfoLabel = "Plan Check Expiration";                           // ASI field name that the batch script is to search.
