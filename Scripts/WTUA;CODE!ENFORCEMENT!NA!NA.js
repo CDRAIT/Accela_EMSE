@@ -47,8 +47,9 @@ if (wfProcess == "CODE_ENF") { //New Workflow
     var refAgenciesStdChoice = "SDL: CE_Ref_Agencies";
     //To control appStatus
     //commented - Revision 5/12/2026
-    //var isCitationActive = false;
-    //var isNuisanceActive = false;
+    var isCitationActive = false;
+    var isNuisanceActive = false;
+    
     var isEnfActive = false;
     var isFineProcActive = false;
 
@@ -346,6 +347,7 @@ if (wfProcess == "CODE_ENF") { //New Workflow
             //Eamil Fines Due to Staff (17) - Batchjob
             editAppSpecific("First Payment Request Date", wfDateMMDDYYYY);
         }
+
         if (wfStatus == "Subsequent Payment Request") {
             //Invoice Cover Letter, 2nd (18)
             reportName = "Second Invoice Cover Letter";
@@ -355,6 +357,8 @@ if (wfProcess == "CODE_ENF") { //New Workflow
             //Eamil Fines Due to Staff (17) - batchjob
             editAppSpecific("Subsequent Payment Request Date", wfDateMMDDYYYY);
         }
+
+        if (matches(wfStatus, "No Fines Assessed", "Fines Paid", "Secured Lien Filed", "Simple Lien Resolved")) closeCap(currentUserID);
 
         if (!(isEnfActive)) {
             if (wfStatus == "Fines Paid") {
@@ -371,6 +375,7 @@ if (wfProcess == "CODE_ENF") { //New Workflow
 
             }
         }
+
     }
 
     //Final Revision - added on May 21, 2026 - Process Invoice email to staff when the case is ready for fee processing     
