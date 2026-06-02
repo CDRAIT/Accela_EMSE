@@ -319,9 +319,8 @@ if (wfProcess == "CODE_ENF") { //New Workflow
         if (wfStatus == "Citation Upheld") {
             //save the wfdate in an ASI for Batchjob
             editAppSpecific("Citation Upheld Date", wfDateMMDDYYYY);
-            //Create fork Manually
-            //Abe: 06/02/2026
-            //activateTask("Fine Processing");
+            //Create fork Manually            
+            activateTask("Fine Processing");
         }
 
         if (wfStatus == "Complied") {
