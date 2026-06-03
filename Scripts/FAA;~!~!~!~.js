@@ -19,6 +19,7 @@
 |         : TDunn 05/16/2024 fixed calculation error for TECH-ADJ amount on exempt fees.
 |         : TDunn 04/16/2026 added excluding PW Imp Plan record 
 |         : TDunn 05/19/2026 added Improvement Plan Type as part of exclusion rule Imp Plan records
+|         : TDunn 06/02/2026 increased back dating for feeGetTotByDateRange from -730 to -1460
 |
 /---------------------------------------------------------------------------------------------------------------------*/
 
