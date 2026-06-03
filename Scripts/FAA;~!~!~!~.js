@@ -98,7 +98,7 @@ if(!matches(appTypeArray[1],"Improvement Plan") || (appTypeArray[1] == "Improvem
 		techFeeAmt = techFeeAmt.toFixed(3);
 		var feesCharged = techFeeAmt/.035;
 		var fixedFeesChgd = feesCharged.toFixed(3);
-		var feeByDate = feeGetTotByDateRange(dateAdd(null,-1460),dateAdd(null,0),"NEW","INVOICED");
+		var feeByDate = feeGetTotByDateRange(dateAdd(null,-2920),dateAdd(null,0),"NEW","INVOICED");
 		if(xmptAmount > 1) {
 			feeByDate = feeByDate - xmptAmount;
 			logDebug("New fee by date = " + feeByDate);
