@@ -8,12 +8,13 @@
 |
 | Requires: EMSE 3.0 and Standard Choice: "EMSE_EXECUTE_OPTIONS": "SCRIPT" to be Active.
 |
-| Notes   : eaftahi 11/22/2024 created script - Converted from StdChoice, WTUA:Code/~/~/~ branch
-|           EAFTAHI 10/01/2025 Added IT Request# 1675 - New Code Compliance WF
-|           EAFTAHI 02/05/2026 Added Fisrt Revision outputs to the script
+| Notes   : Abe     11/22/2024 created script - Converted from StdChoice, WTUA:Code/~/~/~ branch
+|           Abe     10/01/2025 Added IT Request# 1675 - New Code Compliance WF
+|           Abe     02/05/2026 Added Fisrt Revision outputs to the script
 |           Abe     04/23/2026 added 2nd to 4th revision 
 |           Abe     05/21/2026 added revision dated May 12, 2026 - removed all the codes regarding to appStatus manipulation
 |                              so that only record status (after Enforcement Action) will be "Enforcement" and "Fine Processing"
+|           Abe     06/09/2026 added revision dated June 9, 2026 - Kayla Email
 |
 |
 /--------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
@@ -158,9 +159,11 @@ if (wfProcess == "CODE_ENF") { //New Workflow
 
     if (wfTask == "Enforcement Action") {
         if (wfStatus == "NOV Mailed") {
+            //Set NOV Expiration Date to be used in batch job
+            editAppSpecific("NOV Expiration Date", dateadd(wfDateMMDDYYYY, varAInfo[wfProcess + "." + wfTask + "." + "Days Num"]));
             //Create and send NOV Letter (6)
             reportName = "Complaint Notice of Violation";
-            addParameter(emailParams, "$$emailSubject$$", "NOTICE OF VIOLATION");
+            addParameter(emailParams, "$$emailSubject$$", "NOTICE OF VIOLATION");            
             sendNotice2Recipients("Notice_of_Violation");
         }
 
