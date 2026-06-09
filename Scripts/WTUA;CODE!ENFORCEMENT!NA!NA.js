@@ -160,7 +160,7 @@ if (wfProcess == "CODE_ENF") { //New Workflow
     if (wfTask == "Enforcement Action") {
         if (wfStatus == "NOV Mailed") {
             //Set NOV Expiration Date to be used in batch job
-            editAppSpecific("NOV Expiration Date", dateadd(wfDateMMDDYYYY, varAInfo[wfProcess + "." + wfTask + "." + "Days Num"]));
+            editAppSpecific("NOV Expiration Date", dateAdd(wfDateMMDDYYYY, varAInfo[wfProcess + "." + wfTask + "." + "Days Num"]));
             //Create and send NOV Letter (6)
             reportName = "Complaint Notice of Violation";
             addParameter(emailParams, "$$emailSubject$$", "NOTICE OF VIOLATION");            
@@ -323,7 +323,7 @@ if (wfProcess == "CODE_ENF") { //New Workflow
             //save the wfdate in an ASI for Batchjob
             editAppSpecific("Citation Upheld Date", wfDateMMDDYYYY);
             //Create fork Manually            
-            activateTask("Fine Processing");
+            activateTask("Enforcement Action");
         }
 
         if (wfStatus == "Complied") {
