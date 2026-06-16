@@ -157,7 +157,7 @@ if (paramsOK) {
             var vAsiLable = paramsAppSpecInfoLabelArray[i];
             paramsStartDt = aa.date.parseDate(dateAdd(null, -30));      //12-day hold after citation issuance date
             paramsEndDt = aa.date.parseDate(dateAdd(null, -30));
-            emailContentStr = "The 30-day hold following of a nuisance letter on the above referenced case has expired. Please reinspect to determine if the case remains in violation. <br>";
+            emailContentStr = "The 30-day hold following of a nuisance letter on the above referenced case has expired. \n Please reinspect to determine if the case remains in violation.";
             emailContentStr += "If still in violation, an abatement hearing should be scheduled."
             emailSubject = "NUISANCE HOLD EXPIRED";
             vGetCapResult = aa.cap.getCapIDsByAppSpecificInfoDateRange(paramsAppSubGroupName, vAsiLable, paramsStartDt, paramsEndDt);
@@ -174,7 +174,7 @@ if (paramsOK) {
             var vAsiLable = paramsAppSpecInfoLabelArray[i];
             paramsStartDt = aa.date.parseDate(dateAdd(null, -30));      //12-day hold after citation issuance date
             paramsEndDt = aa.date.parseDate(dateAdd(null, -30));
-            emailContentStr = "The 30-day hold following an upheld abatement hearing on the above referenced case has expired. Please reinspect to determine if the case remains in violation. <br>";
+            emailContentStr = "The 30-day hold following an upheld abatement hearing on the above referenced case has expired. \n Please reinspect to determine if the case remains in violation.";
             emailContentStr += "If still in violation, begin abatement processing."
             emailSubject = "ABATEMENT HOLD EXPIRED";
             vGetCapResult = aa.cap.getCapIDsByAppSpecificInfoDateRange(paramsAppSubGroupName, vAsiLable, paramsStartDt, paramsEndDt);
@@ -191,7 +191,7 @@ if (paramsOK) {
             var vAsiLable = paramsAppSpecInfoLabelArray[i];
             paramsStartDt = aa.date.parseDate(dateAdd(null, -30));      //12-day hold after citation issuance date
             paramsEndDt = aa.date.parseDate(dateAdd(null, -30));
-            emailContentStr = "The above referenced case has passed its 30-day invoce payment window and ready for the next action.<br>";
+            emailContentStr = "The above referenced case has passed its 30-day invoce payment window and ready for the next action.\n";
             emailContentStr += "Please take the appropriate next steps."
             emailSubject = "FIRST INVOICE PAYMENT EXPIRATION";
             vGetCapResult = aa.cap.getCapIDsByAppSpecificInfoDateRange(paramsAppSubGroupName, vAsiLable, paramsStartDt, paramsEndDt);
@@ -208,7 +208,7 @@ if (paramsOK) {
             var vAsiLable = paramsAppSpecInfoLabelArray[i];
             paramsStartDt = aa.date.parseDate(dateAdd(null, -15));      //12-day hold after citation issuance date
             paramsEndDt = aa.date.parseDate(dateAdd(null, -15));
-            emailContentStr = "The above referenced case has passed its 15-day invoce payment window and ready for the next action.<br>";
+            emailContentStr = "The above referenced case has passed its 15-day invoce payment window and ready for the next action.\n";
             emailContentStr += "Please take the appropriate next steps."
             emailSubject = "SUBSEQUENT INVOICE PAYMENT EXPIRATION";
             vGetCapResult = aa.cap.getCapIDsByAppSpecificInfoDateRange(paramsAppSubGroupName, vAsiLable, paramsStartDt, paramsEndDt);
@@ -226,7 +226,7 @@ if (paramsOK) {
             paramsStartDt = aa.date.parseDate(dateAdd(null, 0));      //NOV Expired Today
             paramsEndDt = aa.date.parseDate(dateAdd(null, 0));             
 
-            emailContentStr = "The waiting period following issuance of the NOV for the above referenced case has expired.<br>";
+            emailContentStr = "The waiting period following issuance of the NOV for the above referenced case has expired.\n";
             emailContentStr += "Please reinspect to determine if the case remains in violation. If still in violation, move forward with the appropriate enforcement action."
             emailSubject = "NOV WAITING PERIOD EXPIRED";
             vGetCapResult = aa.cap.getCapIDsByAppSpecificInfoDateRange(paramsAppSubGroupName, vAsiLable, paramsStartDt, paramsEndDt);
