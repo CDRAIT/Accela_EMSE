@@ -15,6 +15,7 @@
 |                         Nuisance Abatement Upheld Date 
 |                         Nuisance Letter Issuance Date
 |                         Citation Upheld Date
+|                         NOV Expiration Date
 |
 | Criteria: 
 |                         AppStatus = 
@@ -96,7 +97,7 @@ var paramsAppGroup = "Code";
 var paramsAppPerType = "Enforcement";
 var paramsAppStatusArray = new Array("Unfounded", "Void", "Referred & Closed", "Withdrawn", "Duplicate","No Violation"); //Exception cases
 var paramsAppSubGroupName = "CASE DATES";                     	
-var paramsAppSpecInfoLabelArray = new Array("Citation Issuance Date","First Payment Request Date", "Subsequent Payment Request Date","Nuisance Abatement Upheld Date","Nuisance Letter Issuance Date","Citation Upheld Date"); 	
+var paramsAppSpecInfoLabelArray = new Array("Citation Issuance Date","First Payment Request Date", "Subsequent Payment Request Date","Nuisance Abatement Upheld Date","Nuisance Letter Issuance Date","Citation Upheld Date", "NOV Expiration Date"); 	
 var paramsStartDt = null;                    // Start Date for the batch script to select records on Expiration Date.
 var paramsEndDt = null;                     // End Date for the batch script to select records on Expiration Date.
 
@@ -220,6 +221,24 @@ if (paramsOK) {
             emailText += "*****************" + "<br>";            
             totalCount += vCount;
         }
+        if (paramsAppSpecInfoLabelArray[i] == "NOV Expiration Date") {
+            var vAsiLable = paramsAppSpecInfoLabelArray[i];
+            paramsStartDt = aa.date.parseDate(dateAdd(null, 0));      //NOV Expired Today
+            paramsEndDt = aa.date.parseDate(dateAdd(null, 0));             
+
+            emailContentStr = "The waiting period following issuance of the NOV for the above referenced case has expired.<br>";
+            emailContentStr += "Please reinspect to determine if the case remains in violation. If still in violation, move forward with the appropriate enforcement action."
+            emailSubject = "NOV Waiting Period Expired";
+            vGetCapResult = aa.cap.getCapIDsByAppSpecificInfoDateRange(paramsAppSubGroupName, vAsiLable, paramsStartDt, paramsEndDt);
+            vCount = sendStaffNotifications(vGetCapResult, vAsiLable, paramsStartDt, emailSubject, emailContentStr);
+
+            aa.print("Number of records processed = " + vCount + " with " + vAsiLable + " at " + dateAdd(null, 0));
+            aa.print("*****************");
+
+            emailText += "Number of records processed = " + vCount + " with " + vAsiLable + " at " + dateAdd(null, 0) + "<br>";
+            emailText += "*****************" + "<br>";            
+            totalCount += vCount;
+        }
     }
     
     aa.print("Total Number of Code Enforcment Notifications sent to staff today is: " + totalCount);
@@ -301,10 +320,10 @@ function sendStaffNotifications(getCapResult, paramsAppSpecInfoLabel, vDate, vEm
             if (paramsAppSpecInfoLabel == "Citation Issuance Date" && isTaskActive("Appeal"))
                 processFlag = true;
 
-            if (paramsAppSpecInfoLabel == "Citation Upheld Date" && isTaskActive("Enforcement Action") && matches(capStatus, "Enforcement Action", "Enforcement & Nuisance") && isTaskStatus("Administrative Hearing", "Citation Upheld") )
+            if (paramsAppSpecInfoLabel == "Citation Upheld Date" && (isTaskActive("Enforcement Action")||isTaskActive("Fine Processing")) && isTaskStatus("Administrative Hearing", "Citation Upheld") )
                 processFlag = true;
 
-            if (paramsAppSpecInfoLabel == "Nuisance Letter Issuance Date" && isTaskActive("Nuisance Outcome") && isTaskStatus("Notice of Nuisance", "Notice of Nuisance") )
+            if (paramsAppSpecInfoLabel == "Nuisance Letter Issuance Date" && isTaskActive("Nuisance Outcome"))
                 processFlag = true;
 
             if (paramsAppSpecInfoLabel == "Nuisance Abatement Upheld Date" && isTaskActive("Reinspection Outcome") && isTaskStatus("Abatement Hearing", "Abatement upheld") )
@@ -314,6 +333,9 @@ function sendStaffNotifications(getCapResult, paramsAppSpecInfoLabel, vDate, vEm
                 processFlag = true;
 
             if (paramsAppSpecInfoLabel == "Subsequent Payment Request Date" && isTaskActive("Fine Processing") && isTaskStatus("Fine Processing", "Subsequent Payment Request") )
+                processFlag = true;
+
+            if (paramsAppSpecInfoLabel == "NOV Expiration Date" && isTaskActive("Enforcement Action"))
                 processFlag = true;
         }  
         
