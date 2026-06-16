@@ -228,7 +228,7 @@ if (paramsOK) {
 
             emailContentStr = "The waiting period following issuance of the NOV for the above referenced case has expired.<br>";
             emailContentStr += "Please reinspect to determine if the case remains in violation. If still in violation, move forward with the appropriate enforcement action."
-            emailSubject = "NOV Waiting Period Expired";
+            emailSubject = "NOV WAITING PERIOD EXPIRED";
             vGetCapResult = aa.cap.getCapIDsByAppSpecificInfoDateRange(paramsAppSubGroupName, vAsiLable, paramsStartDt, paramsEndDt);
             vCount = sendStaffNotifications(vGetCapResult, vAsiLable, paramsStartDt, emailSubject, emailContentStr);
 
