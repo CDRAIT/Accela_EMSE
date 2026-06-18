@@ -66,9 +66,7 @@ if (wfProcess == "CODE_ENF") { //New Workflow
     }
 
     if (isTaskActive("Enforcement Action") || isCitationActive || isNuisanceActive) { isEnfActive = true; }
-
-
-    //if (isTaskActive("Fine Processing") && !(isCitationActive || isEnfActive || isNuisanceActive)) { isFineProcActive = true; }    
+       
     if (isTaskActive("Fine Processing") && !(isEnfActive)) { isFineProcActive = true; }
 
     addParameter(reportParams, "altID", capIDString);
@@ -359,26 +357,27 @@ if (wfProcess == "CODE_ENF") { //New Workflow
 
             //Eamil Fines Due to Staff (17) - batchjob
             editAppSpecific("Subsequent Payment Request Date", wfDateMMDDYYYY);
-        }
-
-        if (matches(wfStatus, "No Fines Assessed", "Fines Paid", "Secured Lien Filed", "Simple Lien Resolved")) closeCap(currentUserID);
+        }        
 
         if (!(isEnfActive)) {
+
+            if (wfStatus == "Simple Lien Resolved") {
+                updateAppStatus("Simple Lien Resolved", "Updated by WTUA Script");
+                closeCap(currentUserID);
+            }
             if (wfStatus == "Fines Paid") {
                 updateAppStatus("Fines Paid", "Updated by WTUA Script");
                 closeCap(currentUserID);
             }
             if (wfStatus == "Secured Lien Filed") {
-                updateAppStatus("Lien Filed", "Updated by WTUA Script");
+                updateAppStatus("Secured Lien Filed", "Updated by WTUA Script");
                 closeCap(currentUserID);
             }
-            if (wfStatus == "Simple Lien Resolved") {
-                updateAppStatus("Lien Resolved", "Updated by WTUA Script");
+            if (wfStatus == "No Fines Assessed") {
+                updateAppStatus("No Fines Assessed", "Updated by WTUA Script");
                 closeCap(currentUserID);
-
             }
         }
-
     }
 
     //Final Revision - added on May 21, 2026 - Process Invoice email to staff when the case is ready for fee processing     
