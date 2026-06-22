@@ -15,20 +15,23 @@
 |         
 |
 /=============================================================================================*/
-if(matches(currentUserID,"JMCKENZI","TDUNN", "EAFTAHI")) {showDebug = 1;}
+if (matches(currentUserID, "JMCKENZI", "TDUNN", "EAFTAHI")) { showDebug = 1; }
 logDebug("CTRCA:Planning/Inquiry/~/~: started...");
 
-var StrContent = "A New Achievable Housing Inquiry has been submitted. Please review the details below and follow up with the inquirer as needed." + "<br><br>";
-StrContent += "<b>Inquiry Number:</b> " + capId.getCustomID() + "<br>";
-StrContent += "<b>Inquiry Name:</b> " + capName + "<br>";
-StrContent += "<b>Received Date:</b> " + fileDate + "<br>";
 
+if (publicUser) {
+    var emailTemplate = "MESSAGE_RECEIPT_PLANNING";
+    var emailParams = aa.util.newHashtable();
 
-if(getAppSpecific("Project Office") == "Tahoe" ){
-    aa.sendMail(defaultFrom, "planningTahoe", "eaftahi@placer.ca.gov", "New Achievable Housing Inquiry Recieved - " + capId.getCustomeID(), StrContent);
-}
-if(getAppSpecific("Project Office") == "Auburn"){
-    aa.sendMail(defaultFrom, "planningAuburn", "eaftahi@placer.ca.gov", "New Achievable Housing Inquiry Recieved - " + capId.getCustomID(), StrContent);
+    var emailTo = getAppSpecific("Project Office") == "Tahoe" ? "onlinePlnPermitsTahoe@placer.ca.gov" : "onlinePlnPermits@placer.ca.gov";
+    var emailCc = "";
+
+    addParameter(emailParams, "$$altID$$", capId.getCustomID());
+    addParameter(emailParams, "$$capName$$", capName);
+    addParameter(emailParams, "$$fileDate$$", fileDate);
+
+    var result = sendNotification(defaultFrom, emailTo, emailCc, emailTemplate, emailParams, null);
+
 }
 
 

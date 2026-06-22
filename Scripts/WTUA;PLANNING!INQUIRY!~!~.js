@@ -13,33 +13,62 @@
 |         : Abe  03/04/2026 Added the IT Request # 2887 - Achievable Housing Interest Form
 |         
 /=====================================================================================================================================*/
-if(matches(currentUserID,"JMCKENZI","TDUNN", "EAFTAHI")) {showDebug = 1;}
+if (matches(currentUserID, "JMCKENZI", "TDUNN", "EAFTAHI")) { showDebug = 1; }
 logDebug("WTUA:Planning/Inquiry/~/~: started...");
 
-var varStrContent = "";
+var emailTemplate = "";
 var mailTo = "";
-var mailCc = "eaftahi@placer.ca.gov";
-var mailSubject = "Action Required - Achievable Housing Inquiry - " + capId.getCustomID();
+var mailCc = "";
+var emailParams = aa.util.newHashtable();
+var officeEmail = getAppSpecific("Project Office") == "Tahoe" ? "onlinePlnPermitsTahoe@placer.ca.gov" : "onlinePlnPermits@placer.ca.gov";
+var assignedPlanner = "";
 
-if (getContactByType("Contact", capId))
-    mailTo = getContactEmailByContactType("Contact", capId);
+addParameter(emailParams, "$$altID$$", capId.getCustomID());
+addParameter(emailParams, "$$PLNOfficeEmail$$", officeEmail);
+
+var sendEmail = false;
 
 
-if(wfTask == "Form Review" && wfStatus == "Incomplete") {
-    //Send email to Contact with Task Comments
-    varStrContent = "The Achievable Housing Inquiry form you submitted is missing required information. Please review the instructions below and update your form accordingly." + "<br><br>";
-    varStrContent += "<b>Instructions/Comments:</b> " + "<br>";
-    varStrContent += wfComment + "<br><br>"; 
-    aa.sendMail(defaultFrom, mailTo, mailCc, mailSubject, varStrContent);
+if (wfTask == "Form Review" && wfStatus == "Incomplete") {
+    //Send email to Contact with Task Comments    
+    emailTemplate = "INCOMPLETE_HOUSING_INQUIRY";
 
+    if (getContactByType("Contact", capId))
+        mailTo = getContactEmailByContactType("Contact", capId);
+
+    addParameter(emailParams, "$$wfComment$$", wfComment);
+    sendEmail = true;
 }
 
-if(wfTask == "Customer Discussion" && wfStatus == "Scheduled") {
-    //Send email to contact with scheduled date
-        //Send email to Contact with Task Comments
-    varStrContent = "We are pleased to invite you to a meeting to discuss your submitted Achievable Housing Inquiry." + "<br><br>";
-    varStrContent += "<b>Date:</b> " + AInfo["Meeting Date"] + "<br>";
-    varStrContent += "<b>Time:</b> " + "TBD" + "<br>";        
-    varStrContent += "<b>Location:</b> " + "TBD" + "<br><br>"; 
-    aa.sendMail(defaultFrom, mailTo, mailCc, mailSubject, varStrContent);
+if (wfTask == "Customer Discussion" && wfStatus == "Scheduled") {
+
+    emailTemplate = "INQUIRY_MEETING_SCHEDULED";
+    if (getContactByType("Applicant", capId))
+        mailTo = getContactEmailByContactType("Applicant", capId);
+
+
+    var assignedStaff = getAssignedToStaff();
+    if (assignedStaff != null) {
+        var staffResult = aa.person.getUser(assignedStaff);
+        if (!staffResult.getSuccess()) { logDebug("**ERROR retrieving  user model " + assignId + " : " + staffResult.getErrorMessage()) }
+        if (staffResult.getSuccess()) {
+            var staffObject = staffResult.getOutput();
+            var staffEmail = staffObject.getEmail();
+            var staffFirst = staffObject.getFirstName();
+            var staffLast = staffObject.getLastName();
+            var staffPhone = staffObject.getPhoneNumber();
+            assignedPlanner = staffFirst + " " + staffLast + "; " + staffEmail + "; " + staffPhone;
+        }
+    }
+
+    addParameter(emailParams, "$$meetingDate$$", AInfo["Meeting Date"]);
+    addParameter(emailParams, "$$meetingTime$$", AInfo["Meeting Time"]);
+    addParameter(emailParams, "$$meetingLocation$$", AInfo["Meeting Location"]);
+    addParameter(emailParams, "$$TeamsLink$$", !matches(AInfo["Teams Link"], null, "", " ") ? AInfo["Teams Link"] : "N/A");
+    addParameter(emailParams, "$$assignedPlanner$$", assignedPlanner);
+    sendEmail = true;
+}
+
+if (sendEmail) {
+    var result = sendNotification(defaultFrom, mailTo, mailCc, emailTemplate, emailParams, null);
 }

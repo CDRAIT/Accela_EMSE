@@ -11,7 +11,7 @@
 |
 | Notes   : TDunn 11/19/2021 created production version 
 |         : Abe   09/05/2024  added IT Rquest# 2057 - ECS Notifications for PLN
-|         : Abe   3/16/2026  Added IT Request # 2887 - PLN Housing - Added Project Office assignemnt 
+|
 |         
 |
 /=============================================================================================*/
@@ -72,14 +72,5 @@ if (appTypeArray[1] == "Pre-Application" && !publicUser) {
 }
 //End of IT Request # 2057
 
-//IT Request # 2887 - PLN Housing - Added Project Office assignemnt
-if (!publicUser && appMatch("Planning/Inquiry/Achievable Housing/NA")) {
-	if (AInfo['ParcelAttribute.BLDRESPONSE'] == "Tahoe") {
-		editAppSpecific("Project Office", "Tahoe");
-	} else {
-		editAppSpecific("Project Office", "Auburn");
-	}
-}
 
-//End of IT Request # 2887
 
