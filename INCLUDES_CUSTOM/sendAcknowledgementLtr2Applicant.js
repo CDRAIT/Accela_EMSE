@@ -18,7 +18,11 @@ function sendAcknowledgementLtr2Applicant() {
 
 	if (appTypeArray[0] == "Code") {
 		if (appTypeArray[1] == "Enforcement") {
-			//TBD
+			reportName = "Complaint Acknowledgement Letter";
+			reportModule = "Code";
+			emailTemp = "CE_GENERAL_EMAIL_TEMPLATE";
+			addParameter(emailParams, "$$emailSubject$$", "ACKNOWLEDGMENT OF BUILDING VIOLATION COMPLAINT");
+			emailTo = getAppSpecific("Complaintant Email");
 		}
 		else if (appTypeArray[1] == "Vehicle Abatement") {
 			reportName = "Vehicle Acknowledgement Letter";

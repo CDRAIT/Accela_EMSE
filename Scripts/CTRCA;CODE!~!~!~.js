@@ -12,33 +12,41 @@
 | Notes   : Abe 08/16/2023 Created 3.0 version
 | Update  : Abe 08/16/2023 Added Staff Notification - Enforcement
 |         : Abe 08/22/2024 Added Staff Notification for Vehicle Abatement - IT Request# 2024
-|         : 
+|         : Abe 06/24/2026 Added Code Enf section - IT Request# 1675
 |         
 /=============================================================================================*/
-if (publicUser) {
-    logDebug("Entring the EMSE CTRCA:Code/*/*/* ....");
+if (publicUser) {    
 
-    editAppSpecific("Application Received", "Online");
+    editAppSpecific("Application Received", "Online");    
 
-    //var notificationTemplate = "NEW_ONLINE_CODE_CASE_ACK_LETTER";  /* this is for sending ack to complainant */
-
+    //Confirm this with Kayla later
     var notificationTemplate = "STAFF_NEW_ONLINE_CASE_SUBMITTED_CODE"; /* This is for Staff notice */
     var complainantName = "";
     var complainantEmail = "";
     var complainantPhone = "";
 
     var emailParams = aa.util.newHashtable();
-    var emailSendFrom = "";
-    var toEmailStaff = "";
-    var emailStaffCC = "";
+    var sendFrom = defaultFrom;
+    var toEmail = "";
+    var ccEmail = "";
+    var sendStaffNotification = false;
 
-
-    toEmailStaff = (getAppSpecific("Project Office") == "Tahoe") ? "codeCompTahoe@placer.ca.gov" : "codeComp@placer.ca.gov";
+    toEmail = (getAppSpecific("Project Office") == "Tahoe") ? "codeCompTahoe@placer.ca.gov" : "codeComp@placer.ca.gov";
 
     if (appTypeArray[1] == "Enforcement") {
+        /** No Acknowledgement Letter sent to ACA complainants for Enforcement */ 
+        /** No staff notification sent for new Enforcement cases*/ 
+        editAppSpecific("Complainant Communication Preference", "Email");
         complainantName = getAppSpecific("Complaintant");
         complainantEmail = getAppSpecific("Complaintant Email");
         complainantPhone = getAppSpecific("Complaintant Phone");
+
+        /**
+         * Revision Apr 7th, 2026
+         * sendAcknowledgementLtr2Applicant();
+         * 
+         */
+        
     }
 
     if (appTypeArray[1] == "Vehicle Abatement") {
@@ -49,7 +57,7 @@ if (publicUser) {
         else
             complainantPhone = getAppSpecific("Complainant Work Phone");
 
-        //Copying ASITable to ASI Fields 
+        //Copying ASITable to ASI Fields for VA
         var vIndex = 1;
         if (typeof (VEHICLEDESCRIPTION) == "object") {
             for (thisRow in VEHICLEDESCRIPTION) {
@@ -67,17 +75,20 @@ if (publicUser) {
             }
             editAppSpecific("Number of Vehicles", (vIndex - 1));
         }
-   }
+        sendStaffNotification = true;
+    }
 
 
     if (complainantName)
         addParameter(emailParams, "$$complainantName$$", complainantName);
     else
         addParameter(emailParams, "$$complainantName$$", "Anonymous");
+
     if (complainantEmail)
         addParameter(emailParams, "$$complainantEmail$$", complainantEmail);
     else
         addParameter(emailParams, "$$complainantEmail$$", "N/A");
+
     if (complainantPhone)
         addParameter(emailParams, "$$complainantPhone$$", complainantPhone);
     else
@@ -88,9 +99,8 @@ if (publicUser) {
 
     //"$$addressLine$$", "$$parcelNumber$$", "$$ownerFullName$$" ,"$$ownerPhone$$" 
     getAPOParams4Notification(emailParams);
-    sendNotification(emailSendFrom, toEmailStaff, emailStaffCC, notificationTemplate, emailParams, null);
-    //sendResult = aa.sendMail("noreply@placer.ca.gov","eaftahi@placer.ca.gov", "", "C_VA CTRCA Debug ", debug);
+
+    if(sendStaffNotification)
+        var sendResult= sendNotification(sendFrom, toEmail, ccEmail, notificationTemplate, emailParams, null);
+        //sendResult = aa.sendMail(defaultFrom,"eaftahi@placer.ca.gov", "", "C_VA CTRCA Debug ", debug);
 }
-
-
-
