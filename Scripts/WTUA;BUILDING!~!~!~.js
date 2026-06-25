@@ -745,7 +745,8 @@ if(wfProcess == "BLD_20230501_MAIN")
 				updateTask("Placer County Fire Fee Review","Completion Pending","","(Preissuance Requirement)",wfProcess);
 				assignPreissue("Placer County Fire Fee Review",wfProcess);
 			}
-			if((matches(AInfo["Fire Review - Partner Agency"],"Y","Yes") || matches(AInfo["Fire review - Partner Agency"],"Y","Yes")) && !isTaskStatus("Fire Review - Partner Agency","Complete"))			
+			if((matches(AInfo["Fire Review - Partner Agency"],"Y","Yes") || matches(AInfo["Fire review - Partner Agency"],"Y","Yes")) && !isTaskStatus("Fire Review - Partner Agency","Complete"))
+			{				
 				activateTask("Fire Review - Partner Agency",wfProcess);
 				updateTask("Fire Review - Partner Agency","Completion Pending","","(Preissuance Requirement)",wfProcess);
 				assignPreissue("Fire Review - Partner Agency",wfProcess);
@@ -790,7 +791,7 @@ if(wfProcess == "BLD_20230501_MAIN")
 		activateTask("Building Plan Check",wfProcess);
 		assignThisTask(thisTask,wfProcess);
 		editTaskDueDate(thisTask,dateAdd(null,addNumDays,"Y"));
-        if(isTaskStatus(thisTask,"Corrections Required") || isTaskStatus(thisTask,"Approved Pending Resubmittal"))
+		if(isTaskStatus(thisTask,"Corrections Required") || isTaskStatus(thisTask,"Approved Pending Resubmittal"))
 		{
 			updateTask(thisTask,"Resubmittal Received","",""); 
 		}
