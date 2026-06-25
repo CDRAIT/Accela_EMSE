@@ -103,6 +103,11 @@
 |         : TDunn 01/09/2026 simplified rules for Pre-check criteria for precheck distribution versus plan review Distribution
 |         : TDunn 01/10/2026 moved staff creation of Revisions and Deferred to WTUA:Building 'Residential' and 'Commercial scripts
 |         : TDunn 01/22/2026 added test for null for the FIREINSP parcel attribute
+|         : TDunn 02/05/2026 fixed issue with Fire Review - Partner Agency not activating.
+|         : TDunn 02/06/2026 added rules for activating Fire Review - Partner Agency when Fire Review TSI is checked but not Placer Fire District.
+|         : TDunn 03/19/2026 updated due date for Closure
+|         : TDunn 04/19/2026 optimized criteria logic for triage versus plan review distribution rules
+|         : TDunn 06/24/2026 syncd production back to nonprod1 to support updates to in possession tracking
 |
 /---------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 
@@ -740,8 +745,7 @@ if(wfProcess == "BLD_20230501_MAIN")
 				updateTask("Placer County Fire Fee Review","Completion Pending","","(Preissuance Requirement)",wfProcess);
 				assignPreissue("Placer County Fire Fee Review",wfProcess);
 			}
-			if(matches(AInfo["Fire Review - Partner Agency"],"Y","Yes") && !isTaskStatus("Fire Review - Partner Agency","Complete"))
-			{
+			if((matches(AInfo["Fire Review - Partner Agency"],"Y","Yes") || matches(AInfo["Fire review - Partner Agency"],"Y","Yes")) && !isTaskStatus("Fire Review - Partner Agency","Complete"))			
 				activateTask("Fire Review - Partner Agency",wfProcess);
 				updateTask("Fire Review - Partner Agency","Completion Pending","","(Preissuance Requirement)",wfProcess);
 				assignPreissue("Fire Review - Partner Agency",wfProcess);
@@ -786,7 +790,10 @@ if(wfProcess == "BLD_20230501_MAIN")
 		activateTask("Building Plan Check",wfProcess);
 		assignThisTask(thisTask,wfProcess);
 		editTaskDueDate(thisTask,dateAdd(null,addNumDays,"Y"));
-		
+        if(isTaskStatus(thisTask,"Corrections Required") || isTaskStatus(thisTask,"Approved Pending Resubmittal"))
+		{
+			updateTask(thisTask,"Resubmittal Received","",""); 
+		}
 		if(matches(AInfo["Scope of Work"],"SFD Production") && !isTaskActive("Sewer Permit Issuance") && !isTaskStatus("Sewer Permit Issuance","Complete"))
 		{
 			activateTask("Sewer Permit Issuance",wfProcess);
@@ -990,7 +997,7 @@ if(wfProcess == "BLD_20230501_MAIN")
 			updateTask("Placer County Fire Fee Review","Completion Pending","","(Preissuance Requirement)",wfProcess);
 			assignPreissue("Placer County Fire Fee Review",wfProcess);
 		}
-		if(matches(AInfo["Fire Review - Partner Agency"],"Y","Yes") && !isTaskStatus("Fire Review - Partner Agency","Complete"))
+		if((matches(AInfo["Fire Review - Partner Agency"],"Y","Yes") || matches(AInfo["Fire review - Partner Agency"],"Y","Yes")) && !isTaskStatus("Fire Review - Partner Agency","Complete"))
 		{
 			activateTask("Fire Review - Partner Agency",wfProcess);
 			updateTask("Fire Review - Partner Agency","Completion Pending","","(Preissuance Requirement)",wfProcess);
@@ -1434,7 +1441,7 @@ if(wfProcess == "BLD_20230501_MAIN")
 	
 	// Update Assigned To for all tasks with initial generic staff default assignment ----------------------
 	/*  Designated defaults to update: CDRA_UNASSIGED,APCD_UNASSIGNED,PLN_UNASSIGNED_COUNTER,PLN_UNASSIGNED_BACKOFFICE,DPW_UNASSIGNED,STORMWATER_UNASSIGNED  */
-	
+	/*  This was in the nonprod1 but not present in production.
 	logDebug("Action by is " + wfActionByUserID);
 	var currAssigned = getTaskAssignUser(wfTask,wfProcess);
 	logDebug("Assigned to: " + currAssigned)
@@ -1449,7 +1456,7 @@ if(wfProcess == "BLD_20230501_MAIN")
 			assignTask(wfTask,wfActionByUserID,wfProcess);
 		}
 	}
-	
+	/----------------------------------------------------------------------------------------------------------------------------*/
 	// Rules for updating Dist Recon task when all Plan Review tasks are complete
 	if((wfTask.indexOf("Review") > -1 || wfTask == "Building Plan Check") && !matches(wfTask,"Submittal Review","Traffic Fee Review","Placer County Fire Fee Review","Real Estate Services Review","ADU Review","ADU Addressing Review"))
 	{
@@ -1696,6 +1703,7 @@ if(wfProcess == "BLD_20230501_MAIN")
 			{
 				updateAppStatus("Final Processing","All preissuance tasks Complete or inactive. Updated by script");
 				updateTask("Process for Issuance","Final Processing","All preissuance tasks Complete or inactive. Updated by script","",wfProcess);
+				editTaskDueDate("Process for Issuance",dateAdd(null,2,"Y"),wfProcess);																		  
 			}
 		}
 	}
