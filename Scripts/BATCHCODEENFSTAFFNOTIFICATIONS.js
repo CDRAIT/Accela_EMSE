@@ -245,7 +245,7 @@ if (paramsOK) {
 
     aa.print("Total Number of Code Enforcment Notifications sent to staff today is: " + totalCount);
     emailText += "Total Number of Code Enforcement Notifications sent to staff today is: " + totalCount;
-    aa.sendEmail(senderEmailAddr, emailAddrAdmin, ccEmailAddrAdmin, "CE Notifications 2 Staff - " + batchJobName, emailText, null);
+    aa.sendEmail(senderEmailAddr, emailAddrAdmin, ccEmailAddrAdmin, "Batch Job Result: Daily Code Enforcement Staff Notifications - Batch Job Name: " + batchJobName, emailText, null);
 }
 
 
