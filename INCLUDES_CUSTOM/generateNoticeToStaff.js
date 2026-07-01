@@ -15,7 +15,7 @@ function generateNoticeToStaff(vTemplate,vEmailTo,vWfDueDate,vWfTask)
 	addParameter(emailParameters,"$$wfDueDateParam$$",vWfDueDate);
 	addParameter(emailParameters,"$$wfTaskNameParam$$",wfTaskParam);
 	getPrimaryAddressLineParam4Notification(emailParameters); /* returns $$addressLine$$ parameter */	
-	var	emailResult = sendNotification("noreply@placer.ca.gov",vEmailTo,"",vTemplate,emailParameters,null);
+	var	emailResult = sendNotification(defaultFrom,vEmailTo,"",vTemplate,emailParameters,null);
 	logDebug(vTemplate + " notification result is " + emailResult);
 	return emailResult;
 }

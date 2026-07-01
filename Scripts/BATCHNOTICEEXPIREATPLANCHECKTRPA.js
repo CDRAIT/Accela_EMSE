@@ -20,6 +20,7 @@
 | Updates: TDunn 12/27/2023 created
 |          TDunn 02/01/2024 revised rules for Prime LP, not limited to Contractors and no LP email if no prime
 |          TDunn 05/26/2026 added INCLUDES_CUSTOM_GLOBALS and new excludes app statuses for Revisions and Awaiting Signature
+|          Abe   07/01/2026 Replaced all noreply@placer.ca.gov emails to defaultFrom (INCLUDES_CUSTOM_GLOBALS)
 |
 /------------------------------------------------------------------------------------------------------*/
 /*------------------------------------------------------------------------------------------------------/
@@ -80,7 +81,7 @@ var capId;
 // Variable used to hold the Cap Id value.
 
 // email parameters for batch results, must be added to batch job.  
-var senderEmailAddr = "noreply@placer.ca.gov";                                  // Email address of the sender
+var senderEmailAddr = defaultFrom;                                              // Email address of the sender
 //var emailAddrAdmin = getParam("emailAddrAdmin");                              // This must be added to batch job parameters. 
 //var ccEmailAddrAdmin = getParam("ccEmailAddrAdmin");                          // This must be added to batch job parameters. 
 //var emailAddrAdmin = "tdunn@truepointsolutions.com";
@@ -183,7 +184,7 @@ function aboutToExpirePermit() {
         if (capGroup == paramsAppGroup && exists(capPerType, paramsAppPerTypeArray) && exists(capPerCategory, paramsAppPerCategory) && !exists(capStatus, paramsAppStatusArray))
 		{
 			aa.print("Category type: " + capPerCategory + ", record number = " + capIDString + ". Expiration date: " + permitExpireDate + ". Cap status: " + capStatus);
-			var vFromEmail = "noreply@placer.ca.gov";
+			var vFromEmail = defaultFrom;
 			var vToEmail = "";
 			var vCcEmail = "";
 			var cTypeArray = new Array();

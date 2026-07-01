@@ -29,6 +29,7 @@
 |         : TDunn 10/03/2025 removed wfprocess criteria for staff record creation notification
 |         : TDunn 11/05/2025 added dynamic parameter for Project Office email address.
 |         : TDunn 01/02/2025 added new try clause
+|         : Abe   07/01/2026 Replaced all noreply@placer.ca.gov emails to defaultFrom (INCLUDES_CUSTOM_GLOBALS)
 |
 /=============================================================================================*/
 if(matches(currentUserID,"TDUNN","JMCKENZI","EAFTAHI")) { showDebug = 1;}
@@ -244,7 +245,7 @@ try
 			//addAdHocTask("ADHOC","Real Estate Services Review","County Property");
 			emailParameters = aa.util.newHashtable();
 			getRecordParams4Notification(emailParameters);
-			sendNotification("noreply@placer.ca.gov","",null, "REAL_ESTATE_SVCS_NOTIFICATION", emailParameters, null);
+			sendNotification(defaultFrom,"",null, "REAL_ESTATE_SVCS_NOTIFICATION", emailParameters, null);
 		}
 	}
 
@@ -389,7 +390,7 @@ try
 	//End of IT Request# 1911 - EV Charging Station 	
 } catch(e)
 {
-	aa.sendMail("noreply@placer.ca.gov","tdunn@truepointsolutions.com", "", "Testing ASA:Building try error ", e.message);	
+	aa.sendMail(defaultFrom,"tdunn@truepointsolutions.com", "", "Testing ASA:Building try error ", e.message);	
 }
 
 
@@ -431,7 +432,7 @@ if(!publicUser)
 	}
 	catch (err) {
 		logDebug("A JavaScript Error occured: " + err.message + " at line " + err.lineNumber + " stack: " + err.stack);
-		aa.sendMail("noreply@placer.ca.gov","tdunn@truepointsolutions.com", "", "Testing ASA:Building not public user try error ", err.message);
+		aa.sendMail(defaultFrom,"tdunn@truepointsolutions.com", "", "Testing ASA:Building not public user try error ", err.message);
 	}
 }
 
@@ -459,7 +460,7 @@ try{
 catch (err)
 {
 	logDebug("A JavaScript Error occured: " + err.message + " at line " + err.lineNumber + " stack: " + err.stack);
-	aa.sendMail("noreply@placer.ca.gov","tdunn@truepointsolutions.com", "", "Testing ASA:Building EV message try error ", err.message);
+	aa.sendMail(defaultFrom,"tdunn@truepointsolutions.com", "", "Testing ASA:Building EV message try error ", err.message);
 }
 
 //aa.sendMail("noreply@placer.ca.gov","tdunn@truepointsolutions.com", "", "Testing ASA:Building: debug ", debug);

@@ -111,5 +111,10 @@
 |   01/11/2026 TDunn >> added custom function createCollectionOfParcels
 |   04/27/2026 Abe   >> Added parcelConditionExists_PCO() for PCCP parcel conditions 
 |   06/24/2026 Abe   >> Updated function sendAcknowledgementLtr2Applicant() for sending email for Code Enforcement 
+|   07/01/2026 Abe   >> Replaced all noreply@placer.ca.gov emails to defaultFrom (INCLUDES_CUSTOM_GLOBALS) in following functions:
+                                    - generateAddlPermitRequiredNotice
+                                    - generateNoticeToStaff
+                                    - generateStormFloodNotice
+
 |
 /---------------------------------------------------------------------------------------------------------------------------------------------------------*/

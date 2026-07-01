@@ -27,7 +27,7 @@ function generateAddlPermitRequiredNotice(vTemplate,rpList)
 		}
 	}
 
-	var	emailResult = sendNotification("noreply@placer.ca.gov",vToEmail,"",vTemplate,emailParameters,null);
+	var	emailResult = sendNotification(defaultFrom, vToEmail,"",vTemplate,emailParameters,null);
 	logDebug(vTemplate + " notification result is " + emailResult);
 	return emailResult;
 }

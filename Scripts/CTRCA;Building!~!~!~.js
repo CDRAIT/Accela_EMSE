@@ -22,6 +22,8 @@
 |         : TDunn 08/29/2025 copied from onsite dev/test
 |         : TDunn 08/29/2025 deployed to Github repository
 |         : TDunn 11/17/2025 fixed issue with email parameters
+|         : Abe   07/01/2026 Replaced all noreply@placer.ca.gov emails to defaultFrom (INCLUDES_CUSTOM_GLOBALS)
+
 |
 /======================================================================================================*/
 showDebug = 1
@@ -156,7 +158,7 @@ if(publicUser)
 	{
 		emailParameters = aa.util.newHashtable();
 		getRecordParams4Notification(emailParameters);
-		sendNotification("noreply@placer.ca.gov","",null, "REAL_ESTATE_SVCS_NOTIFICATION", emailParameters, null);
+		sendNotification(defaultFrom,"",null, "REAL_ESTATE_SVCS_NOTIFICATION", emailParameters, null);
 	}
 	
 	var wfProcess = "";

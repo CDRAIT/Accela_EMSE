@@ -54,6 +54,7 @@
 |         : TDunn 03/05/2026 added Approval Notification to applicant, Owner
 |         : TDunn 03/19/2026 deployed to production
 |         : TDunn 04/17/2026 added review due date logic for TRPA revisions
+|         : Abe   07/01/2026 Replaced all noreply@placer.ca.gov emails to defaultFrom (INCLUDES_CUSTOM_GLOBALS)
 | 
 /---------------------------------------------------------------------------------------------------------------------------------*/
 
@@ -2367,6 +2368,6 @@ function generateStormFloodNotice()
 	var emailParameters = aa.util.newHashtable();
 	// Parameters returned by getRecordParameters4Notification: $$altID$$; $$capName$$; $$capStatus$$; $$fileDate$$; $$workDesc$$; $$balanceDue$$; $$capTypeAlias$$
 	getRecordParams4Notification(emailParameters);
-	var	emailResult = sendNotification("noreply@placer.ca.gov","stormwtrquality@placer.ca.gov","","NOTICE_STORMWTR_AND_FLOOD_REVIEW_ACTIVE",emailParameters,null);
+	var	emailResult = sendNotification(defaultFrom,"stormwtrquality@placer.ca.gov","","NOTICE_STORMWTR_AND_FLOOD_REVIEW_ACTIVE",emailParameters,null);
 	logDebug("StormFloodNotice result = " + emailResult);
 }

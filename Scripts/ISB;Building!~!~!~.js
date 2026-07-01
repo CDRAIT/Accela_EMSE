@@ -32,6 +32,7 @@
 |         : TDunn 03/20/2026 ?
 |         : Abe   04/10/2026 Synced the Github version with database - the Github was behind!
 |         : Abe   05/13/2026 added 515 ESS to the "Final Inspection" list - IT REQUEST# 3465
+|         : Abe   07/01/2026 Replaced all noreply@placer.ca.gov emails to defaultFrom (INCLUDES_CUSTOM_GLOBALS)
 |
 |
 /------------------------------------------------------------------------------------------------------*/
@@ -105,7 +106,7 @@ if (vEventName == "InspectionScheduleBefore") {
 }
 
 if (varUseInspInspector) {
-    var senderEmailAddr = "noreply@placer.ca.gov";
+    var senderEmailAddr = defaultFrom;                                              
     var emailAddrAdmin = "tdunn@truepointsolutions.com";
     var ccEmailAddrAdmin = "";
     var emailText = inspType + "; " + inspInspector + "; scheduled = " + checkInspectionResult(inspType, "Scheduled");
