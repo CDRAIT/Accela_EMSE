@@ -18,6 +18,7 @@
 |         : TDunn 03/26/2025 added setting Submittal Review due date and staff assignment
 |         : TDunn 08/29/2025 copied to Non-prod1
 |         : TDunn 08/30/2025 Deployed to GitHub
+|         : TDunn 06/30/2026 added updating revision with parent permit type
 |           
 /---------------------------------------------------------------------------------------------------------------------*/
 
@@ -49,7 +50,19 @@ logDebug("parentCapString= " + parentCapString);
 
 var saveCap = cap; 
 cap = aa.cap.getCap(parentCapString).getOutput();
-if (parentCapString) {
+if (parentCapString) 
+{
+	try
+	{
+		var capGroup = cap.getCapType().getGroup(); // Cap Type Group
+		var capPerType = cap.getCapType().getType(); // Cap Per Type Group
+		var capSubType = cap.getCapType().getSubType(); //
+		logDebug("Group: " + capGroup + "; Type: " + capPerType + "; SubType: " + capSubType);
+		editAppSpecific("Parent Record Type",capPerType);
+	}
+	catch (err) {
+		logDebug("A JavaScript Error occured retrieving parent type: " + err.message + " at line " + err.lineNumber + " stack: " + err.stack);
+	}	
 	pCapIdSplit = String(parentCapString).split("-"); 
 	pCapId = aa.cap.getCapID(pCapIdSplit[0],pCapIdSplit[1],pCapIdSplit[2]).getOutput(); 
 	pCapIDString = pCapId.getCustomID(); 
