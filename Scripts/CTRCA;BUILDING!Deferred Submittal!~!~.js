@@ -16,6 +16,7 @@
 |         : TDunn 08/29/2025 copied to Non-prod1
 |         : TDunn 08/30/2025 deployed to Github
 |         | TDunn 12/30/2025 deployed to production
+|         : TDunn 06/30/2026 added updating parent record type: Residential or Commercial
 |           
 /---------------------------------------------------------------------------------------------------------------------*/
 
@@ -51,6 +52,17 @@ var saveCap = cap;
 cap = aa.cap.getCap(parentCapString).getOutput();
 if (parentCapString) 
 {
+	try
+	{
+		var capGroup = cap.getCapType().getGroup(); // Cap Type Group
+		var capPerType = cap.getCapType().getType(); // Cap Per Type Group
+		var capSubType = cap.getCapType().getSubType(); //
+		logDebug("Group: " + capGroup + "; Type: " + capPerType + "; SubType: " + capSubType);
+		editAppSpecific("Parent Record Type",capPerType);
+	}
+	catch (err) {
+		logDebug("A JavaScript Error occured retrieving parent type: " + err.message + " at line " + err.lineNumber + " stack: " + err.stack);
+	}	
 	pCapIdSplit = String(parentCapString).split("-"); 
 	pCapId = aa.cap.getCapID(pCapIdSplit[0],pCapIdSplit[1],pCapIdSplit[2]).getOutput(); 
 	pCapIDString = pCapId.getCustomID(); 
