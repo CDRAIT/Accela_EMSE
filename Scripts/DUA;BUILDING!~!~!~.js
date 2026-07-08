@@ -170,7 +170,8 @@ if((publicUser || publicUserEDR == true) && capIDString.indexOf("TMP") == -1)
 					}
 				}
 				editTaskDueDate("Distribution",dateAdd(null,1,"Y"),"BLD_20230501_MAIN");
-				updateAppStatus("Resubmittal Received","Document uploaded following a Corrections Required/Responses Received status. Updated by script");				
+				updateAppStatus("Resubmittal Received","Document uploaded following a Corrections Required/Responses Received status. Updated by script");
+				editTaskSpecific("Distribution","Possession Start Date",dateAdd(null,0,"Y"));				
 				if(recFromTriage)
 				{
 					updateTask("Distribution","Resubmittal Received","Resubmittal from Pre-screen received. Updated by script","Resubmittal from Pre-screen");
@@ -183,7 +184,8 @@ if((publicUser || publicUserEDR == true) && capIDString.indexOf("TMP") == -1)
 						resubNum = 1;
 					}
 					updateTask("Distribution","Resubmittal Received","Submittal " + formatResubNum(resubNum) + " received. Updated by script","Submittal " + formatResubNum(resubNum));
-				}				
+				}
+				
 			}
 		}
 	}

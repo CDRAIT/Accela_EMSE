@@ -62,8 +62,10 @@ try
 }
 
 // Auto assign and set due date for Submittal Review
-assignTask("Submittal Review","CDRA_UNASSIGNED");
+assignTask("Submittal Review","PERMIT CENTER_UNASSIGNED");
 editTaskDueDate("Submittal Review",dateAdd(null,2,"Y"));
+editTaskSpecific("Submittal Review","Possession Start Date",dateAdd(null,0,"Y"));
+updateTask("Submittal Review","Received","Possession Start Date logged by system","",wfProcess);
 
 
 //IT Request# 1911 - EV Charging Station

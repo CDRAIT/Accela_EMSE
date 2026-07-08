@@ -469,6 +469,9 @@ if(wfProcess == "BLD_20230501_MAIN")
 			assignThisTask("Distribution",wfProcess);			
 			if(AInfo["Application Received"] == "Online" && AInfo["Code Enforcement Action"] != "Yes") editAppSpecific("Plan Check Expiration",dateAdd(null,365));
 			if(AInfo["Application Received"] == "Online" && AInfo["Code Enforcement Action"] == "Yes") editAppSpecific("Plan Check Expiration",dateAdd(null,182));
+			/*****  New for in possession ****/
+			editTaskSpecific("Distribution","Possession Start Date",dateAdd(null,0,"Y"));
+			updateTask("Distribution","Submittal Received","Possession Start Date logged by system","",wfProcess);			
 		}
 		// End review preset rules -----------------
 
@@ -629,22 +632,10 @@ if(wfProcess == "BLD_20230501_MAIN")
 				thisReview = preTriageListArray[xx];
 				if(matches(AInfo[thisReview],"Y","Yes"))
 				{
-					if(thisReview == "Initial Planning Review") 
-					{
-						assignThisTask(thisReview,wfProcess);
-						editTaskDueDate(thisReview,dateAdd(null,addNumDays,"Y"),wfProcess);
-					}
-					if(thisReview == "Plan Completeness Review") 
-					{
-						defaultStaff = lookup("SDL:BLD Default Assignment",thisReview);
-						assignTask(thisReview,defaultStaff,wfProcess);
-						editTaskDueDate(thisReview,dateAdd(null,addNumDays,"Y"),wfProcess);
-					}
-					if(thisReview == "TRPA Completeness Review") 
-					{
-						assignThisTask(thisReview,wfProcess);
-						editTaskDueDate(thisReview,dateAdd(null,addNumDays,"Y"),wfProcess);
-					}				
+					assignThisTask(thisReview,wfProcess);
+					editTaskDueDate(thisReview,dateAdd(null,addNumDays,"Y"),wfProcess);
+					editTaskSpecific(thisReview,"Possession Start Date",dateAdd(null,0,"Y"));
+					updateTask(thisReview,"Submittal Received","Possession Start Date logged by system","",wfProcess);
 				}
 			}
 		}
@@ -696,6 +687,7 @@ if(wfProcess == "BLD_20230501_MAIN")
 			}
 			setDueDate("BLDPERMIT",addNumDays,wfProcess);
 			assignConcurrent("BLDPERMIT",wfProcess,resubNum);				
+			setConcurrentStatusAndPossDate("BLDPERMIT",wfProcess);
 			
 			preIssueFlag = true;
 			
@@ -943,7 +935,8 @@ if(wfProcess == "BLD_20230501_MAIN")
 				addNumDays = getDueInDays("SDL:DueDates","Reviews|" + dueDateRecType,1);	
 			}
 			setDueDate("BLDPERMIT",addNumDays,wfProcess);
-			assignConcurrent("BLDPERMIT",wfProcess,resubNum);				
+			assignConcurrent("BLDPERMIT",wfProcess,resubNum);
+			setConcurrentStatusAndPossDate("BLDPERMIT",wfProcess);			
 
 			preIssueFlag = true;
 
@@ -1441,7 +1434,7 @@ if(wfProcess == "BLD_20230501_MAIN")
 	}
 	
 	// Update Assigned To for all tasks with initial generic staff default assignment ----------------------
-	/*  Designated defaults to update: CDRA_UNASSIGED,APCD_UNASSIGNED,PLN_UNASSIGNED_COUNTER,PLN_UNASSIGNED_BACKOFFICE,DPW_UNASSIGNED,STORMWATER_UNASSIGNED  */
+	/*  Designated defaults to update: PERMIT CENTER_UNASSIGNED,APCD_UNASSIGNED,PLANNING_UNASSIGNED_COUNTER,DPW_UNASSIGNED,STORMWATER_UNASSIGNED  */
 	/*  This was in the nonprod1 but not present in production.
 	logDebug("Action by is " + wfActionByUserID);
 	var currAssigned = getTaskAssignUser(wfTask,wfProcess);
@@ -1516,6 +1509,7 @@ if(wfProcess == "BLD_20230501_MAIN")
 					distRecStatus = "Ready for Reconciliation - Corrections";
 				}
 				//updateTask("Distribution Reconciliation",distRecStatus,"Status updated by script.",""); // Remarked out due to duplication of WTUA digEplan script.
+				editTaskSpecific("Distribution Reconciliation","Possession Start Date",dateAdd(null,0,"Y"));
 			}
 		}
 	}	
@@ -1567,6 +1561,7 @@ if(wfProcess == "BLD_20230501_MAIN")
 				showMessage = true;
 				comment("<font size = 4 color=ff000><b>No applicant email address found. " + wfStatus + " email notification cannot be sent.</b></font><br><br>A status of " + wfStatus + " for the " + wfTask + " task will send a " + wfStatus + " notification to the applicant.<br>The email notification cannot be sent without a valid applicant email address.<br> Please review applicant contact record for a valid email address.");
 			}
+			editTaskSpecific("Distribution","Possession Start Date",dateAdd(null,0,"Y"));			
 			if(recFromTriage)
 			{
 				updateTask("Distribution","Pending Resubmittal","Corrections required for " + failTask + ". Updated by script","Pending Resubmittal from Pre-screen");
@@ -1590,6 +1585,7 @@ if(wfProcess == "BLD_20230501_MAIN")
 			thisTask = "Distribution";
 			assignThisTask(thisTask,wfProcess);
 			editTaskDueDate("Distribution",dateAdd(null,1,"Y"),wfProcess);
+
 			presetTSIpco("BLDPERMIT","Distribution","Approved","Cleared","ThirdStatus");
 		}
 		
@@ -1610,7 +1606,13 @@ if(wfProcess == "BLD_20230501_MAIN")
 			{
 				cTask = preTasksArraySD[thisPI];
 				logDebug("For setting date, current cTask = " + cTask);
-				if(isTaskActive(cTask)) { editTaskDueDate(cTask,dateAdd(null,1,"Y"),wfProcess); }
+				if(isTaskActive(cTask)) 
+				{ 
+					editTaskDueDate(cTask,dateAdd(null,1,"Y"),wfProcess); 
+					editTaskSpecific(cTask,"Possession Start Date",dateAdd(null,0,"Y"));
+					updateTask(cTask,"Awaiting Review","Possession Start Date logged by system","",wfProcess);				
+				}
+				
 			}
 			// Generate notification for active preissuance tasks to assigned staff
 			var preIssueToStaffTemplate = "OUTSTANDING _PREISSUANCE_TASK";
@@ -2048,4 +2050,40 @@ if(wfProcess == "BLD_20230501_MAIN")
 			assignTask(thisTask,thisStaff,wfProcess);
 		}
 	}
+}
+
+
+/***************************************
+| Required internal functions          |
+\**************************************/
+function setConcurrentStatusAndPossDate(lkupCriteria,tprocess)
+{
+	
+	/* Retrieve concurrent list */
+	taskListArray = new Array();
+	taskList = lookup("PLAN REVIEW - REQUIRED REVIEWS", lkupCriteria); //requiredReviewsStdChoice ... Get Reviews Required by Record Type from Standard Choice
+	taskListArray = taskList.split(",");
+	/* Load cycle TSI values */
+	useTaskSpecificGroupName = true;
+	TsiInfo = new Array();
+	loadTaskSpecific(TsiInfo,capId);
+	/* Find tasks to activate */
+	for(tla in taskListArray)
+	{
+		newStatus = "Submittal Received";
+		thisTask = taskListArray[tla];
+		if (matches(AInfo[thisTask],"Yes","Y","YES"))
+		{
+			if(matches(TsiInfo[tprocess + "." + thisTask + "." + "Cycle Number"],null,"",undefined))
+			{
+				newCycle = 0;
+			} else{		
+			newCycle = 1 * TsiInfo[tprocess + "." + thisTask + "." + "Cycle Number"];
+			}
+			if(newCycle > 1) { newStatus = "Resubmittal Received"; }
+			editTaskSpecific(thisTask,"Possession Start Date",dateAdd(null,0,"Y"));
+			updateTask(thisTask,newStatus,"Possession Start Date logged by system","",wfProcess);
+		}
+	}
+	useTaskSpecificGroupName = false;
 }

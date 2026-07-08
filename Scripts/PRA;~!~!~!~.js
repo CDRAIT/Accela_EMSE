@@ -93,6 +93,7 @@ if(matches(appTypeArray[1],"Residential","Commercial"))
 			updateTask("Distribution","Payment Received","Updated on Payment of fees due","");
 			updateAppStatus("Payment Received","Updated by script on Payment Received via Citizen Portal");
 			editTaskDueDate("Distribution",dateAdd(null,1,"Y"));
+			editTaskSpecific("Distribution","Possession Start Date",dateAdd(null,0,"Y"));
 		}
 	}
 }
