@@ -19,6 +19,7 @@
 |         : TDunn 08/29/2025 copied to Non-prod1
 |         : TDunn 08/30/2025 Deployed to GitHub
 |         : TDunn 06/30/2026 added updating revision with parent permit type
+|         : TDunn 07/08/2026 updated parent permit type for TRPA to use subType
 |           
 /---------------------------------------------------------------------------------------------------------------------*/
 
@@ -58,7 +59,14 @@ if (parentCapString)
 		var capPerType = cap.getCapType().getType(); // Cap Per Type Group
 		var capSubType = cap.getCapType().getSubType(); //
 		logDebug("Group: " + capGroup + "; Type: " + capPerType + "; SubType: " + capSubType);
-		editAppSpecific("Parent Record Type",capPerType);
+		if(capGroup == "Building")
+		{
+			editAppSpecific("Parent Record Type",capPerType);
+		}
+		if(capGroup == "TRPA")
+		{
+			editAppSpecific("Parent Record Type",capSubType);
+		}
 	}
 	catch (err) {
 		logDebug("A JavaScript Error occured retrieving parent type: " + err.message + " at line " + err.lineNumber + " stack: " + err.stack);
