@@ -1,5 +1,5 @@
 /*------------------------------------------------------------------------------------------------------/
-| Program : CTRCA:Building/Revision/~/~
+| Program : CTRCA;Building!Revision!~!~
 | Event   : ConvertToRealCapAfter
 |
 | Client  : Placer County, CA
@@ -18,7 +18,8 @@
 |         : TDunn 03/26/2025 added setting Submittal Review due date and staff assignment
 |         : TDunn 08/29/2025 copied to Non-prod1
 |         : TDunn 08/30/2025 Deployed to GitHub
-|         : TDunn 01/16/2026 added updating parent record type: Residential or Commercial
+|         : TDunn 06/30/2026 added updating revision with parent permit type
+|         : TDunn 07/08/2026 updated parent permit type for TRPA to use subType
 |           
 /---------------------------------------------------------------------------------------------------------------------*/
 
@@ -58,7 +59,14 @@ if (parentCapString)
 		var capPerType = cap.getCapType().getType(); // Cap Per Type Group
 		var capSubType = cap.getCapType().getSubType(); //
 		logDebug("Group: " + capGroup + "; Type: " + capPerType + "; SubType: " + capSubType);
-		editAppSpecific("Parent Record Type",capPerType);
+		if(capGroup == "Building")
+		{
+			editAppSpecific("Parent Record Type",capPerType);
+		}
+		if(capGroup == "TRPA")
+		{
+			editAppSpecific("Parent Record Type",capSubType);
+		}
 	}
 	catch (err) {
 		logDebug("A JavaScript Error occured retrieving parent type: " + err.message + " at line " + err.lineNumber + " stack: " + err.stack);
@@ -160,6 +168,7 @@ if(publicUser) {
 	editAppSpecific("RequiredDocumentTypes","");
 }
 
-sendResult = aa.sendMail("noreply@placer.ca.gov","tdunn@govPath.tech","","Test: revision created " + newAltID, debug);
+
+//sendResult = aa.sendMail("noreply@placer.ca.gov","tdunn@truepointsolutions.com","","Test: revision created " + newAltID, debug);
 
 //aa.sendMail("noreply@placer.ca.gov","mckenzie@truepointsolutions.com", "", "PLACERCO CTRCA Revisions ", debug);	
