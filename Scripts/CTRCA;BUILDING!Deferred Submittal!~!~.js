@@ -58,7 +58,14 @@ if (parentCapString)
 		var capPerType = cap.getCapType().getType(); // Cap Per Type Group
 		var capSubType = cap.getCapType().getSubType(); //
 		logDebug("Group: " + capGroup + "; Type: " + capPerType + "; SubType: " + capSubType);
-		editAppSpecific("Parent Record Type",capPerType);
+		if(capGroup == "Building")
+		{
+			editAppSpecific("Parent Record Type",capPerType);
+		}
+		if(capGroup == "TRPA")
+		{
+			editAppSpecific("Parent Record Type",capSubType);
+		}
 	}
 	catch (err) {
 		logDebug("A JavaScript Error occured retrieving parent type: " + err.message + " at line " + err.lineNumber + " stack: " + err.stack);
