@@ -169,6 +169,6 @@ if(publicUser) {
 }
 
 
-sendResult = aa.sendMail("noreply@placer.ca.gov","tdunn@truepointsolutions.com","","Test: revision created " + newAltID, debug);
+//sendResult = aa.sendMail("noreply@placer.ca.gov","tdunn@truepointsolutions.com","","Test: revision created " + newAltID, debug);
 
-aa.sendMail("noreply@placer.ca.gov","mckenzie@truepointsolutions.com", "", "PLACERCO CTRCA Revisions ", debug);	
+//aa.sendMail("noreply@placer.ca.gov","mckenzie@truepointsolutions.com", "", "PLACERCO CTRCA Revisions ", debug);	
