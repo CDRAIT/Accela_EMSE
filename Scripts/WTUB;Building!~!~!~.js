@@ -22,6 +22,7 @@
 |         : TDunn   03/20/2026 deployed to nonprod1 for testing
 |         : TDunn   03/20/2026 removed CreateCollectionOfParcels function from script and moved to Includes_Custom
 |         : TDunn   03/20/2026 remarked out Revisions at Inspection task, replaced by expression
+|         : TDunn   07/14/2026 added Signature Requested status to criteria for cancel on conditions
 |
 /=================================================================================================*/
 if(matches(currentUserID,"TDUNN","JMCKENZI","EAFTAHI")) { showDebug = 1;}
@@ -98,7 +99,7 @@ else {
 
 if (((appMatch("Building/Residential/Limited/*") && matches(wfTask, "Plan Check")) || matches(wfTask, "Ready to Issue") ||
     matches(wfTask, "Process for Issuance") || matches(wfTask, "Issue Status")) &&
-    matches(wfStatus, "Issued", "Re-Issue") && ConditionStopsIssuance == true) {
+    matches(wfStatus, "Issued", "Re-Issue","Signature Requested") && ConditionStopsIssuance == true) {
 
     showMessage = true;
     customComment("There are applied Conditions that must be cleared before proceeding!");
@@ -324,5 +325,10 @@ if(wfProcess == "BLD_20230501_MAIN" || wfProcess == "BLD_20231116_REV")
 			// }				
 		// }
 	// }
+}
+
+if(wfProcess == "BLD_20231116_REV")
+{
+	logDebug("holder");
 }
 

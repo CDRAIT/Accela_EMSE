@@ -1996,14 +1996,3 @@ if(matches(appTypeArray[1],"Revision") && wfProcess == "BLD_20231116_REV")
 		}		
 	}
 }
-
-// Custom functions in development - move to Includes_Custom on validation
-
-function generateStormFloodNotice()
-{
-	var emailParameters = aa.util.newHashtable();
-	// Parameters returned by getRecordParameters4Notification: $$altID$$; $$capName$$; $$capStatus$$; $$fileDate$$; $$workDesc$$; $$balanceDue$$; $$capTypeAlias$$
-	getRecordParams4Notification(emailParameters);
-	var	emailResult = sendNotification("noreply@placer.ca.gov","stormwtrquality@placer.ca.gov","","NOTICE_STORMWTR_AND_FLOOD_REVIEW_ACTIVE",emailParameters,null);
-	logDebug("StormFloodNotice result = " + emailResult);
-}
