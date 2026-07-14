@@ -18,6 +18,7 @@
 |                           added new rules for emailto distribution list.
 |          TDunn 01/23/2024 updated call for Prime LP
 |          TDunn 02/01/2024 revised rules for Prime LP, not limited to Contractors and no LP email if no prime
+|          Abe   07/14/2026 added closed status to the list of statuses to exclude from processing - IT Request# 3686
 /------------------------------------------------------------------------------------------------------*/
 /*------------------------------------------------------------------------------------------------------/
 | START: USER CONFIGURABLE PARAMETERS
@@ -93,7 +94,7 @@ var emailText2 = "";
 var paramsAppGroup = "Building";
 var paramsAppPerTypeArray = new Array("Residential","Commercial");
 var paramsAppSubTypeArray = new Array("Full Review", "Limited","PV Solar");
-var paramsAppStatusArray = new Array("Expired", "Construction Complete", "Void", "Withdrawn", "DONE", "CANC");
+var paramsAppStatusArray = new Array("Expired", "Construction Complete", "Void", "Withdrawn", "DONE", "CANC", "Closed");
 // Parameter variables data
 var paramsAppSubGroupName = "EXTENSIONS AND EXPIRATION";                     	// Application Spec Info Subgroup Name that the ASI field is associated to.
 var paramsAppSpecInfoLabel = "Expiration Date";                              	// ASI field name that the batch script is to search.
