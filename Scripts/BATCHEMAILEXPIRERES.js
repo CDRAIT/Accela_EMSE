@@ -25,6 +25,7 @@
 |                                            - Changed batch to process records by ASI field.
 |                                            - Updated batch script criteria on sending out email.
 |               TDunn, TPS,      10/26/2023  - Modified to include PV Solar/SolarApp record type
+|               Abe, TPS,        07/14/2026  - Added "Closed" to the App Status Array - IT Req# 3686
 /------------------------------------------------------------------------------------------------------*/
 /*------------------------------------------------------------------------------------------------------/
 | START: USER CONFIGURABLE PARAMETERS
@@ -66,7 +67,7 @@ var emailText2 = "";
 var paramsAppGroup = "Building";
 var paramsAppPerType = "Residential";
 var paramsAppSubTypeArray = new Array("Full Review", "Limited","PV Solar");
-var paramsAppStatusArray = new Array("Expired", "Construction Complete", "Void", "Withdrawn", "DONE", "CANC");
+var paramsAppStatusArray = new Array("Expired", "Construction Complete", "Void", "Withdrawn", "DONE", "CANC", "Closed");  // Application Status that the batch script is to ignore.
 
 var paramsAppSubGroupName = "EXTENSIONS AND EXPIRATION";                           // Application Spec Info Subgroup Name that the ASI field is associated to.
 var paramsAppSpecInfoLabel = "Expiration Date";                                    // ASI field name that the batch script is to search.

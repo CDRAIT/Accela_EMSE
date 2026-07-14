@@ -22,6 +22,7 @@
 |          TDunn 01/23/2024 updated call for Prime LP
 |          TDunn 02/01/2024 updated LP email rules, added numDays loop to run batch twice against multiple expiration dates
 |          TDunn 03/06/2024 removed app status update completely from script.
+|          Abe   07/14/2026 added "Closed" to the App Status Array - IT Req# 3686
 /------------------------------------------------------------------------------------------------------*/
 /*------------------------------------------------------------------------------------------------------/
 | START: USER CONFIGURABLE PARAMETERS
@@ -97,7 +98,7 @@ var emailText2 = "";
 var paramsAppGroup = "Building";
 var paramsAppPerTypeArray = new Array("Residential","Commercial");
 var paramsAppSubTypeArray = new Array("Full Review", "Limited","PV Solar");
-var paramsAppStatusArray = new Array("Expired", "Construction Complete", "Void", "Withdrawn", "DONE", "CANC");
+var paramsAppStatusArray = new Array("Expired", "Construction Complete", "Void", "Withdrawn", "DONE", "CANC", "Closed");
 // Parameter variables data
 var startDate = 60;
 var endDate = 60;
