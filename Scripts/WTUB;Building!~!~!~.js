@@ -329,6 +329,28 @@ if(wfProcess == "BLD_20230501_MAIN" || wfProcess == "BLD_20231116_REV")
 
 if(wfProcess == "BLD_20231116_REV")
 {
-	logDebug("holder");
+	if(wfTask == "Submittal Review" && wfStatus == "Submittal Accepted")
+	{
+		if(getParent() != null && getParent() != false)
+		{
+			logDebug("Parent found");
+			pCapId = getParent();
+			pCapIDString = pCapId.getCustomID();
+			pCap = aa.cap.getCap(pCapId).getOutput();
+			pappTypeResult = pCap.getCapType();
+			pappTypeAlias = pappTypeResult.getAlias();
+			pappTypeString = pappTypeResult.toString();
+			pappTypeArray = pappTypeString.split("/");
+			if(pappTypeArray[0]== "TRPA")
+			{
+				if(matches(getAppSpecific("TRPA Permit Type"),null,"",undefined))
+				{
+					showMessage = true;
+					comment("<font size = 4 color=ff000><b>No TRPA Permit Type found:<br> " + cMessage + ".</b></font><br>The TRPA Permit Type MUST be populated before the Submittal can be accepted.");
+					cancel = true;					
+				}
+			}
+		}
+	}
 }
 
