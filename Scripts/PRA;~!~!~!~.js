@@ -27,6 +27,7 @@
 |         : TDunn 03/20/2026 added updating due dates for originating tasks on payment
 |         : TDunn 03/25/2026 added updating child task due dates
 |         : TDunn 03/26/2026 added including old 'Plan Check Only' type in criteria for Master/Rev updates
+|         : TDunn 07/14/2026 added tracking in possession date
 |
 \-------------------------------------------------------------------------------------------------------*/
 
@@ -84,6 +85,7 @@ if(matches(appTypeArray[1],"Residential","Commercial"))
 		updateTask("Process for Issuance","Payment Received","Payment Received via Citizen Portal. Updated by script","");
 		updateAppStatus("Payment Received","Updated by script on Payment Received via Citizen Portal");
 		editTaskDueDate("Process for Issuance",dateAdd(null,2,"Y"));
+		editTaskSpecific("Process for Issuance","Possession Start Date",dateAdd(null,0,"Y"));
 	}
 	if(isTaskActive("Distribution") && isTaskStatus("Distribution","Payment Requested"))
 	{
@@ -166,6 +168,7 @@ if(matches(appTypeArray[1],"Revision"))
 		updateTask("Process for Issuance","Payment Received","Payment Received via Citizen Portal. Updated by script","");
 		updateAppStatus("Payment Received","Updated by script on Payment Received via Citizen Portal");
 		editTaskDueDate("Process for Issuance",dateAdd(null,2,"Y"));
+		editTaskSpecific("Process for Issuance","Possession Start Date",dateAdd(null,0,"Y"));
 	}
 	if(isTaskActive("Distribution") && isTaskStatus("Distribution","Payment Requested"))
 	{
@@ -175,6 +178,7 @@ if(matches(appTypeArray[1],"Revision"))
 			updateTask("Distribution","Payment Received","Updated on Payment of fees due","");
 			updateAppStatus("Payment Received","Updated by script on Payment Received via Citizen Portal");
 			editTaskDueDate("Distribution",dateAdd(null,1,"Y"));
+			editTaskSpecific("Distribution","Possession Start Date",dateAdd(null,0,"Y"));
 		}
 	}
 }
@@ -187,6 +191,7 @@ if(appTypeArray[1] == "Deferred Submittal")
 		updateTask("Process for Issuance","Payment Received","Payment Received via Citizen Portal. Updated by script","");
 		updateAppStatus("Payment Received","Updated by script on Payment Received via Citizen Portal");	
 		editTaskDueDate("Process for Issuance",dateAdd(null,2,"Y"));
+		editTaskSpecific("Process for Issuance","Possession Start Date",dateAdd(null,0,"Y"));
 	}
 }
 

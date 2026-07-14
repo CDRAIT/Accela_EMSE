@@ -91,7 +91,7 @@
 |         : TDunn 04/02/2025 changed condition type to add for Stormwater Floodplain Review Required
 |         : TDunn 08/29/2025 copied to Non-prod1
 |         : TDunn 08/29/2025 deployed to Github repository
-|         : Abe   09/10/2025 Added IT Request# 2548  
+|         : Abe   09/10/2025 Added IT Request# 2548
 |         : TDunn 10/02/2025 added new ESD Improvement plan req notification
 |         : TDunn 11/05/2025 added dynamic CDR Project Office email parameter for notifications.
 |         : TDunn 11/05/2025 updated multiple notifications to accommodate addition of project office email parameter.
@@ -108,6 +108,7 @@
 |         : TDunn 03/19/2026 updated due date for Closure
 |         : TDunn 04/19/2026 optimized criteria logic for triage versus plan review distribution rules
 |         : TDunn 06/24/2026 syncd production back to nonprod1 to support updates to in possession tracking
+|         : TDunn 07/01-14/2026 added updating inpossession dates and updated assignment rules
 |
 /---------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 
@@ -198,8 +199,8 @@ if(wfProcess == "BLD_20230501_MAIN")
 {
 	logDebug("Running code for process BLD_20230501_MAIN");
 	// Initialize defaults and flags
-	var closureStaff = "CDRA_UNASSIGNED";
-	var pfiStaff = "CDRA_UNASSIGNED";
+	var closureStaff = "PERMIT CENTER_UNASSIGNED";
+	var pfiStaff = "PERMIT CENTER_UNASSIGNED";
 	var defaultStaff = "";
 	var cdrEmail = "OnlineBLDPermits@placer.ca.gov";
 	var stmTemplate = "TASK_REVIEW_STMWTR";
@@ -655,7 +656,7 @@ if(wfProcess == "BLD_20230501_MAIN")
 			for(rtl in rtaskListArray)
 			{
 				rTask = rtaskListArray[rtl];
-				if(matches(AInfo[rTask],"Y","Yes","YES"))
+				if(matches(AInfo[rTask],"Y","Yes","YES"))	  
 				{
 					noTSIYes = false;
 					noScope = false;
@@ -922,7 +923,7 @@ if(wfProcess == "BLD_20230501_MAIN")
 			editTaskSpecific("Distribution","TRPA Completeness Review","N");
 			AInfo["Initial Planning Review"] = "No";
 			AInfo["Plan Completeness Review"] = "No";
-			AInfo["TRPA Completeness Review"] = "No";			
+			AInfo["TRPA Completeness Review"] = "No";							   
 			autoRouteReviewsTD("P", "Y","BLDPERMIT");
 			// for setting review task dates and staff assignment during autoRouteReviewsTD();
 			resubNum = AInfo["Resubmittal Number"];
@@ -946,7 +947,6 @@ if(wfProcess == "BLD_20230501_MAIN")
 				stmDueDate = dateAdd(null,addNumDays,"Y");
 				sentStormNotice = generateNoticeToStaff(stmTemplate,stmToEmail,stmDueDate);	
 				if(sentStormNotice)
-				{
 					logDebug("Send Stormwater notification is " + sentStormNotice);
 				} else {
 					logDebug("Failed to send Stormwater notification");
@@ -957,12 +957,9 @@ if(wfProcess == "BLD_20230501_MAIN")
 				apcdDueDate = dateAdd(null,addNumDays,"Y");
 				sentAPCDNotice = generateNoticeToStaff(apcdTemplate,apcdToEmail,apcdDueDate);
 				if(sentAPCDNotice)
-				{
 					logDebug("Sent APCD Review notification is " + sentAPCDNotice);
 				} else {
 					logDebug("Failed to send APCD notification");
-				}
-			}
 			if(isTaskStatus("Initial Planning Review",clearStatus))
 			{
 				if(matches(AInfo["Planning Review Type"],"Back Office Planning Review")) {assignTask("Planning Review","PLN_UNASSIGNED_BACKOFFICE",wfProcess);}
@@ -1329,7 +1326,7 @@ if(wfProcess == "BLD_20230501_MAIN")
 			}
 		}
 		if(wfStatus == "Approved Pending Resubmittal")
-		{			
+		{
 			if(matches(AInfo["LPG Tank"],"Above Ground","Underground"))
 			{
 				if(!appHasCondition("Fire - Prevent Final / Completion",null,"Fire LPG Article 15.12 Inspections Required",null))
@@ -1343,7 +1340,7 @@ if(wfProcess == "BLD_20230501_MAIN")
 				if(AInfo["LPG Tank"] == "Underground")
 				{
 					updateFee("9014","FIRE PLANNER FEES","FINAL",1,"N");
-				}	
+				}
 			}
 		}		
 	}
@@ -1406,7 +1403,7 @@ if(wfProcess == "BLD_20230501_MAIN")
 					addStdCondition("Fire - Prevent Final / Completion","Fire Driveway Inspection Required");
 				}
 			}
-		}		
+		}
 	}	
 	
 	// Update Cycle for all review tasks -----------------
@@ -1476,7 +1473,7 @@ if(wfProcess == "BLD_20230501_MAIN")
 				editTaskDueDate(thisTask,dateAdd(null,1,"Y"));
 				assignThisTask(thisTask,wfProcess);				
 			}
-		}				
+		}
 		
 		var distRecStatus = "Ready for Reconciliation - Approved";
 		if(matches(wfStatus,"Approved","Approved Pending Resubmittal","Corrections Required")) 
@@ -1594,6 +1591,7 @@ if(wfProcess == "BLD_20230501_MAIN")
 		{
 			if(isTaskStatus("Distribution","Distribute")) {updateTask("Distribution","Distributed","Updated by script on Distribution Reconciliation Complete","");}
 			editTaskDueDate("Process for Issuance",dateAdd(null,2,"Y"),wfProcess);
+			editTaskSpecific("Process for Issuance","Possession Start Date",dateAdd(null,0,"Y"));
 			thisTask = "Process for Issuance";
 			thisStaff = lookup("SDL:BLD Default Assignment",thisTask);
 			assignTask(thisTask,thisStaff,wfProcess);
@@ -1705,6 +1703,7 @@ if(wfProcess == "BLD_20230501_MAIN")
 			if(allPreComplete)
 			{
 				updateAppStatus("Final Processing","All preissuance tasks Complete or inactive. Updated by script");
+				editTaskSpecific("Process for Issuance","Possession Start Date",dateAdd(null,0,"Y"));
 				updateTask("Process for Issuance","Final Processing","All preissuance tasks Complete or inactive. Updated by script","",wfProcess);
 				editTaskDueDate("Process for Issuance",dateAdd(null,2,"Y"),wfProcess);																		  
 			}
@@ -1798,7 +1797,12 @@ if(wfProcess == "BLD_20230501_MAIN")
 			// var	emailResult = sendNotification(vFromEmail,vToEmail,vCcEmail,emailTemplate,emailParameters, new Array(report));
 			var	emailResult = sendNotification(vFromEmail,vToEmail,vCcEmail,emailTemplate,emailParameters, null);
 						
-			var sendResult = aa.sendMail("noreply@placer.ca.gov","tdunn@truepointsolutions.com", "", "Testing WTUA sent permit script ", debug);	
+			var sendResult = aa.sendMail("noreply@placer.ca.gov","tdunn@truepointsolutions.com", "", "Testing WTUA sent permit script ", debug);
+			
+			// Initialize Inspection task possession date and assignment
+			editTaskSpecific("Inspection","Possession Start Date",dateAdd(null,0,"Y"));
+			assignTask("Inspection","BUILDING_UNASSIGNED",wfProcess);
+			updateTask("Inspection","In Progress","Possession Start Date logged by system","",wfProcess);	
 			
 		}
 		if(wfStatus == "Payment Requested")
@@ -2045,9 +2049,9 @@ if(wfProcess == "BLD_20230501_MAIN")
 		if(wfStatus == "Construction Complete")
 		{
 			editTaskDueDate("Closure",dateAdd(null,180),wfProcess);
-			thisStaff = closureStaff;
-			thisTask = "Closure";
-			assignTask(thisTask,thisStaff,wfProcess);
+			assignTask("Closure",closureStaff,wfProcess);
+			editTaskSpecific("Closure","Possession Start Date",dateAdd(null,0,"Y"));
+			updateTask("Closure","Ready for File Cleanup","Possession Start Date logged by system","",wfProcess);
 		}
 	}
 }

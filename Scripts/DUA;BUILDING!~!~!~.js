@@ -26,6 +26,7 @@
 |           TDunn 08/29/2025 copied to Non-prod1
 |           TDunn 08/30/2025 deployed to Github
 |			TDunn 01/02/2026 removed random 're' typo
+|           TDunn 07/14/2026 added updating in possession date
 |
 /------------------------------------------------------------------------------------------------------*/
 
@@ -226,7 +227,8 @@ if((publicUser || publicUserEDR == true) && capIDString.indexOf("TMP") == -1)
 					}
 				}
 				editTaskDueDate("Distribution",dateAdd(null,1,"Y"),"BLD_20230501_MAIN");
-				updateAppStatus("Resubmittal Received","Document uploaded following a Corrections Required/Responses Received status. Updated by script");				
+				updateAppStatus("Resubmittal Received","Document uploaded following a Corrections Required/Responses Received status. Updated by script");
+				editTaskSpecific("Distribution","Possession Start Date",dateAdd(null,0,"Y"));	
 				if(recFromTriage)
 				{
 					updateTask("Distribution","Resubmittal Received","Resubmittal from Pre-screen received. Updated by script","Resubmittal from Pre-screen");
@@ -304,7 +306,8 @@ if((publicUser || publicUserEDR == true) && capIDString.indexOf("TMP") == -1)
 				if(matches(getAppSpecific("Resubmittal Number"),null,"",undefined,0))
 				{
 					resubNum = 1;
-				}					
+				}
+				editTaskSpecific("Distribution","Possession Start Date",dateAdd(null,0,"Y"));
 				updateTask("Distribution","Resubmittal Received","Submittal " + formatResubNum(resubNum) + " received. Updated by script","Submittal " + formatResubNum(resubNum));
 			}
 		}
