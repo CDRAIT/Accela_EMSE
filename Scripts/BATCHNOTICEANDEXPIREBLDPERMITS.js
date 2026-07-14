@@ -78,7 +78,7 @@ var capId;
 // Variable used to hold the Cap Id value.
 
 // email parameters for batch results, must be added to batch job.  if a second one is needed, change the second value from "" to a parameter.
-var senderEmailAddr = "noreply@placer.ca.gov";                                      // Email address of the sender
+var senderEmailAddr = defaultFrom;                                      // Email address of the sender
 //var emailAddrAdmin = getParam("emailAddrAdmin");                              // This must be added to batch job parameters. 
 //var ccEmailAddrAdmin = getParam("ccEmailAddrAdmin");                          // This must be added to batch job parameters. 
 //var emailAddrAdmin = "tdunn@truepointsolutions.com";
@@ -176,7 +176,7 @@ function ExpiredPermit() {
         /* Process records if condition is met //  */
         if (capGroup == paramsAppGroup && exists(capPerType, paramsAppPerTypeArray) && !exists(capStatus, paramsAppStatusArray)) {
 			aa.print("record number = " + capIDString + ". Expiration date: " + permitExpireDate + ". Cap status: " + capStatus);
-			var vFromEmail = "noreply@placer.ca.gov";
+			var vFromEmail = defaultFrom;
 			var vToEmail = "";
 			var vCcEmail = "";
 			var cTypeArray = new Array();
