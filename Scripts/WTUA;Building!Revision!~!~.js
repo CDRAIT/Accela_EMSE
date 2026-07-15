@@ -52,6 +52,7 @@
 |         : TDunn 01/14/2026 reenabled the moveDoc function after McKenzie restored it to Includes_Custom
 |         : TDunn 01/22/2026 added test for null for FIREINSP parcel attributes
 |         : TDunn 03/05/2026 added Approval Notification to applicant, Owner
+|         : TDunn 07/13-15/2026 added In possession date rules and new assignments
 | 
 /---------------------------------------------------------------------------------------------------------------------------------*/
 
@@ -356,7 +357,7 @@ if(matches(appTypeArray[1],"Revision") && wfProcess == "BLD_20231116_REV")
 				{
 					editTaskSpecific("Distribution",srvwListArray[xy],"N");
 					editTaskSpecific("Distribution","Fire Review - Partner Agency","Y");
-				}														   
+				}
 			}
 			if(reFlag == "County Property")
 			{
@@ -379,14 +380,14 @@ if(matches(appTypeArray[1],"Revision") && wfProcess == "BLD_20231116_REV")
 			if(isDriveway && !isPlacerFire)
 			{
 				editTaskSpecific("Distribution","Fire Review - Partner Agency","Y");
-			}									  
+			}
 			editTaskDueDate("Distribution",dateAdd(null,1,"Y"),wfProcess);
-			assignThisTask("Distribution",wfProcess);											   
+			assignThisTask("Distribution",wfProcess);
 
 
 			/*****  New for in possession ****/
 			editTaskSpecific("Distribution","Possession Start Date",dateAdd(null,0,"Y"));
-			updateTask("Distribution","Submittal Received","Possession Start Date logged by system","",wfProcess);									  																											
+			updateTask("Distribution","Submittal Received","Possession Start Date logged by system","",wfProcess);
 		}
 
 		// End review preset rules for parent scope -----------------
@@ -439,12 +440,11 @@ if(matches(appTypeArray[1],"Revision") && wfProcess == "BLD_20231116_REV")
 			{
 				showMessage = true;
 				comment("<font size = 4 color=ff000><b>No applicant email address found. Applicant Request for Information was NOT sent.</b></font><br><br>Please review applicant contact record for a valid email address");
-			}			
-			
+			}																					   		
 			// createNotificationTPS2("NOTICE_BLD_ADDITIONAL_INFORMATION_REQUIRED","Y","Applicant","N","","N","N","N","Y","N","N","");
 			updateTask("Submittal Review","Pending Resubmittal","Submittal incomplete. Updated by script","Pending Resubmittal");
 			editTaskDueDate("Distribution",dateAdd(null,2,"Y"),wfProcess);
-			editTaskDueDate("Submittal Review",dateAdd(null,1,"Y"),wfProcess);			
+			editTaskDueDate("Submittal Review",dateAdd(null,1,"Y"),wfProcess);
 		}
 			
 	}
@@ -538,8 +538,8 @@ if(matches(appTypeArray[1],"Revision") && wfProcess == "BLD_20231116_REV")
 				if(matches(AInfo[thisReview],"Y","Yes"))
 				{
 
-						assignThisTask(thisReview,wfProcess);
-						editTaskDueDate(thisReview,dateAdd(null,addNumDays,"Y"),wfProcess);
+					assignThisTask(thisReview,wfProcess);
+					editTaskDueDate(thisReview,dateAdd(null,addNumDays,"Y"),wfProcess);
 					editTaskSpecific(thisReview,"Possession Start Date",dateAdd(null,0,"Y"));
 					updateTask(thisReview,"Submittal Received","Possession Start Date logged by system","",wfProcess);
 				}
@@ -559,7 +559,7 @@ if(matches(appTypeArray[1],"Revision") && wfProcess == "BLD_20231116_REV")
 			for(rtl in rtaskListArray)
 			{
 				rTask = rtaskListArray[rtl];
-				if(matches(AInfo[rTask],"Y","Yes","YES"))					 
+				if(matches(AInfo[rTask],"Y","Yes","YES"))
 				{
 					noTSIYes = false;
 					noScope = false;
@@ -574,7 +574,7 @@ if(matches(appTypeArray[1],"Revision") && wfProcess == "BLD_20231116_REV")
 				updateTask("Process for Issuance","Final Processing","Possession Start date logged. Updated by script","",wfProcess);					
 				thisStaff = lookup("SDL:BLD Default Assignment",thisTask);
 				assignTask(thisTask,thisStaff,wfProcess);
-				logDebug("Process for Issuance assigned to " + thisStaff);				
+				logDebug("Process for Issuance assigned to " + thisStaff);
 			}
 		}
 		
@@ -594,8 +594,8 @@ if(matches(appTypeArray[1],"Revision") && wfProcess == "BLD_20231116_REV")
 			}
 			setDueDate("BLDPERMIT",addNumDays,wfProcess);
 			assignConcurrent("BLDPERMIT",wfProcess,resubNum);
-			setConcurrentStatusAndPossDate("BLDPERMIT",wfProcess);														 
-			preIssueFlag = true;					   
+			setConcurrentStatusAndPossDate("BLDPERMIT",wfProcess);
+			preIssueFlag = true;
 			
 			// Generate required staff notifications for target activated reviews
 			if(matches(AInfo["Stormwater and Floodplain Review"],"Y","Yes","YES"))
@@ -842,7 +842,7 @@ if(matches(appTypeArray[1],"Revision") && wfProcess == "BLD_20231116_REV")
 			editTaskSpecific("Distribution","Initial Planning Review","N");																	 
 			editTaskSpecific("Distribution","Plan Completeness Review","N");
 			editTaskSpecific("Distribution","TRPA Completeness Review","N");
-			AInfo["Initial Planning Review"] = "No";			
+			AInfo["Initial Planning Review"] = "No";
 			AInfo["Plan Completeness Review"] = "No";
 			AInfo["TRPA Completeness Review"] = "No";
 			autoRouteReviewsTD("P", "Y","BLDPERMIT");
@@ -873,7 +873,7 @@ if(matches(appTypeArray[1],"Revision") && wfProcess == "BLD_20231116_REV")
 					logDebug("Failed to send Stormwater notification");
 				}
 			}
-			if(matches(AInfo["Air Pollution Control Review"],"Y","Yes","YES"))				  
+			if(matches(AInfo["Air Pollution Control Review"],"Y","Yes","YES"))
 			{
 				apcdDueDate = dateAdd(null,addNumDays,"Y");
 				sentAPCDNotice = generateNoticeToStaff(apcdTemplate,apcdToEmail,apcdDueDate);
@@ -947,6 +947,7 @@ if(matches(appTypeArray[1],"Revision") && wfProcess == "BLD_20231116_REV")
 		if((!triageThree && triageTwo && isTaskStatus("Plan Completeness Review",failStatus) && !isTaskActive("Plan Completeness Review")) || (!triageTwo && triageThree && isTaskStatus("TRPA Completeness Review",failStatus) && !isTaskActive("TRPA Completeness Review")) || (triageTwo && triageThree && (isTaskStatus("Plan Completeness Review",failStatus) || isTaskStatus("TRPA Completeness Review",failStatus)) && !isTaskActive("Plan Completeness Review") && !isTaskActive("TRPA Completeness Review")))
 		{
 			activateTask("Distribution Reconciliation",wfProcess);
+			editTaskSpecific("Distribution Reconciliation","Possession Start Date",dateAdd(null,0,"Y"));																										 
 			updateTask("Distribution Reconciliation","Ready for Reconciliation - Corrections","One or more readiness tasks require corrections.","");
 			editTaskDueDate("Distribution Reconciliation",dateAdd(null,1,"Y"),wfProcess);
 		}
@@ -958,6 +959,7 @@ if(matches(appTypeArray[1],"Revision") && wfProcess == "BLD_20231116_REV")
 		if((!triageThree && triageOne && isTaskStatus("Initial Planning Review",failStatus) && !isTaskActive("Initial Planning Review")) || (!triageOne && triageThree && isTaskStatus("TRPA Completeness Review",failStatus) && !isTaskActive("TRPA Completeness Review")) || (triageOne && triageThree && (isTaskStatus("Initial Planning Review",failStatus) || isTaskStatus("TRPA Completeness Review",failStatus)) && !isTaskActive("Intial Planning Review") && !isTaskActive("TRPA Completeness Review")))
 		{
 			activateTask("Distribution Reconciliation",wfProcess);
+			editTaskSpecific("Distribution Reconciliation","Possession Start Date",dateAdd(null,0,"Y"));																					 
 			updateTask("Distribution Reconciliation","Ready for Reconciliation - Corrections","One or more readiness tasks require corrections.","");
 			editTaskDueDate("Distribution Reconciliation",dateAdd(null,1,"Y"),wfProcess);
 		}
@@ -969,6 +971,7 @@ if(matches(appTypeArray[1],"Revision") && wfProcess == "BLD_20231116_REV")
 		if((!triageTwo && triageOne && isTaskStatus("Initial Planning Review",failStatus) && !isTaskActive("Initial Planning Review")) || (!triageOne && triageTwo && isTaskStatus("Plan Completeness Review",failStatus) && !isTaskActive("Plan Completeness Review")) || (triageOne && triageThree && (isTaskStatus("Initial Planning Review",failStatus) || isTaskStatus("Plan Completeness Review",failStatus)) && !isTaskActive("Intial Planning Review") && !isTaskActive("Plan Completeness Review")))
 		{
 			activateTask("Distribution Reconciliation",wfProcess);
+			editTaskSpecific("Distribution Reconciliation","Possession Start Date",dateAdd(null,0,"Y"));																						
 			updateTask("Distribution Reconciliation","Ready for Reconciliation - Corrections","One or more readiness tasks require corrections.","");
 			editTaskDueDate("Distribution Reconciliation",dateAdd(null,1,"Y"),wfProcess);
 		}
@@ -1460,7 +1463,7 @@ if(matches(appTypeArray[1],"Revision") && wfProcess == "BLD_20231116_REV")
 	{
 		// Determine if from Triage tasks
 		recFromTriage = false;
-		failTask = "";						
+		failTask = "";
 		for(xx in preTriageListArray)
 		{
 
@@ -1552,7 +1555,7 @@ if(matches(appTypeArray[1],"Revision") && wfProcess == "BLD_20231116_REV")
 					editTaskDueDate(cTask,dateAdd(null,1,"Y"),wfProcess); 
 					editTaskSpecific(cTask,"Possession Start Date",dateAdd(null,0,"Y"));
 					updateTask(cTask,"Awaiting Review","Possession Start Date logged by system","",wfProcess);				
-				}																		 
+				}
 			// Generate notification for active preissuance tasks to assigned staff
 			var preIssueToStaffTemplate = "OUTSTANDING _PREISSUANCE_TASK";
 			var thisPreToEmail = null;
@@ -1997,7 +2000,7 @@ if(matches(appTypeArray[1],"Revision") && wfProcess == "BLD_20231116_REV")
 			{
 				showMessage = true;
 				comment("<font size = 4 color=ff000><b>No applicant email address found. Applicant Request for Information was NOT sent.</b></font><br><br>Please review applicant contact record for a valid email address");
-			}			
+			}
 			//createNotificationTPS2("SIG_REQUEST","Y","Applicant,Owner","N","","N","N","N","Y","N","N","");
 		}		
 	}

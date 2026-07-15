@@ -442,7 +442,7 @@ if(wfProcess == "BLD_20230501_MAIN")
 				{
 					editTaskSpecific("Distribution",srvwListArray[xy],"N");
 					editTaskSpecific("Distribution","Fire Review - Partner Agency","Y");
-				}				
+				}
 			}
 			if(reFlag == "County Property")
 			{
@@ -465,14 +465,14 @@ if(wfProcess == "BLD_20230501_MAIN")
 			if(isDriveway && !isPlacerFire)
 			{
 				editTaskSpecific("Distribution","Fire Review - Partner Agency","Y");
-			}			
+			}
 			editTaskDueDate("Distribution",dateAdd(null,1,"Y"),wfProcess);
-			assignThisTask("Distribution",wfProcess);			
+			assignThisTask("Distribution",wfProcess);
 			if(AInfo["Application Received"] == "Online" && AInfo["Code Enforcement Action"] != "Yes") editAppSpecific("Plan Check Expiration",dateAdd(null,365));
 			if(AInfo["Application Received"] == "Online" && AInfo["Code Enforcement Action"] == "Yes") editAppSpecific("Plan Check Expiration",dateAdd(null,182));
 			/*****  New for in possession ****/
 			editTaskSpecific("Distribution","Possession Start Date",dateAdd(null,0,"Y"));
-			updateTask("Distribution","Submittal Received","Possession Start Date logged by system","",wfProcess);			
+			updateTask("Distribution","Submittal Received","Possession Start Date logged by system","",wfProcess);
 		}
 		// End review preset rules -----------------
 
@@ -525,8 +525,7 @@ if(wfProcess == "BLD_20230501_MAIN")
 				showMessage = true;
 				comment("<font size = 4 color=ff000><b>No applicant email address found. Applicant Request for Information was NOT sent.</b></font><br><br>Please review applicant contact record for a valid email address");
 			}			
-			// createNotificationTPS2("NOTICE_BLD_ADDITIONAL_INFORMATION_REQUIRED","Y","Applicant,Owner","N","","N","N","N","Y","N","N","");
-			
+			// createNotificationTPS2("NOTICE_BLD_ADDITIONAL_INFORMATION_REQUIRED","Y","Applicant,Owner","N","","N","N","N","Y","N","N","");														 
 			updateTask("Submittal Review","Pending Resubmittal","Submittal incomplete. Updated by script","Pending Resubmittal");
 			editTaskDueDate("Distribution",dateAdd(null,2,"Y"),wfProcess);
 			editTaskDueDate("Submittal Review",dateAdd(null,1,"Y"),wfProcess);
@@ -656,7 +655,7 @@ if(wfProcess == "BLD_20230501_MAIN")
 			for(rtl in rtaskListArray)
 			{
 				rTask = rtaskListArray[rtl];
-				if(matches(AInfo[rTask],"Y","Yes","YES"))	  
+				if(matches(AInfo[rTask],"Y","Yes","YES"))
 				{
 					noTSIYes = false;
 					noScope = false;
@@ -671,7 +670,7 @@ if(wfProcess == "BLD_20230501_MAIN")
 				updateTask("Process for Issuance","Final Processing","Possession Start date logged. Updated by script","",wfProcess);				
 				thisStaff = lookup("SDL:BLD Default Assignment",thisTask);
 				assignTask(thisTask,thisStaff,wfProcess);
-				logDebug("Process for Issuance assigned to " + thisStaff);					
+				logDebug("Process for Issuance assigned to " + thisStaff);
 			}
 		}
 		
@@ -741,7 +740,7 @@ if(wfProcess == "BLD_20230501_MAIN")
 				assignPreissue("Placer County Fire Fee Review",wfProcess);
 			}
 			if((matches(AInfo["Fire Review - Partner Agency"],"Y","Yes") || matches(AInfo["Fire review - Partner Agency"],"Y","Yes")) && !isTaskStatus("Fire Review - Partner Agency","Complete"))
-			{				
+			{
 				activateTask("Fire Review - Partner Agency",wfProcess);
 				updateTask("Fire Review - Partner Agency","Completion Pending","","(Preissuance Requirement)",wfProcess);
 				assignPreissue("Fire Review - Partner Agency",wfProcess);
@@ -924,12 +923,12 @@ if(wfProcess == "BLD_20230501_MAIN")
 		}
 		if(precheckFlag)
 		{
-			editTaskSpecific("Distribution","Initial Planning Review","N");			
+			editTaskSpecific("Distribution","Initial Planning Review","N");
 			editTaskSpecific("Distribution","Plan Completeness Review","N");
 			editTaskSpecific("Distribution","TRPA Completeness Review","N");
 			AInfo["Initial Planning Review"] = "No";
 			AInfo["Plan Completeness Review"] = "No";
-			AInfo["TRPA Completeness Review"] = "No";							   
+			AInfo["TRPA Completeness Review"] = "No";
 			autoRouteReviewsTD("P", "Y","BLDPERMIT");
 			// for setting review task dates and staff assignment during autoRouteReviewsTD();
 			resubNum = AInfo["Resubmittal Number"];
@@ -1514,7 +1513,7 @@ if(wfProcess == "BLD_20230501_MAIN")
 				{
 					distRecStatus = "Ready for Reconciliation - Corrections";
 				}
-				//updateTask("Distribution Reconciliation",distRecStatus,"Status updated by script.",""); // Remarked out due to duplication of WTUA digEplan script.
+				//updateTask("Distribution Reconciliation",distRecStatus,"Status updated by script.","");// Remarked out due to duplication of WTUA digEplan script.
 				editTaskSpecific("Distribution Reconciliation","Possession Start Date",dateAdd(null,0,"Y"));
 			}
 		}
@@ -1526,7 +1525,7 @@ if(wfProcess == "BLD_20230501_MAIN")
 
 		// Determine if from Triage tasks
 		recFromTriage = false;
-		failTask = "";		
+		failTask = "";
 		for(xx in preTriageListArray)
 		{
 			thisReview = preTriageListArray[xx];
