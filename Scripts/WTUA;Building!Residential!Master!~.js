@@ -242,6 +242,8 @@ if(wfProcess == "BLD_PLNCHK_20241222")
 			addNumDays = getDueInDays("SDL:DueDates","Reviews|" + dueDateRecType,1);	
 		}
 		editTaskDueDate("Building Plan Check",dateAdd(null,addNumDays,"Y"),wfProcess);
+		editTaskSpecific("Building Plan Check","Possession Start Date",dateAdd(null,0,"Y"));
+		updateTask("Building Plan Check","Submittal Received","Possession Start date logged. Updated by script","",wfProcess);		
 		assignConcurrent("MASTER",wfProcess,resubNum);
 		thisStaff = lookup("SDL:BLD Default Assignment","Building Plan Check");
 		if(resubNum <= 1)
