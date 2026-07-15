@@ -510,7 +510,7 @@ if(wfProcess == "BLD_PLNCHK_20241222")
 				showMessage = true;
 				comment("<font size = 4 color=ff000><b>No applicant email address found. " + wfStatus + " email notification cannot be sent.</b></font><br><br>A status of " + wfStatus + " for the " + wfTask + " task will send a " + wfStatus + " notification to the applicant.<br>The email notification cannot be sent without a valid applicant email address.<br> Please review applicant contact record for a valid email address.");
 			}
-
+			editTaskSpecific("Distribution","Possession Start Date",dateAdd(null,0,"Y"));
 			// Set and update resubmittal number
 			if(matches(AInfo["Resubmittal Number"],null,"",0)) 
 			{
@@ -525,7 +525,8 @@ if(wfProcess == "BLD_PLNCHK_20241222")
 		
 			//---------------------------------------------
 			createNotificationTPS2("NOTICE_BLD_CORRECTIONS REQUIRED","Y","Applicant","N","","N","N","N","Y","N","N","");
-			assignTask("Distribution","CDRA_UNASSIGNED",wfProcess);
+			thisTask = "Distribution";
+			assignThisTask(thisTask,wfProcess);
 			editTaskDueDate("Distribution",dateAdd(null,1,"Y"),wfProcess);
 			presetTSIpco("MASTER","Distribution","Approved","Cleared","ThirdStatus");
 			if(AInfo["Assess Fee"] != null) {editTaskSpecific("Distribution Reconciliation","Assess Fee",null);}
