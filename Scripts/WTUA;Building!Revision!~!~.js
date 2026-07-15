@@ -570,6 +570,8 @@ if(matches(appTypeArray[1],"Revision") && wfProcess == "BLD_20231116_REV")
 				activateTask("Process for Issuance",wfProcess);
 				thisTask = "Process for Issuance";
 				editTaskDueDate("Process for Issuance",dateAdd(null,2,"Y"),wfProcess);
+				editTaskSpecific("Process for Issuance","Possession Start Date",dateAdd(null,0,"Y"));
+				updateTask("Process for Issuance","Final Processing","Possession Start date logged. Updated by script","",wfProcess);					
 				thisStaff = lookup("SDL:BLD Default Assignment",thisTask);
 				assignTask(thisTask,thisStaff,wfProcess);
 				logDebug("Process for Issuance assigned to " + thisStaff);				
@@ -688,6 +690,8 @@ if(matches(appTypeArray[1],"Revision") && wfProcess == "BLD_20231116_REV")
 		activateTask("Building Plan Check",wfProcess);
 		assignThisTask(thisTask,wfProcess);
 		editTaskDueDate(thisTask,dateAdd(null,addNumDays,"Y"));
+		editTaskSpecific("Building Plan Check","Possession Start Date",dateAdd(null,0,"Y"));
+		updateTask("Building Plan Check","Submittal Received","Possession Start date logged. Updated by script","",wfProcess);		
 		if(isTaskStatus(thisTask,"Corrections Required") || isTaskStatus(thisTask,"Approved Pending Resubmittal"))
 		{
 			updateTask(thisTask,"Resubmittal Received","",""); 
@@ -704,6 +708,8 @@ if(matches(appTypeArray[1],"Revision") && wfProcess == "BLD_20231116_REV")
 	if (matches(wfTask, "Distribution") && matches(wfStatus, "Not Required - Process for Issuance"))
 	{
 		editTaskDueDate("Process for Issuance",dateAdd(null,2,"Y"),wfProcess);
+		editTaskSpecific("Process for Issuance","Possession Start Date",dateAdd(null,0,"Y"));
+		updateTask("Process for Issuance","Final Processing","Possession Start date logged. Updated by script","",wfProcess);		
 		thisTask = "Process for Issuance";
 		thisStaff = lookup("SDL:BLD Default Assignment",thisTask);
 		cAssigned = getTaskAssignUser(thisTask);

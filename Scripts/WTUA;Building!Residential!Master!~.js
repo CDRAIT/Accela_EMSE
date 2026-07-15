@@ -143,8 +143,10 @@ if(wfProcess == "BLD_PLNCHK_20241222")
 		// preset TSI for required reviews
 		{
 
-			assignTask("Distribution","CDRA_UNASSIGNED",wfProcess);
+			assignThisTask("Distribution",wfProcess);	
 			editTaskDueDate("Distribution",dateAdd(null,1,"Y"),wfProcess);
+			editTaskSpecific("Distribution","Possession Start Date",dateAdd(null,0,"Y"));
+			updateTask("Distribution","Submittal Received","Possession Start Date logged by system","",wfProcess);					
 		}
 
 
@@ -222,7 +224,8 @@ if(wfProcess == "BLD_PLNCHK_20241222")
 			addNumDays = getDueInDays("SDL:DueDates","Reviews|" + dueDateRecType,1);	
 		}
 		setDueDate("MASTER",addNumDays,wfProcess);
-		assignConcurrent("MASTER",wfProcess,resubNum);		
+		assignConcurrent("MASTER",wfProcess,resubNum);
+		setConcurrentStatusAndPossDate("MASTER",wfProcess);		
 	}
 	
 	// Rules for Distribution/Not Required - Plan Check Only
@@ -263,7 +266,9 @@ if(wfProcess == "BLD_PLNCHK_20241222")
 		thisStaff = pfiStaff;
 		thisTask = "Process for Issuance";
 		cAssigned = getTaskAssignUser(thisTask);
-		editTaskDueDate(thisTask,dateAdd(null,2,"Y"),wfProcess);		
+		editTaskDueDate(thisTask,dateAdd(null,2,"Y"),wfProcess);
+		editTaskSpecific("Process for Issuance","Possession Start Date",dateAdd(null,0,"Y"));
+		updateTask("Process for Issuance","Final Processing","Possession Start date logged. Updated by script","",wfProcess);		
 		logDebug("Process for Issuance assigned to " + cAssigned);
 		if(!matches(cAssigned,false,"",null,undefined,"ACAPAYMENT"))
 		{

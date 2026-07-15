@@ -667,6 +667,8 @@ if(wfProcess == "BLD_20230501_MAIN")
 				activateTask("Process for Issuance",wfProcess);
 				thisTask = "Process for Issuance";
 				editTaskDueDate("Process for Issuance",dateAdd(null,2,"Y"),wfProcess);
+				editTaskSpecific("Process for Issuance","Possession Start Date",dateAdd(null,0,"Y"));
+				updateTask("Process for Issuance","Final Processing","Possession Start date logged. Updated by script","",wfProcess);				
 				thisStaff = lookup("SDL:BLD Default Assignment",thisTask);
 				assignTask(thisTask,thisStaff,wfProcess);
 				logDebug("Process for Issuance assigned to " + thisStaff);					
@@ -784,6 +786,8 @@ if(wfProcess == "BLD_20230501_MAIN")
 		activateTask("Building Plan Check",wfProcess);
 		assignThisTask(thisTask,wfProcess);
 		editTaskDueDate(thisTask,dateAdd(null,addNumDays,"Y"));
+		editTaskSpecific("Building Plan Check","Possession Start Date",dateAdd(null,0,"Y"));
+		updateTask("Building Plan Check","Submittal Received","Possession Start date logged. Updated by script","",wfProcess);		
 		if(isTaskStatus(thisTask,"Corrections Required") || isTaskStatus(thisTask,"Approved Pending Resubmittal"))
 		{
 			updateTask(thisTask,"Resubmittal Received","",""); 
@@ -801,6 +805,8 @@ if(wfProcess == "BLD_20230501_MAIN")
 	if (matches(wfTask, "Distribution") && matches(wfStatus, "Not Required - Process for Issuance"))
 	{
 		editTaskDueDate("Process for Issuance",dateAdd(null,2,"Y"),wfProcess);
+		editTaskSpecific("Process for Issuance","Possession Start Date",dateAdd(null,0,"Y"));
+		updateTask("Process for Issuance","Final Processing","Possession Start date logged. Updated by script","",wfProcess);		
 		thisTask = "Process for Issuance";
 		thisStaff = lookup("SDL:BLD Default Assignment",thisTask);
 		assignTask(thisTask,thisStaff,wfProcess);
@@ -1022,6 +1028,7 @@ if(wfProcess == "BLD_20230501_MAIN")
 		if((!triageThree && triageTwo && isTaskStatus("Plan Completeness Review",failStatus) && !isTaskActive("Plan Completeness Review")) || (!triageTwo && triageThree && isTaskStatus("TRPA Completeness Review",failStatus) && !isTaskActive("TRPA Completeness Review")) || (triageTwo && triageThree && (isTaskStatus("Plan Completeness Review",failStatus) || isTaskStatus("TRPA Completeness Review",failStatus)) && !isTaskActive("Plan Completeness Review") && !isTaskActive("TRPA Completeness Review")))
 		{
 			activateTask("Distribution Reconciliation",wfProcess);
+			editTaskSpecific("Distribution Reconciliation","Possession Start Date",dateAdd(null,0,"Y"));		
 			updateTask("Distribution Reconciliation","Ready for Reconciliation - Corrections","One or more readiness tasks require corrections.","");
 			editTaskDueDate("Distribution Reconciliation",dateAdd(null,1,"Y"),wfProcess);
 		}
@@ -1033,6 +1040,7 @@ if(wfProcess == "BLD_20230501_MAIN")
 		if((!triageThree && triageOne && isTaskStatus("Initial Planning Review",failStatus) && !isTaskActive("Initial Planning Review")) || (!triageOne && triageThree && isTaskStatus("TRPA Completeness Review",failStatus) && !isTaskActive("TRPA Completeness Review")) || (triageOne && triageThree && (isTaskStatus("Initial Planning Review",failStatus) || isTaskStatus("TRPA Completeness Review",failStatus)) && !isTaskActive("Intial Planning Review") && !isTaskActive("TRPA Completeness Review")))
 		{
 			activateTask("Distribution Reconciliation",wfProcess);
+			editTaskSpecific("Distribution Reconciliation","Possession Start Date",dateAdd(null,0,"Y"));		
 			updateTask("Distribution Reconciliation","Ready for Reconciliation - Corrections","One or more readiness tasks require corrections.","");
 			editTaskDueDate("Distribution Reconciliation",dateAdd(null,1,"Y"),wfProcess);
 		}
@@ -1044,6 +1052,7 @@ if(wfProcess == "BLD_20230501_MAIN")
 		if((!triageTwo && triageOne && isTaskStatus("Initial Planning Review",failStatus) && !isTaskActive("Initial Planning Review")) || (!triageOne && triageTwo && isTaskStatus("Plan Completeness Review",failStatus) && !isTaskActive("Plan Completeness Review")) || (triageOne && triageThree && (isTaskStatus("Initial Planning Review",failStatus) || isTaskStatus("Plan Completeness Review",failStatus)) && !isTaskActive("Intial Planning Review") && !isTaskActive("Plan Completeness Review")))
 		{
 			activateTask("Distribution Reconciliation",wfProcess);
+			editTaskSpecific("Distribution Reconciliation","Possession Start Date",dateAdd(null,0,"Y"));					
 			updateTask("Distribution Reconciliation","Ready for Reconciliation - Corrections","One or more readiness tasks require corrections.","");
 			editTaskDueDate("Distribution Reconciliation",dateAdd(null,1,"Y"),wfProcess);
 		}
