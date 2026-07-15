@@ -22,6 +22,7 @@ function setConcurrentStatusAndPossDate(lkupCriteria,tprocess)
 			} else{		
 			newCycle = 1 * TsiInfo[tprocess + "." + thisTask + "." + "Cycle Number"];
 			}
+			newCycle = newCycle + 1;
 			if(newCycle > 1) { newStatus = "Resubmittal Received"; }
 			editTaskSpecific(thisTask,"Possession Start Date",dateAdd(null,0,"Y"));
 			updateTask(thisTask,newStatus,"Possession Start Date logged by system","",wfProcess);
