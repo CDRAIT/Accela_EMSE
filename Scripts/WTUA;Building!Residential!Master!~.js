@@ -541,6 +541,7 @@ if(wfProcess == "BLD_PLNCHK_20241222")
 		{
 			if(isTaskStatus("Distribution","Distribute")) {updateTask("Distribution","Distributed","Updated by script on Distribution Reconciliation Complete","");}
 			editTaskDueDate("Process for Issuance",dateAdd(null,2,"Y"),wfProcess);
+			editTaskSpecific("Process for Issuance","Possession Start Date",dateAdd(null,0,"Y"));			
 			thisStaff = pfiStaff;
 			thisTask = "Process for Issuance";
 			cAssigned = getTaskAssignUser(thisTask);
@@ -601,7 +602,9 @@ if(wfProcess == "BLD_PLNCHK_20241222")
 			if(isTaskActive("Process for Issuance"))
 			{
 				updateAppStatus("Final Processing","All preissuance tasks Complete or inactive. Updated by script");
-				editTaskDueDate("Process for Issuance",dateAdd(null,2,"Y"),wfProcess);				
+				editTaskDueDate("Process for Issuance",dateAdd(null,2,"Y"),wfProcess);
+				editTaskSpecific("Process for Issuance","Possession Start Date",dateAdd(null,0,"Y"));					
+				updateTask("Process for Issuance","Final Processing","All preissuance tasks Complete or inactive. Updated by script","",wfProcess);				
 			}			
 		}
 	}

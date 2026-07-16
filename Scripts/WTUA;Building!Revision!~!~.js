@@ -1505,7 +1505,7 @@ if(matches(appTypeArray[1],"Revision") && wfProcess == "BLD_20231116_REV")
 				showMessage = true;
 				comment("<font size = 4 color=ff000><b>No applicant email address found. " + wfStatus + " email notification cannot be sent.</b></font><br><br>A status of " + wfStatus + " for the " + wfTask + " task will send a " + wfStatus + " notification to the applicant.<br>The email notification cannot be sent without a valid applicant email address.<br> Please review applicant contact record for a valid email address.");
 			}
-			editTaskSpecific("Distribution","Possession Start Date",dateAdd(null,0,"Y"));				
+			editTaskSpecific("Distribution","Possession Start Date",dateAdd(null,0,"Y"));			
 			if(recFromTriage)
 			{
 				updateTask("Distribution","Pending Resubmittal","Corrections required for " + failTask + ". Updated by script","Pending Resubmittal from Pre-screen");
