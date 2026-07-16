@@ -211,7 +211,8 @@ if(wfProcess == "BLD_PLNCHK_20241222")
 		if(matches(AInfo["Fire Review - Partner Agency"],"Y","Yes") && !isTaskStatus("Fire Review - Partner Agency","Complete"))
 		{
 			activateTask("Fire Review - Partner Agency",wfProcess);
-			updateTask("Fire Review - Partner Agency","Completion Pending","","-(Preissuance Requirement)",wfProcess);			
+			updateTask("Fire Review - Partner Agency","Completion Pending","","-(Preissuance Requirement)",wfProcess);
+			assignPreissue("Fire Review - Partner Agency",wfProcess);		
 		}	
 		// for setting review task dates and staff assignment during autoRouteReviewsTD();
 		resubNum = AInfo["Resubmittal Number"];
@@ -233,17 +234,19 @@ if(wfProcess == "BLD_PLNCHK_20241222")
 	{
 		activateTask("Building Plan Check",wfProcess);
 		resubNum = AInfo["Resubmittal Number"];
+		newStatus = "Submittal Received";
 		if(resubNum <= 1)
 		{
 			addNumDays = getDueInDays("SDL:DueDates","Reviews|" + dueDateRecType,0);	
 		}
 		if(resubNum > 1)
 		{
-			addNumDays = getDueInDays("SDL:DueDates","Reviews|" + dueDateRecType,1);	
+			addNumDays = getDueInDays("SDL:DueDates","Reviews|" + dueDateRecType,1);
+			newStatus = "Resubmittal Received";
 		}
 		editTaskDueDate("Building Plan Check",dateAdd(null,addNumDays,"Y"),wfProcess);
 		editTaskSpecific("Building Plan Check","Possession Start Date",dateAdd(null,0,"Y"));
-		updateTask("Building Plan Check","Submittal Received","Possession Start date logged. Updated by script","",wfProcess);		
+		updateTask("Building Plan Check",newStatus,"Possession Start date logged. Updated by script","",wfProcess);		
 		assignConcurrent("MASTER",wfProcess,resubNum);
 		thisStaff = lookup("SDL:BLD Default Assignment","Building Plan Check");
 		if(resubNum <= 1)
@@ -421,7 +424,7 @@ if(wfProcess == "BLD_PLNCHK_20241222")
 			}
 			if(allRevComplete)
 			{
-				thisStaff = "CDRA_UNASSIGNED";
+				thisStaff = lookup("SDL:BLD Default Assignment","Distribution Reconciliation");
 				thisTask = "Distribution Reconciliation";
 				editTaskDueDate(thisTask,dateAdd(null,1,"Y"));
 				
@@ -473,6 +476,7 @@ if(wfProcess == "BLD_PLNCHK_20241222")
 					distRecStatus = "Ready for Reconciliation - Corrections";
 				}
 				//updateTask("Distribution Reconciliation",distRecStatus,"Status updated by script.",""); // Remarked out due to duplication of WTUA digEplan script.
+				editTaskSpecific("Distribution Reconciliation","Possession Start Date",dateAdd(null,0,"Y"));
 			}
 		}
 	}	
@@ -556,7 +560,12 @@ if(wfProcess == "BLD_PLNCHK_20241222")
 			{
 				cTask = preTasksArraySD[thisPI];
 				logDebug("For setting date, current cTask = " + cTask);
-				if(isTaskActive(cTask)) { editTaskDueDate(cTask,dateAdd(null,1,"Y"),wfProcess); }
+				if(isTaskActive(cTask)) 
+				{ 
+					editTaskDueDate(cTask,dateAdd(null,1,"Y"),wfProcess); 
+					editTaskSpecific(cTask,"Possession Start Date",dateAdd(null,0,"Y"));
+					updateTask(cTask,"Awaiting Review","Possession Start Date logged by system","",wfProcess);					
+				}
 			}
 		}
 		
