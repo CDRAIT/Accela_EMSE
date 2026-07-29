@@ -23,7 +23,7 @@
 |         : TDunn 08/29/2025 deployed to Github repository
 |         : TDunn 11/17/2025 fixed issue with email parameters
 |         : Abe   07/01/2026 Replaced all noreply@placer.ca.gov emails to defaultFrom (INCLUDES_CUSTOM_GLOBALS)
-
+|         : Abe   07/29/2026 Updated "Plan Check Expiration" to 365 days from submittal
 |
 /======================================================================================================*/
 showDebug = 1
@@ -152,7 +152,7 @@ if(publicUser)
 	
 	editAppSpecific("Application Received","Online");
 	editAppSpecific("Primary Plan Check Contact", "Agent");
-	editAppSpecific("Plan Check Expiration",dateAdd(null,182));
+	editAppSpecific("Plan Check Expiration",dateAdd(null,365));
 	
 	if (AInfo['ParcelAttribute.COUNTYPROP'] == "COUNTYPROP" || AInfo['ParcelAttribute.COUNTYPROP'] == "County Property") 
 	{

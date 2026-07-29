@@ -11,6 +11,7 @@
 |
 | Notes   : TDunn 01/11/2022 created 3.0 version
 |         : TDunn 07/18/2024 remarked out section that calls addSPFees to eliminate error.
+|         : Abe   07/29/2026 Commented "Plan Check Expiration" update, since it is already being updated in CTRCA;Building!~!~!~.js 
 |         
 |
 /=============================================================================================*/
@@ -73,9 +74,15 @@ if(publicUser) {
 			updateFee("FIRE-MITCM","B_COM","FINAL",0,"N");
 		}
 	}
+
+	/* remove this from here, handled in CTRCA;Building!~!~!~.js, and there's no active application as "Business License"
+
 	if(appTypeArray[2] != "Business License") {
 		editAppSpecific("Plan Check Expiration",dateAdd(null,365));
-	}
+	} 
+
+	*/
+
 	if(AInfo["Third Party Review"] == "Yes") {
 		addFee("0113", "B_COM", "FINAL",1,"N"); removeFee("0102","FINAL");
 	}

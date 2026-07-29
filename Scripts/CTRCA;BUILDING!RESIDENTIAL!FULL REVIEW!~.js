@@ -16,6 +16,7 @@
 |         : eaftahi 04/09/2024 IT Request# 2035 - updated ADU Fees
 |         : TDunn  12/31/2025 Remarked out addition of adHoc tasks
 |         : eaftahi 04/07/2026 Added IT Request# 2698
+|         : Abe     07/29/2026 Commented "Plan Check Expiration" update, since it is already being updated in CTRCA;Building!~!~!~.js
 |
 /==========================================================================================================*/
 
@@ -193,10 +194,11 @@ if(publicUser && !appMatch("Building/Residential/Limited/*")) {
 		if(AInfo["ParcelAttribute.SPECIFIC PLAN"] == "Martis Valley West Parcel SP" && specFeeCodes[thisCode] == "TF-HSG MVW") {updateFee("TF-HSG MVW","AFFORDABLE HOUSING","FINAL",1,"N");}
 
 	}
-		
+	/* 	SInce there's same thing on CTRCA;Building!~!~!~.js, we don't need to add it here.
+
 	if(!publicUser) {
 		editAppSpecific("Plan Check Expiration",dateAdd(null,365));
-	}
+	} */
 
 	if(getAppSpecific("Plumbing") == "CHECKED") { 
 	updateFee("0710","B_RES","FINAL",1,"N");
