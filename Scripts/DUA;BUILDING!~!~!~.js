@@ -269,7 +269,8 @@ if((publicUser || publicUserEDR == true) && capIDString.indexOf("TMP") == -1)
 				var resubNum = getAppSpecific("Resubmittal Number");
 				logDebug("Resub Number is " + resubNum);
 				editTaskDueDate("Submittal Review",dateAdd(null,1,"Y"),"BLD_DEFERRED_20240710");
-				updateTask("Distribution","Resubmittal Received","Submittal " + formatResubNum(resubNum) + " received. Updated by script","Submittal " + formatResubNum(resubNum));
+				editTaskSpecific("Submittal Review","Possession Start Date",dateAdd(null,0,"Y"));
+				updateTask("Submittal Review","Resubmittal Received","Submittal " + formatResubNum(resubNum) + " received. Updated by script","Submittal " + formatResubNum(resubNum));
 				updateAppStatus("Resubmittal Received","Document uploaded following a Corrections Required/Responses Received status. Updated by script");	
 			}
 		}
