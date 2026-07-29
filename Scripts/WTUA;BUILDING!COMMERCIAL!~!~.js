@@ -20,7 +20,8 @@
 |         : Abe   06/27/2024 added IT Request # 1924 - ESD Building Permit Sign Off - "ESD Checklist"
 |         : TDunn 12/30/2025 updated criteria for setting Plan Check Expiration date
 |         : TDunn 01/10/2026 Moved Revisions and Deferred Submittal from Parent by staff from WTUA:Building to here
-|         : TDunn 01/23/2026 added updating revisions and deferred with parent record type (Res or Com)
+|         : TDunn 01/23/2026 added updating Revisions and Deferred with Parent record type (Res or Com)
+|         : TDunn 07/29/2026 added updating in possession date for revision and deferred Submittal Review
 |
 /-----------------------------------------------------------------------------------------------------------------------*/
 if (matches(currentUserID, "TDUNN", "EAFTAHI", "MHELVIC")) {
@@ -216,7 +217,7 @@ if(matches(wfProcess,"BLD_20181201_DISTRIBUTION","BLD_20181201_MAIN","BLD_202305
 {
 	if(matches(wfTask,"Inspections","Inspection"))
 	{
-		if(wfStatus == "Revisions")
+		if(wfStatus == "Revisions" && matches(capStatus,"Issued"))
 		{
 			logDebug("Inside creating revision child record");
 			var recName = "Building Permit Revision for " + capIDString;
@@ -248,9 +249,13 @@ if(matches(wfProcess,"BLD_20181201_DISTRIBUTION","BLD_20181201_MAIN","BLD_202305
 			
 			copyOwnerTPS(pCapId,cCapId);
 			var assignedTo = getAssignedToStaff(pCapId); 
-			if(assignedTo != null && assignedTo != "") {
-				assignCap(assignedTo,cCapId);
-			}
+			// Auto assign and set due date for Submittal Review
+			capId = cCapId;
+			editTaskDueDate("Submittal Review",dateAdd(null,2,"Y"),"BLD_20231116_REV");
+			assignTask("Submittal Review","PERMIT CENTER_UNASSIGNED","BLD_20231116_REV");
+			editTaskSpecific("Submittal Review","Possession Start Date",dateAdd(null,0,"Y"),cCapId);
+			updateTask("Submittal Review","Received","Possession Start Date logged by system","","BLD_20231116_REV",cCapId);				
+			capId = pCapId;
 			copyAddresses(pCapId,cCapId);
 			copyParcels(pCapId,cCapId);
 			updateAppStatus("Issued - Revision Pending", "Revision " + formatRevNumber(revNumber) + " created by staff. Updated by Script", capId)
@@ -314,8 +319,9 @@ if(matches(wfProcess,"BLD_20181201_DISTRIBUTION","BLD_20181201_MAIN","BLD_202305
 			}
 		}
 		// Inspections/Deferred Submittal: Create Deferred from parent record by Staff
-		if(wfStatus == "Deferred Submittal")
+		if(wfStatus == "Deferred Submittal" && matches(capStatus,"Issued","Issued - Revision Pending"))
 		{
+			
 			logDebug("Inside creating deferred submittal child record");
 			var recName = "Building Permit Deferred Submittal for " + capIDString;
 			var cCapId = createChild("Building","Deferred Submittal","NA","NA",recName); 
@@ -344,17 +350,20 @@ if(matches(wfProcess,"BLD_20181201_DISTRIBUTION","BLD_20181201_MAIN","BLD_202305
 			logDebug("Child AltID = " + newAltID);
 			
 			copyOwnerTPS(pCapId,cCapId);
-			var assignedTo = getAssignedToStaff(pCapId); 
-			if(assignedTo != null && assignedTo != "") {
-				assignCap(assignedTo,cCapId);
-			}
+			// Auto assign and set due date for Submittal Review
+			capId = cCapId;
+			editTaskDueDate("Submittal Review",dateAdd(null,2,"Y"),"BLD_DEFERRED_20240710");
+			assignTask("Submittal Review","PERMIT CENTER_UNASSIGNED","BLD_DEFERRED_20240710");
+			editTaskSpecific("Submittal Review","Possession Start Date",dateAdd(null,0,"Y"),cCapId);
+			updateTask("Submittal Review","Received","Possession Start Date logged by system","","BLD_DEFERRED_20240710",cCapId);					
+			capId = pCapId;
 			copyAddresses(pCapId,cCapId);
 			copyParcels(pCapId,cCapId);	
 			editAppSpecific("Project Office",getAppSpecific("Project Office",pCapId),cCapId);
 			editAppSpecific("Type of Work",getAppSpecific("Type of Work",pCapId),cCapId);
 			editAppSpecific("Scope of Work",getAppSpecific("Scope of Work",pCapId),cCapId);	
 			editAppSpecific("Plan Check Type",getAppSpecific("Plan Check Type",pCapId),cCapId);
-			editAppSpecific("Parent Record Type",appTypeArray[1],cCapId);			
+			editAppSpecific("Parent Record Type",appTypeArray[1],cCapId);
 			
 			// Generate email notice to parent applicant for new Deferred Submittal application createDocumentFragment
 			var vEmailTemplate = "ONLINE_PERMIT_AMENDMENT_SUBMITTED";

@@ -1,4 +1,4 @@
-/*------------------------------------------------------------------------------------------------------/
+/*--------------------------------------------------------------------------------------------------------------------------------------------------/
 | Program : WTUA;Building!Residential!~!~
 | Event   : WorkflowTaskUpdateAfter
 |
@@ -12,7 +12,9 @@
 |         : TDunn 12/30/2025 updated criteria for setting Plan Check Expiration
 |         : TDunn 01/07/2026 added additional 20181201 processes to criteria for running code
 |         : TDunn 01/10/2026 moved Revision and Deferred submittal creation from parent from WTUA:Building here
+|         : TDunn 01/22/2026 updated Revisions to use the new 'Master/Revision' for the legacy Master < 3000 and > 3000 plan check only record types.
 |         : TDunn 01/23/2026 added updating Revisions and Deferred with Parent record type (Res or Com)
+|         : TDunn 07/29/2026 added updating in possession date for revision and deferred Submittal Review
 |
 /---------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 
@@ -73,7 +75,8 @@ if(matches(wfProcess,"BLD_20181201_DISTRIBUTION","BLD_20181201_MAIN","BLD_202305
 {
 	if(matches(wfTask,"Inspections","Inspection") && !matches(appTypeArray[3],"Master < 3000","Master > 3000"))
 	{
-		if(wfStatus == "Revisions")
+		logDebug("Permit status is " + capStatus);
+		if(wfStatus == "Revisions" && capStatus == "Issued")
 		{
 			logDebug("Inside creating revision child record");
 			var recName = "Building Permit Revision for " + capIDString;
@@ -104,10 +107,14 @@ if(matches(wfProcess,"BLD_20181201_DISTRIBUTION","BLD_20181201_MAIN","BLD_202305
 			logDebug("Child AltID = " + newAltID);
 			
 			copyOwnerTPS(pCapId,cCapId);
-			var assignedTo = getAssignedToStaff(pCapId); 
-			if(assignedTo != null && assignedTo != "") {
-				assignCap(assignedTo,cCapId);
-			}
+
+			// Auto assign and set due date for Submittal Review
+			capId = cCapId;			
+			editTaskDueDate("Submittal Review",dateAdd(null,2,"Y"),"BLD_20231116_REV");
+			assignTask("Submittal Review","PERMIT CENTER_UNASSIGNED","BLD_20231116_REV");
+			editTaskSpecific("Submittal Review","Possession Start Date",dateAdd(null,0,"Y"),cCapId);
+			updateTask("Submittal Review","Received","Possession Start Date logged by system","","BLD_20231116_REV",cCapId);
+			capId = pCapId;
 			copyAddresses(pCapId,cCapId);
 			copyParcels(pCapId,cCapId);
 			updateAppStatus("Issued - Revision Pending", "Revision " + formatRevNumber(revNumber) + " created by staff. Updated by Script", capId)
@@ -171,7 +178,7 @@ if(matches(wfProcess,"BLD_20181201_DISTRIBUTION","BLD_20181201_MAIN","BLD_202305
 			}
 		}
 		// Inspections/Deferred Submittal: Create Deferred from parent record by Staff
-		if(wfStatus == "Deferred Submittal")
+		if(wfStatus == "Deferred Submittal" && matches(capStatus,"Issued","Issued - Revision Pending"))
 		{
 			logDebug("Inside creating deferred submittal child record");
 			var recName = "Building Permit Deferred Submittal for " + capIDString;
@@ -201,10 +208,14 @@ if(matches(wfProcess,"BLD_20181201_DISTRIBUTION","BLD_20181201_MAIN","BLD_202305
 			logDebug("Child AltID = " + newAltID);
 			
 			copyOwnerTPS(pCapId,cCapId);
-			var assignedTo = getAssignedToStaff(pCapId); 
-			if(assignedTo != null && assignedTo != "") {
-				assignCap(assignedTo,cCapId);
-			}
+
+			// Auto assign and set due date for Submittal Review
+			capId = cCapId;			
+			editTaskDueDate("Submittal Review",dateAdd(null,2,"Y"),"BLD_DEFERRED_20240710");
+			assignTask("Submittal Review","PERMIT CENTER_UNASSIGNED","BLD_DEFERRED_20240710");
+			editTaskSpecific("Submittal Review","Possession Start Date",dateAdd(null,0,"Y"),cCapId);
+			updateTask("Submittal Review","Received","Possession Start Date logged by system","","BLD_DEFERRED_20240710",cCapId);
+			capId = pCapId;
 			copyAddresses(pCapId,cCapId);
 			copyParcels(pCapId,cCapId);	
 			editAppSpecific("Project Office",getAppSpecific("Project Office",pCapId),cCapId);
@@ -266,7 +277,7 @@ if(matches(wfProcess,"BLD_20181201_DISTRIBUTION","BLD_20181201_MAIN","BLD_202305
 	}
 	if(matches(appTypeArray[3],"Master < 3000","Master > 3000"))
 	{
-		if(wfTask == "Inspections" && wfStatus == "Revisions" && appTypeArray[3] != "Revision")
+		if(wfTask == "Inspections" && wfStatus == "Revisions" && matches(capStatus,"Issued","Approved") && appTypeArray[3] != "Revision")
 		{
 			logDebug("Inside creating revision child record");
 			var recName = "Master Plan Revision for " + capIDString;
@@ -355,6 +366,6 @@ if(matches(wfProcess,"BLD_20181201_DISTRIBUTION","BLD_20181201_MAIN","BLD_202305
 			showMessage = true;
 			comment("<font size = 4 color=ff000><b>Revision record created. Record number " + newAltID + ".</b></font><br><br>You can navigate to the new record using the Related Records tab.<br>");
 		}		
-	}
+	}	
 }
 
