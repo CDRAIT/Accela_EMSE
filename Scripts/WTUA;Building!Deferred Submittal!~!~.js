@@ -193,7 +193,9 @@ if(wfProcess == "BLD_DEFERRED_20240710")
 					assignTask(thisTask,thisStaff,wfProcess);
 				}				
 			}
-			editTaskDueDate(thisTask,dateAdd(null,addNumDays,"Y"),wfProcess);		
+			editTaskDueDate(thisTask,dateAdd(null,addNumDays,"Y"),wfProcess);
+			editTaskSpecific("Building Plan Check","Possession Start Date",dateAdd(null,0,"Y"));
+			updateTask("Building Plan Check","Submittal Received","Possession Start date logged. Updated by script","",wfProcess);			
 		}
 	}
 
@@ -256,6 +258,8 @@ if(wfProcess == "BLD_DEFERRED_20240710")
 			thisStaff = lookup("SDL:BLD Default Assignment","Process for Issuance");
 			editTaskDueDate("Process for Issuance",dateAdd(null,2,"Y"),wfProcess);
 			assignTask("Process for Issuance",thisStaff);
+			editTaskSpecific("Process for Issuance","Possession Start Date",dateAdd(null,0,"Y"));
+			updateTask("Process for Issuance","Final Processing","Possession Start date logged. Updated by script","",wfProcess);			
 		}
 
 	}
