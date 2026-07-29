@@ -308,6 +308,13 @@ if(matches(wfProcess,"BLD_20181201_DISTRIBUTION","BLD_20181201_MAIN","BLD_202305
 			logDebug("Child AltID = " + newAltID);
 			
 			// copyOwnerTPS(pCapId,cCapId);
+			// Auto assign and set due date for Submittal Review
+			capId = cCapId;			
+			editTaskDueDate("Submittal Review",dateAdd(null,2,"Y"),"BLD_PLNCHK_20241222");
+			assignTask("Submittal Review","PERMIT CENTER_UNASSIGNED","BLD_PLNCHK_20241222");
+			editTaskSpecific("Submittal Review","Possession Start Date",dateAdd(null,0,"Y"),cCapId);
+			updateTask("Submittal Review","Received","Possession Start Date logged by system","","BLD_PLNCHK_20241222",cCapId);
+			capId = pCapId;			
 			var assignedTo = getAssignedToStaff(pCapId); 
 			if(assignedTo != null && assignedTo != "") {
 				assignCap(assignedTo,cCapId);
