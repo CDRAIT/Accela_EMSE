@@ -1170,6 +1170,7 @@ if(wfProcess == "BLD_20230501_MAIN")
 				activateTask(thisTask,wfProcess);
 				updateTask(thisTask,"Completion Pending","","(Preissuance Requirement)",wfProcess);
 				assignPreissue(thisTask,wfProcess);
+				editTaskSpecific(thisTask,"Possession Start Date",dateAdd(null,0,"Y"));
 			}
 		}
 		if(addlPermitRequiredFlag)

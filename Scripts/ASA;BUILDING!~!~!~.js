@@ -362,8 +362,10 @@ try
 	if(AInfo['ParcelAttribute.FIRE'] == "Sacramento Metropolitan Fire District") {addStdCondition("Fire - Prevent Issuance / Approval", "Review by Sac Metro Fire may be required");}
 	if(!publicUser)
 	{
-		assignTask("Submittal Review","CDRA_UNASSIGNED");
+		assignTask("Submittal Review","PERMIT CENTER_UNASSIGNED");
 		editTaskDueDate("Submittal Review",dateAdd(null,2,"Y"));
+		editTaskSpecific("Submittal Review","Possession Start Date",dateAdd(null,0,"Y"));
+		updateTask("Submittal Review","Received","Possession Start Date logged by system","",wfProcess);		
 	}
 	
 	//IT Request# 1911 - EV Charging Station
