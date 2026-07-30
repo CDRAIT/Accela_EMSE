@@ -70,7 +70,7 @@ if(matches(wfProcess,"BLD_20181201_DISTRIBUTION","BLD_20181201_MAIN"))
 			{
 				editAppSpecific("Parent Record Type",appTypeArray[1],cCapId);
 			}
-			if((appTypeArray[0] == "TRPA")
+			if(appTypeArray[0] == "TRPA")
 			{
 				editAppSpecific("Parent Record Type",appTypeArray[2],cCapId);
 				editAppSpecific("Revision Parent Type",appTypeArray[2],cCapId);
