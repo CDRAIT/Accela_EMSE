@@ -66,7 +66,15 @@ if(matches(wfProcess,"BLD_20181201_DISTRIBUTION","BLD_20181201_MAIN"))
 			editAppSpecific("Type of Work",getAppSpecific("Type of Work",pCapId),cCapId);
 			editAppSpecific("Scope of Work",getAppSpecific("Scope of Work",pCapId),cCapId);	
 			editAppSpecific("Plan Check Type",getAppSpecific("Plan Check Type",pCapId),cCapId);
-			editAppSpecific("Parent Record Type",appTypeArray[1],cCapId);
+			if(appTypeArray[0] == "Building")
+			{
+				editAppSpecific("Parent Record Type",appTypeArray[1],cCapId);
+			}
+			if((appTypeArray[0] == "TRPA")
+			{
+				editAppSpecific("Parent Record Type",appTypeArray[2],cCapId);
+				editAppSpecific("Revision Parent Type",appTypeArray[2],cCapId);
+			}			
 			//copyContacts(pCapId,cCapId);
 
 			// Create notification to applicant for new Revision record created
