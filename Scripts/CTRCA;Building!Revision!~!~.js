@@ -69,6 +69,7 @@ if (parentCapString)
 		if(capGroup == "TRPA")
 		{
 			editAppSpecific("Parent Record Type",capSubType);
+			editAppSpecific("Revision Parent Type",capSubType);
 		}
 	}
 	catch (err) {
