@@ -355,6 +355,8 @@ if(matches(wfProcess,"BLD_20181201_DISTRIBUTION","BLD_20181201_MAIN","BLD_202305
 			editTaskDueDate("Submittal Review",dateAdd(null,2,"Y"),"BLD_DEFERRED_20240710");
 			assignTask("Submittal Review","PERMIT CENTER_UNASSIGNED","BLD_DEFERRED_20240710");
 			editTaskSpecific("Submittal Review","Possession Start Date",dateAdd(null,0,"Y"),cCapId);
+			updateTask("Submittal Review","Received","Possession Start Date logged by system","","BLD_DEFERRED_20240710",cCapId);
+			editTaskSpecific("Submittal Review","Possession Start Date",dateAdd(null,0,"Y"),cCapId);
 			updateTask("Submittal Review","Received","Possession Start Date logged by system","","BLD_DEFERRED_20240710",cCapId);					
 			capId = pCapId;
 			copyAddresses(pCapId,cCapId);
