@@ -20,14 +20,17 @@
 |         : TDunn 08/30/2025 Deployed to GitHub
 |         : TDunn 06/30/2026 added updating revision with parent permit type
 |         : TDunn 07/08/2026 updated parent permit type for TRPA to use subType
+|         : TDunn 07/30/2026 added in possession rules for Revision Submittal Review
 |           
 /---------------------------------------------------------------------------------------------------------------------*/
 
 logDebug("Inside CTRCA:Building/Revision/");
 
 // Auto assign and set due date for Submittal Review
-assignTask("Submittal Review","CDRA_UNASSIGNED");
 editTaskDueDate("Submittal Review",dateAdd(null,2,"Y"));
+assignTask("Submittal Review","PERMIT CENTER_UNASSIGNED");
+editTaskSpecific("Submittal Review","Possession Start Date",dateAdd(null,0,"Y"));
+updateTask("Submittal Review","Received","Possession Start Date logged by system","");
 if(matches(AInfo["Project Office"],"",null,undefined))
 {
 	var projectOffice = getAppSpecific("Project Office");
