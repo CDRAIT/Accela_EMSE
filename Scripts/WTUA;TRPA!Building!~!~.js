@@ -9,6 +9,7 @@
 | Requires: EMSE 3.0 and Standard Choice: "EMSE_EXECUTE_OPTIONS": "SCRIPT" to be Active.
 |
 | Notes   : TDunn 03/04/2026 created script to manage Revisions and Deferred Submittals
+|         : TDunn 07/30/2026 Fixed issue with TRPA revision Parent Type
 |
 |
 /------------------------------------------------------------------------------------------------------*/
@@ -66,7 +67,15 @@ if(matches(wfProcess,"BLD_20181201_DISTRIBUTION","BLD_20181201_MAIN"))
 			editAppSpecific("Type of Work",getAppSpecific("Type of Work",pCapId),cCapId);
 			editAppSpecific("Scope of Work",getAppSpecific("Scope of Work",pCapId),cCapId);	
 			editAppSpecific("Plan Check Type",getAppSpecific("Plan Check Type",pCapId),cCapId);
-			editAppSpecific("Parent Record Type",appTypeArray[2],cCapId);
+			if(appTypeArray[0] == "Building")
+			{
+				editAppSpecific("Parent Record Type",appTypeArray[1],cCapId);
+			}
+			if(appTypeArray[0] == "TRPA")
+			{
+				editAppSpecific("Parent Record Type",appTypeArray[2],cCapId);
+				editAppSpecific("Revision Parent Type",appTypeArray[2],cCapId);
+			}			
 			//copyContacts(pCapId,cCapId);
 
 			// Create notification to applicant for new Revision record created
@@ -164,6 +173,7 @@ if(matches(wfProcess,"BLD_20181201_DISTRIBUTION","BLD_20181201_MAIN"))
 			editAppSpecific("Scope of Work",getAppSpecific("Scope of Work",pCapId),cCapId);	
 			editAppSpecific("Plan Check Type",getAppSpecific("Plan Check Type",pCapId),cCapId);
 			editAppSpecific("Parent Record Type",appTypeArray[2],cCapId);
+			editAppSpecific("Revision Parent Type",appTypeArray[2],cCapId);
 			
 			// Generate email notice to parent applicant for new Deferred Submittal application createDocumentFragment
 			var vEmailTemplate = "ONLINE_PERMIT_AMENDMENT_SUBMITTED";
