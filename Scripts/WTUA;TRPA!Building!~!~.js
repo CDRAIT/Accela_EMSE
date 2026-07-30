@@ -9,6 +9,7 @@
 | Requires: EMSE 3.0 and Standard Choice: "EMSE_EXECUTE_OPTIONS": "SCRIPT" to be Active.
 |
 | Notes   : TDunn 03/04/2026 created script to manage Revisions and Deferred Submittals
+|         : TDunn 07/30/2026 Fixed issue with TRPA revision Parent Type
 |
 |
 /------------------------------------------------------------------------------------------------------*/
@@ -48,15 +49,17 @@ if(matches(wfProcess,"BLD_20181201_DISTRIBUTION","BLD_20181201_MAIN"))
 			// newAltID = capIDString + childExt + String(revNumber);
 			newAltID = capIDString + childExt + formatRevNumber(revNumber);
 			
-			aa.cap.updateCapAltID(cCapId, newAltID);	
+			aa.cap.updateCapAltID(cCapId, newAltID);
 			logDebug("Child AltID = " + newAltID);
 			
 			copyOwnerTPS(pCapId,cCapId);
 
 			// Auto assign and set due date for Submittal Review
 			capId = cCapId;			
-			assignTask("Submittal Review","CDRA_UNASSIGNED","BLD_20231116_REV");
 			editTaskDueDate("Submittal Review",dateAdd(null,2,"Y"),"BLD_20231116_REV");
+			assignTask("Submittal Review","PERMIT CENTER_UNASSIGNED","BLD_20231116_REV");
+			editTaskSpecific("Submittal Review","Possession Start Date",dateAdd(null,0,"Y"),cCapId);
+			updateTask("Submittal Review","Received","Possession Start Date logged by system","","BLD_20231116_REV",cCapId);		
 			capId = pCapId;
 			copyAddresses(pCapId,cCapId);
 			copyParcels(pCapId,cCapId);
@@ -172,6 +175,7 @@ if(matches(wfProcess,"BLD_20181201_DISTRIBUTION","BLD_20181201_MAIN"))
 			editAppSpecific("Scope of Work",getAppSpecific("Scope of Work",pCapId),cCapId);	
 			editAppSpecific("Plan Check Type",getAppSpecific("Plan Check Type",pCapId),cCapId);
 			editAppSpecific("Parent Record Type",appTypeArray[2],cCapId);
+			editAppSpecific("Revision Parent Type",appTypeArray[2],cCapId);
 			
 			// Generate email notice to parent applicant for new Deferred Submittal application createDocumentFragment
 			var vEmailTemplate = "ONLINE_PERMIT_AMENDMENT_SUBMITTED";
