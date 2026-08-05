@@ -951,7 +951,7 @@ if(wfProcess == "BLD_20230501_MAIN")
 			{
 				stmDueDate = dateAdd(null,addNumDays,"Y");
 				sentStormNotice = generateNoticeToStaff(stmTemplate,stmToEmail,stmDueDate);	
-				if(sentStormNotice)
+				if(sentStormNotice){
 					logDebug("Send Stormwater notification is " + sentStormNotice);
 				} else {
 					logDebug("Failed to send Stormwater notification");
@@ -961,10 +961,12 @@ if(wfProcess == "BLD_20230501_MAIN")
 			{
 				apcdDueDate = dateAdd(null,addNumDays,"Y");
 				sentAPCDNotice = generateNoticeToStaff(apcdTemplate,apcdToEmail,apcdDueDate);
-				if(sentAPCDNotice)
+				if(sentAPCDNotice) {
 					logDebug("Sent APCD Review notification is " + sentAPCDNotice);
 				} else {
 					logDebug("Failed to send APCD notification");
+				}
+			}
 			if(isTaskStatus("Initial Planning Review",clearStatus))
 			{
 				if(matches(AInfo["Planning Review Type"],"Back Office Planning Review")) {assignTask("Planning Review","PLN_UNASSIGNED_BACKOFFICE",wfProcess);}
