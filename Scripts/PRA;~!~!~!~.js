@@ -82,20 +82,21 @@ if(matches(appTypeArray[1],"Residential","Commercial"))
 	logDebug("Running actions for Building Records and Revisions at PRA");
 	if(isTaskStatus("Process for Issuance","Payment Requested"))
 	{
-		updateTask("Process for Issuance","Payment Received","Payment Received via Citizen Portal. Updated by script","");
+		
 		updateAppStatus("Payment Received","Updated by script on Payment Received via Citizen Portal");
 		editTaskDueDate("Process for Issuance",dateAdd(null,2,"Y"));
 		editTaskSpecific("Process for Issuance","Possession Start Date",dateAdd(null,0,"Y"));
+		updateTask("Process for Issuance","Payment Received","Payment Received via Citizen Portal. Updated by script","");
 	}
 	if(isTaskActive("Distribution") && isTaskStatus("Distribution","Payment Requested"))
 	{
 		logDebug("running actions for active Distribution at Payment Requested");
 		if(balanceDue < 1)
 		{
-			updateTask("Distribution","Payment Received","Updated on Payment of fees due","");
 			updateAppStatus("Payment Received","Updated by script on Payment Received via Citizen Portal");
 			editTaskDueDate("Distribution",dateAdd(null,1,"Y"));
 			editTaskSpecific("Distribution","Possession Start Date",dateAdd(null,0,"Y"));
+			updateTask("Distribution","Payment Received","Updated on Payment of fees due by system","");
 		}
 	}
 }
