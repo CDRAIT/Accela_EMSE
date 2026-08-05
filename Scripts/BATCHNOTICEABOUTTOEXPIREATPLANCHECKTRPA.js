@@ -1,5 +1,5 @@
 /*------------------------------------------------------------------------------------------------------/
-| Program: batchNoticeAboutToExpireAtPlanCheckTRPA  Trigger: Batch    Client : Placerco
+| Program: batchNoticeAboutToExpireAtPlanCheckTRPA  Trigger: Batch    Client : Placerco  BatchJob Name: AboutToExpireNoticePlnChk_TRPA
 |
 | Version 1.0 - Created  12/26/2023 Terry Dunn
 |
@@ -101,7 +101,7 @@ var paramsAppGroup = "TRPA";
 var paramsAppPerTypeArray = new Array("Building");
 var paramsAppSubTypeArray = new Array("Residential", "Non-Residential");
 var paramsAppPerCategory = new Array("Project","Qualified Exempt","TRPA Review at TRPA")
-var paramsAppStatusArray = new Array("Expired", "Construction Complete", "Void", "Withdrawn", "DONE", "CANC", "Issued", "Issued - Awaiting Signature", "Issued - Revision Pending");
+var paramsAppStatusArray = new Array("Expired", "Construction Complete", "Void", "Withdrawn", "DONE", "CANC", "Issued", "Issued - Awaiting Signature", "Issued - Revision Pending", "Approved");
 // Parameter variables data
 var startDate = 60;
 var endDate = 60;

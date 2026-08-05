@@ -1,5 +1,5 @@
 /*------------------------------------------------------------------------------------------------------/
-| Program: batchNoticeExpireAtPlanCheckTRPA  Trigger: Batch    Client : Placerco
+| Program: batchNoticeExpireAtPlanCheckTRPA  Trigger: Batch    Client : Placerco   batchJob Name: ExpireNoticePlnChk_TRPA
 |
 | Version 1.0 - Created  12/26/2023 Terry Dunn
 |
@@ -99,7 +99,7 @@ var paramsAppGroup = "TRPA";
 var paramsAppPerTypeArray = new Array("Building");
 var paramsAppSubTypeArray = new Array("Residential", "Non-Residential");
 var paramsAppPerCategory = new Array("Project","Qualified Exempt","TRPA Review at TRPA")
-var paramsAppStatusArray = new Array("Expired", "Construction Complete", "Void", "Withdrawn", "DONE", "CANC", "Issued", "Issued - Awaiting Signature", "Issued - Revision Pending");
+var paramsAppStatusArray = new Array("Expired", "Construction Complete", "Void", "Withdrawn", "DONE", "CANC", "Issued", "Issued - Awaiting Signature", "Issued - Revision Pending", "Approved");
 // Parameter variables data
 var paramsAppSubGroupName = "EXTENSIONS AND EXPIRATION";                     	// Application Spec Info Subgroup Name that the ASI field is associated to.
 var paramsAppSpecInfoLabel = "Plan Check Expiration";                           // ASI field name that the batch script is to search.

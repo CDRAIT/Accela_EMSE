@@ -1,5 +1,5 @@
 /*------------------------------------------------------------------------------------------------------/
-| Program: batchNoticeExpireAtPlanCheckBuilding  Trigger: Batch    Client : Placerco
+| Program: batchNoticeExpireAtPlanCheckBuilding  Trigger: Batch    Client : Placerco    batchJob Name: ExpireNoticePlnChk_BLD
 |
 | Version 1.0 - Created  12/26/2023 Terry Dunn
 |
@@ -98,9 +98,9 @@ var listRecordsUpdated = "";													// used for list of records updated in 
 // Parameter variables for records to process
 var paramsAppGroup = "Building";
 var paramsAppPerTypeArray = new Array("Residential","Commercial");
-var paramsAppSubTypeArray = new Array("Full Review", "Limited");
+var paramsAppSubTypeArray = new Array("Full Review", "Limited");              //Not used for this script
 var paramsAppCategoryArray = new Array("Not Used");
-var paramsAppStatusArray = new Array("Expired", "Construction Complete", "Void", "Withdrawn", "DONE", "CANC", "Issued", "Issued - Awaiting Signature", "Issued - Revision Pending");
+var paramsAppStatusArray = new Array("Expired", "Construction Complete", "Void", "Withdrawn", "DONE", "CANC", "Issued", "Issued - Awaiting Signature", "Issued - Revision Pending", "Approved");
 // Parameter variables data
 var paramsAppSubGroupName = "EXTENSIONS AND EXPIRATION";                     	// Application Spec Info Subgroup Name that the ASI field is associated to.
 var paramsAppSpecInfoLabel = "Plan Check Expiration";                           // ASI field name that the batch script is to search.

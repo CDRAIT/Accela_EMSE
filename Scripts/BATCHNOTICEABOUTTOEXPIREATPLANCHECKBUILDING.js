@@ -1,5 +1,5 @@
 /*------------------------------------------------------------------------------------------------------/
-| Program: batchNoticeAboutToExpireAtPlanCheckBuilding  Trigger: Batch    Client : Placerco
+| Program: batchNoticeAboutToExpireAtPlanCheckBuilding  Trigger: Batch    Client : Placerco		BatchJob Name: AboutToExpireNoticePlnChk_BLD
 |
 | Version 1.0 - Created  12/26/2023 Terry Dunn
 |
@@ -15,7 +15,7 @@
 |   ASI Plan Check Expiration date is in 14 or 60 days
 |   appGroup = "Building"
 |   appType(s) = "Commercial","Residential"
-|   appSubtype = "Full Review","Limited"
+|   appSubtype = "Full Review","Limited" ????????????????????????????????????????????????????
 | 
 | Updates: TDunn 12/27/2023 
 |          TDunn 01/23/2024 updated call for Prime LP
@@ -98,9 +98,9 @@ var listRecordsUpdated = "";													// used for list of records updated in 
 // Parameter variables for records to process
 var paramsAppGroup = "Building";
 var paramsAppPerTypeArray = new Array("Residential","Commercial");
-var paramsAppSubTypeArray = new Array("Full Review", "Limited");
+var paramsAppSubTypeArray = new Array("Full Review", "Limited");                // Not used for this script
 var paramsAppCategoryArray = new Array("Not Used");
-var paramsAppStatusArray = new Array("Expired", "Construction Complete", "Void", "Withdrawn", "DONE", "CANC", "Issued", "Issued - Awaiting Signature", "Issued - Revision Pending");
+var paramsAppStatusArray = new Array("Expired", "Construction Complete", "Void", "Withdrawn", "DONE", "CANC", "Issued", "Issued - Awaiting Signature", "Issued - Revision Pending", "Approved");
 // Parameter variables data
 var startDate = 60;
 var endDate = 60;
