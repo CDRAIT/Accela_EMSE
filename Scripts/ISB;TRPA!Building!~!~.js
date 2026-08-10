@@ -9,7 +9,7 @@
 | Requires: EMSE 3.0 and Standard Choice: "EMSE_EXECUTE_OPTIONS": "SCRIPT" to be Active.
 |
 | Notes   : Abe 04/10/2026 Converted to EMSE 3.0 from StdChoice ISB:TRPA/Building
-|                
+          : Abe 08/10/2026 Added "Issued - Revision Pending" to capStatus exclusion list for inspection scheduling
 /------------------------------------------------------------------------------------------------------*/
 if(matches(currentUserID,"EAFTAHI"))
 {
@@ -59,7 +59,7 @@ if(feeGetTotByDateRange(dateAdd(null,-730),dateAdd(null,0),"NEW") > 0 ){
 }
 
 //#090
-if(capStatus != "Inspection Request Received" && capStatus != "Issued" && capStatus != "Re-Issue" && capStatus != "OPEN" && capStatus != "Revisions"){
+if(capStatus != "Inspection Request Received" && capStatus != "Issued" && capStatus != "Re-Issue" && capStatus != "OPEN" && capStatus != "Revisions" && capStatus != "Issued - Revision Pending"){
     vString += "<font size = 4 color=ff000><b>Inspections cannot be scheduled</b></font><br>The current status is: ";
     vString += capStatus;
     vString += " for this Building Permit. All building permts must be in either an Issued or Re-Issue status to schedule inspections.<br><br>";
