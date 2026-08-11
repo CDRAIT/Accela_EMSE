@@ -1539,7 +1539,8 @@ if(matches(appTypeArray[1],"Revision") && wfProcess == "BLD_20231116_REV")
 		{
 			if(isTaskStatus("Distribution","Distribute")) {updateTask("Distribution","Distributed","Updated by script on Distribution Reconciliation Complete","");}
 			editTaskDueDate("Process for Issuance",dateAdd(null,2,"Y"),wfProcess);
-			editTaskSpecific("Process for Issuance","Possession Start Date",dateAdd(null,0,"Y"));																						
+			editTaskSpecific("Process for Issuance","Possession Start Date",dateAdd(null,0,"Y"));
+			updateTask("Process for Issuance","Final Processing","Reconciliation 'Complete'. Possession Start Date logged by system","",wfProcess);				
 			assignThisTask("Process for Issuance",wfProcess);
 			
 
@@ -1647,10 +1648,11 @@ if(matches(appTypeArray[1],"Revision") && wfProcess == "BLD_20231116_REV")
 			}
 			if(allPreComplete)
 			{
-				updateAppStatus("Final Processing","All preissuance tasks Complete or inactive. Updated by script");
+				
 				editTaskSpecific("Process for Issuance","Possession Start Date",dateAdd(null,0,"Y"));																						 
 				updateTask("Process for Issuance","Final Processing","All preissuance tasks Complete or inactive. Updated by script","",wfProcess);
-				editTaskDueDate("Process for Issuance",dateAdd(null,2,"Y"),wfProcess);																		  																							  
+				editTaskDueDate("Process for Issuance",dateAdd(null,2,"Y"),wfProcess);
+				updateAppStatus("Final Processing","All preissuance tasks Complete or inactive. Updated by script");				
 			}
 		}
 	}
