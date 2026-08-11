@@ -1520,7 +1520,7 @@ if(wfProcess == "BLD_20230501_MAIN")
 				{
 					distRecStatus = "Ready for Reconciliation - Corrections";
 					editTaskSpecific("Distribution Reconciliation","Possession Start Date",dateAdd(null,0,"Y"));
-					updateTask("Distribution Reconciliation",distRecStatus,"Possession Start Date logged by system.","");// Remarked out due to duplication of WTUA digEplan script.					
+					updateTask("Distribution Reconciliation",distRecStatus,"Possession Start Date logged by system.","");				
 				}
 				
 
