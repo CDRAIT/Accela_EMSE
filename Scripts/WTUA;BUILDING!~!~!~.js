@@ -1605,6 +1605,7 @@ if(wfProcess == "BLD_20230501_MAIN")
 			if(isTaskStatus("Distribution","Distribute")) {updateTask("Distribution","Distributed","Updated by script on Distribution Reconciliation Complete","");}
 			editTaskDueDate("Process for Issuance",dateAdd(null,2,"Y"),wfProcess);
 			editTaskSpecific("Process for Issuance","Possession Start Date",dateAdd(null,0,"Y"));
+			updateTask("Process for Issuance","Final Processing","Reconciliation 'Complete'. Possession Start Date logged by system","",wfProcess);			
 			thisTask = "Process for Issuance";
 			thisStaff = lookup("SDL:BLD Default Assignment",thisTask);
 			assignTask(thisTask,thisStaff,wfProcess);
@@ -1715,10 +1716,10 @@ if(wfProcess == "BLD_20230501_MAIN")
 			}
 			if(allPreComplete)
 			{
-				updateAppStatus("Final Processing","All preissuance tasks Complete or inactive. Updated by script");
 				editTaskSpecific("Process for Issuance","Possession Start Date",dateAdd(null,0,"Y"));
 				updateTask("Process for Issuance","Final Processing","All preissuance tasks Complete or inactive. Updated by script","",wfProcess);
-				editTaskDueDate("Process for Issuance",dateAdd(null,2,"Y"),wfProcess);																		  
+				editTaskDueDate("Process for Issuance",dateAdd(null,2,"Y"),wfProcess);
+				updateAppStatus("Final Processing","All preissuance tasks Complete or inactive. Updated by script");				
 			}
 		}
 	}
@@ -2080,27 +2081,24 @@ function setConcurrentStatusAndPossDate(lkupCriteria,tprocess)
 	taskListArray = new Array();
 	taskList = lookup("PLAN REVIEW - REQUIRED REVIEWS", lkupCriteria); //requiredReviewsStdChoice ... Get Reviews Required by Record Type from Standard Choice
 	taskListArray = taskList.split(",");
-	/* Load cycle TSI values */
-	useTaskSpecificGroupName = true;
-	TsiInfo = new Array();
-	loadTaskSpecific(TsiInfo,capId);
+	resubNum = AInfo["Resubmittal Number"];
+	newStatus = "Submittal Received";	
+	if(resubNum <= 1)
+	{
+		newStatus = "Submittal Received";
+	}
+	if(resubNum > 1)
+	{
+		newStatus = "Resubmittal Received";
+	}	
 	/* Find tasks to activate */
 	for(tla in taskListArray)
 	{
-		newStatus = "Submittal Received";
 		thisTask = taskListArray[tla];
 		if (matches(AInfo[thisTask],"Yes","Y","YES"))
 		{
-			if(matches(TsiInfo[tprocess + "." + thisTask + "." + "Cycle Number"],null,"",undefined))
-			{
-				newCycle = 0;
-			} else{		
-			newCycle = 1 * TsiInfo[tprocess + "." + thisTask + "." + "Cycle Number"];
-			}
-			if(newCycle > 1) { newStatus = "Resubmittal Received"; }
 			editTaskSpecific(thisTask,"Possession Start Date",dateAdd(null,0,"Y"));
 			updateTask(thisTask,newStatus,"Possession Start Date logged by system","",wfProcess);
 		}
 	}
-	useTaskSpecificGroupName = false;
 }
