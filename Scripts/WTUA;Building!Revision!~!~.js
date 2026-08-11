@@ -981,6 +981,7 @@ if(matches(appTypeArray[1],"Revision") && wfProcess == "BLD_20231116_REV")
 	{
 		if((!triageThree && !triageTwo) || (!triageThree && triageTwo && isTaskStatus("Plan Completeness Review",failStatus) && !isTaskActive("Plan Completeness Review")) || (!triageTwo && triageThree && isTaskStatus("TRPA Completeness Review",failStatus) && !isTaskActive("TRPA Completeness Review")) || (triageTwo && triageThree && (isTaskStatus("Plan Completeness Review",failStatus) && isTaskStatus("TRPA Completeness Review",failStatus)) && !isTaskActive("Plan Completeness Review") && !isTaskActive("TRPA Completeness Review")))
 		{
+			editTaskSpecific("Distribution Reconciliation","Possession Start Date",dateAdd(null,0,"Y"));
 			updateTask("Distribution Reconciliation","Ready for Reconciliation - Corrections","One or more readiness tasks require corrections.","");
 			editTaskDueDate("Distribution Reconciliation",dateAdd(null,1,"Y"),wfProcess);
 		}
@@ -991,6 +992,7 @@ if(matches(appTypeArray[1],"Revision") && wfProcess == "BLD_20231116_REV")
 		logDebug("Initial Planning status is Corrections Required = " + isTaskStatus("Initial Planning Review",failStatus) + " isTaskActive = " + isTaskActive("Initial Planning Review"));
 		if((!triageThree && !triageOne) || (!triageThree && triageOne && isTaskStatus("Initial Planning Review",failStatus) && !isTaskActive("Initial Planning Review")) || (!triageOne && triageThree && isTaskStatus("TRPA Completeness Review",failStatus) && !isTaskActive("TRPA Completeness Review")) || (triageOne && triageThree && (isTaskStatus("Initial Planning Review",failStatus) && isTaskStatus("TRPA Completeness Review",failStatus)) && !isTaskActive("Intial Planning Review") && !isTaskActive("TRPA Completeness Review")))
 		{
+			editTaskSpecific("Distribution Reconciliation","Possession Start Date",dateAdd(null,0,"Y"));
 			updateTask("Distribution Reconciliation","Ready for Reconciliation - Corrections","One or more readiness tasks require corrections.","");
 			editTaskDueDate("Distribution Reconciliation",dateAdd(null,1,"Y"),wfProcess);
 		}
@@ -1001,6 +1003,7 @@ if(matches(appTypeArray[1],"Revision") && wfProcess == "BLD_20231116_REV")
 		logDebug("Initial Planning status is Corrections Required = " + isTaskStatus("Initial Planning Review",failStatus) + " isTaskActive = " + isTaskActive("Initial Planning Review"));
 		if((!triageTwo && !triageOne) || (!triageTwo && triageOne && isTaskStatus("Initial Planning Review",failStatus) && !isTaskActive("Initial Planning Review")) || (!triageOne && triageTwo && isTaskStatus("Plan Completeness Review",failStatus) && !isTaskActive("Plan Completeness Review")) || (triageOne && triageThree && (isTaskStatus("Initial Planning Review",failStatus) && isTaskStatus("Plan Completeness Review",failStatus)) && !isTaskActive("Intial Planning Review") && !isTaskActive("Plan Completeness Review")))
 		{
+			editTaskSpecific("Distribution Reconciliation","Possession Start Date",dateAdd(null,0,"Y"));
 			updateTask("Distribution Reconciliation","Ready for Reconciliation - Corrections","One or more readiness tasks require corrections.","");
 			editTaskDueDate("Distribution Reconciliation",dateAdd(null,1,"Y"),wfProcess);
 		}
@@ -1451,9 +1454,9 @@ if(matches(appTypeArray[1],"Revision") && wfProcess == "BLD_20231116_REV")
 				if(isCorrection)
 				{
 					distRecStatus = "Ready for Reconciliation - Corrections";
+					editTaskSpecific("Distribution Reconciliation","Possession Start Date",dateAdd(null,0,"Y"));
+					updateTask("Distribution Reconciliation",distRecStatus,"Possession Start Date logged by system.","");
 				}
-				// updateTask("Distribution Reconciliation",distRecStatus,"Status updated by script.","");// Remarked out due to duplication of digEplan WTUA script
-				editTaskSpecific("Distribution Reconciliation","Possession Start Date",dateAdd(null,0,"Y"));																								
 			}
 		}
 	}	
