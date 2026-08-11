@@ -24,7 +24,7 @@ function setReviewWorkflowTasksByTsiFieldsTPS(allTasksArray) {
             activateTask(thisTask);
             if(isTaskStatus(thisTask,"Corrections Required") || isTaskStatus(thisTask,"Approved Pending Resubmittal") || isTaskStatus(thisTask,"Approved")) 
 			{
-				updateTask(thisTask,"Resubmittal Received","",""); 
+				//updateTask(thisTask,"Resubmittal Received","",""); 
 			}
             //editTaskDueDate(thisTask,AInfo[thisTask + " Due Date"]);	//Set the Task Due Date from the TSI Review Date field
         }

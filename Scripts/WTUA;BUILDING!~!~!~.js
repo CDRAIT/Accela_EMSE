@@ -109,6 +109,7 @@
 |         : TDunn 04/19/2026 optimized criteria logic for triage versus plan review distribution rules
 |         : TDunn 06/24/2026 syncd production back to nonprod1 to support updates to in possession tracking
 |         : TDunn 07/01-14/2026 added updating inpossession dates and updated assignment rules
+|         : TDunn 08/05/2026 fixed issue with precheck flag logic.
 |
 /---------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 
@@ -1569,7 +1570,8 @@ if(wfProcess == "BLD_20230501_MAIN")
 				showMessage = true;
 				comment("<font size = 4 color=ff000><b>No applicant email address found. " + wfStatus + " email notification cannot be sent.</b></font><br><br>A status of " + wfStatus + " for the " + wfTask + " task will send a " + wfStatus + " notification to the applicant.<br>The email notification cannot be sent without a valid applicant email address.<br> Please review applicant contact record for a valid email address.");
 			}
-			editTaskSpecific("Distribution","Possession Start Date",dateAdd(null,0,"Y"));			
+			editTaskSpecific("Distribution","Possession Start Date",dateAdd(null,0,"Y"));
+			updateTask("Distribution","Pending Resubmittal","Corrections required. Possession Start date updated by system","");
 			if(recFromTriage)
 			{
 				updateTask("Distribution","Pending Resubmittal","Corrections required for " + failTask + ". Updated by script","Pending Resubmittal from Pre-screen");
