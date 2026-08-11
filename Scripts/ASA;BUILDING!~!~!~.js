@@ -30,6 +30,7 @@
 |         : TDunn 11/05/2025 added dynamic parameter for Project Office email address.
 |         : TDunn 01/02/2025 added new try clause
 |         : Abe   07/01/2026 Replaced all noreply@placer.ca.gov emails to defaultFrom (INCLUDES_CUSTOM_GLOBALS)
+|         : Abe   08/11/2026 added "SFD Production", "Accessory Dwelling Unit", "Junior Accessory Dwelling Unit", "ADU Production", "Accessory Production" to Dry Creek Watershed Fees
 |
 /=============================================================================================*/
 if(matches(currentUserID,"TDUNN","JMCKENZI","EAFTAHI")) { showDebug = 1;}
@@ -317,7 +318,7 @@ try
 			varFeePrefix = "DDCH";
 		}
 
-		if (matches(appTypeArray[1],"Residential") && matches(AInfo['Type of Work'],"New","Manufactured Home") && matches(AInfo['Scope of Work'],"Manufactured Home on Foundation","Manufactured Home on Piers","Manufactured Home Secondary","Secondary Dwelling","Single Family < 3000","Single Family > 3000","Tract Home < 3000","Tract Home > 3000")) 
+		if (matches(appTypeArray[1],"Residential") && matches(AInfo['Type of Work'],"New","Manufactured Home") && matches(AInfo['Scope of Work'],"Manufactured Home on Foundation","Manufactured Home on Piers","Manufactured Home Secondary","Secondary Dwelling","Single Family < 3000","Single Family > 3000","Tract Home < 3000","Tract Home > 3000", "SFD Production", "Accessory Dwelling Unit", "Junior Accessory Dwelling Unit", "ADU Production", "Accessory Production")) 
 		{
 			varFeePrefix = "DDCR";
 		}
