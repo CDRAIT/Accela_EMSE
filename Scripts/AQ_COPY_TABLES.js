@@ -19,11 +19,8 @@ var destinations = [
 "TP25-WCCC-42-01-01",
 "TP25-SANJ-01-02-01"
 
-
-
-
-
 ];
+
 var asiFieldsByRecordType = [
     {
         recordTypeContains: "AirQuality/Stationary Source/Throughput/GDF",
@@ -32,7 +29,7 @@ var asiFieldsByRecordType = [
             "GDF Process Type",
             "Transfer Losses Vapor Recovery Control",
             "Pressure Losses Vapor Recovery Control",
-            "Dispensing/Permeation Vapor Recovery control",
+            "Dispensing/Permeation Vapor Recovery controllers",
             "Spillage Vapor Recovery Control",
             "Other Vapor Releases",
             "Transfer Losses Emission Factor",
@@ -50,7 +47,6 @@ var asiFieldsByRecordType = [
 			// "Max Heat Input Rating (MMBtu/hr)"
         // ]
     // },
-	
      {
          recordTypeContains: "AirQuality/Stationary Source/Throughput/Engine",
         fields: [
@@ -89,12 +85,9 @@ var asiFieldsByRecordType = [
 ];
 var resultCount = 0;
 for (var i = 0; i < destinations.length; i++) {
-
     var destTP = destinations[i];
-
     // Try previous year first
     var sourceTP = getPreviousTP(destTP, 1);
-
     if (!recordExists(sourceTP)) {
         logDebug(sourceTP + " not found. Trying one more year back...");
         sourceTP = getPreviousTP(destTP, 2);
@@ -103,15 +96,10 @@ for (var i = 0; i < destinations.length; i++) {
         logDebug(sourceTP + " not found. Trying two years back...");
         sourceTP = getPreviousTP(destTP, 3);
     }
-
-
-
-
     if (!recordExists(sourceTP)) {
         logDebug("No previous TP record found for " + destTP);
         continue;
     }
-
     logDebug("Source: " + sourceTP + " -> Destination: " + destTP);
     resultCount += copytables(sourceTP, destTP);
 }
@@ -129,7 +117,6 @@ function copytables(pFromAltId, pToAltId) {
         logDebug("Target record not found: " + pToAltId);
         return 0;
     }
-
     var fromCapId = fromCapResult.getOutput();
     var toCapId = toCapResult.getOutput();
 	var process = aa.cap.getProjectByChildCapID(toCapId, null, null).getOutput();
@@ -144,7 +131,6 @@ function copytables(pFromAltId, pToAltId) {
     copySpecificASITable( "TOXIC POLLUTANT EMISSION", fromCapId, toCapId );
     copySpecificASITable( "CRITERIA POLLUTANT EMISSION", fromCapId, toCapId );
     logDebug("Copying ASI from " + pFromAltId + " to " + pToAltId);
-
 var fieldsToCopy = getASIFieldsForRecordType(fromCapId);
 for (var i = 0; i < fieldsToCopy.length; i++) {
     copySpecificASIField( fieldsToCopy[i], fromCapId, toCapId );	
@@ -171,20 +157,10 @@ else if (recordType.indexOf("AirQuality/Stationary Source/Throughput/Coffee Roas
     logDebug("Starting Coffee");
     updateCoffeeCriteriaPollutant(toCapId);
 }	
-
-
-
-
-
-
-
-
-
-
-
     capCount++;
     return capCount;
 }
+
 function getRecordType(capId) {
     var capResult = aa.cap.getCap(capId);
     if (capResult.getSuccess()) {
@@ -192,6 +168,7 @@ function getRecordType(capId) {
     }
     return "";
 }
+
 function logDebug(edesc) {
     if (showDebug) {
         aa.eventLog.createEventLog("DEBUG", "Batch Process", batchJobName, sysDate, sysDate, "", edesc, batchJobID);
@@ -199,6 +176,7 @@ function logDebug(edesc) {
         emailText += "DEBUG : " + edesc + " <br />";
     }
 }
+
 function copySpecificASITable(tableName, srcCapId, targetCapId) {
     var allTables = getAllASITables(srcCapId);
     if (allTables && allTables[tableName]) {
@@ -208,57 +186,45 @@ function copySpecificASITable(tableName, srcCapId, targetCapId) {
         logDebug("Table " + tableName + " not found on source record.");
     }
 }
-function addASITable(tableName, tableValueArray, itemCap) {// optional capId
 
+function addASITable(tableName, tableValueArray, itemCap) {// optional capId
 	ASITcapID = aa.cap.getCap(itemCap).getOutput();
 		ASITcapIDString = ASITcapID.getCapModel().getAltID();
 	//  tableName is the name of the ASI table
 	//  tableValueArray is an array of associative array values.  All elements MUST be either a string or asiTableVal object
-
 		var tssmResult = aa.appSpecificTableScript.getAppSpecificTableModel(itemCap, tableName)
-
 		if (!tssmResult.getSuccess()) {
 			logDebug("**WARNING: error retrieving app specific table " + tableName + " " + tssmResult.getErrorMessage());
 			return false
 		}
-
 	var tssm = tssmResult.getOutput();
 	var tsm = tssm.getAppSpecificTableModel();
 	var fld = tsm.getTableField();
 	var fld_readonly = tsm.getReadonlyField(); // get Readonly field
-
 	for (thisrow in tableValueArray) {
-
 		var col = tsm.getColumns()
 			var coli = col.iterator();
 		while (coli.hasNext()) {
 			var colname = coli.next();
-
 			if (!tableValueArray[thisrow][colname.getColumnName()]) {
 				logDebug("addToASITable: null or undefined value supplied for column " + colname.getColumnName() + ", setting to empty string");
 				tableValueArray[thisrow][colname.getColumnName()] = "";
 			}
-			
 			if (typeof(tableValueArray[thisrow][colname.getColumnName()].fieldValue) != "undefined") // we are passed an asiTablVal Obj
 			{
 				fld.add(tableValueArray[thisrow][colname.getColumnName()].fieldValue);
 				fld_readonly.add(tableValueArray[thisrow][colname.getColumnName()].readOnly);
-				//fld_readonly.add(null);
 			} else // we are passed a string
 			{
 				fld.add(tableValueArray[thisrow][colname.getColumnName()]);
 				fld_readonly.add(null);
 			}
 		}
-
 		tsm.setTableField(fld);
-
 		tsm.setReadonlyField(fld_readonly);
-
-	}
-
+}
 	var addResult = aa.appSpecificTableScript.editAppSpecificTableInfos(tsm, itemCap, currentUserID);
-//logDebug("ADDING COLUMN: " + colname.getColumnName() + " VALUE=[" + tableValueArray[thisrow][colname.getColumnName()] + "]");
+	//logDebug("ADDING COLUMN: " + colname.getColumnName() + " VALUE=[" + tableValueArray[thisrow][colname.getColumnName()] + "]");
 	if (!addResult.getSuccess()) {
 		logDebug("**WARNING: error adding record to ASI Table:  " + tableName);
 		logDebug("ERROR OBJECT: " + addResult);
@@ -266,30 +232,25 @@ function addASITable(tableName, tableValueArray, itemCap) {// optional capId
 		return false;
 	} else
 		logDebug("Successfully added record to ASI Table: " + tableName + " for Record " + ASITcapIDString);
-
 }
+
 function getAllASITables(itemCap) {
     var result = {};
     var gm = aa.appSpecificTableScript.getAppSpecificTableGroupModel(itemCap).getOutput();
     var ta = gm.getTablesArray();
     if (!ta || ta.size() == 0) return null;
-
     var tai = ta.iterator();
     while (tai.hasNext()) {
         var tsm = tai.next();
         var tn = tsm.getTableName();
         if (tsm.rowIndex.isEmpty()) continue;
-
         logDebug("Loading ASI Table: " + tn);
-
         var tempObject = {};
         var tempArray = [];
-
         var tsmfldi = tsm.getTableField().iterator();
         var tsmcoli = tsm.getColumns().iterator();
         var readOnlyi = tsm.getAppSpecificTableModel().getReadonlyField().iterator();
         var numrows = 1;
-
         while (tsmfldi.hasNext()) {
             if (!tsmcoli.hasNext()) {
                 tsmcoli = tsm.getColumns().iterator();
@@ -297,7 +258,6 @@ function getAllASITables(itemCap) {
                 tempObject = {};
                 numrows++;
             }
-
             var tcol = tsmcoli.next();
             var tval = tsmfldi.next();
             var readOnly = readOnlyi.hasNext() ? readOnlyi.next() : 'N';
@@ -309,30 +269,27 @@ function getAllASITables(itemCap) {
     }
     return result;
 }
+
 function asiTableValObj(columnName, fieldValue, readOnly) {
 	this.columnName = columnName;
 	this.fieldValue = fieldValue;
 	this.readOnly = readOnly;
 	this.hasValue = Boolean(fieldValue != null & fieldValue != "");
-
 	asiTableValObj.prototype.toString=function(){ return this.hasValue ? String(this.fieldValue) : String(""); }
 }; 	
-function copySpecificASIField(fieldName, srcCapId, targetCapId) {
 
+function copySpecificASIField(fieldName, srcCapId, targetCapId) {
     // Get source value
     var fieldValue = getAppSpecific(fieldName, srcCapId);
-
     if (fieldValue != null && fieldValue != "") {
-
         logDebug("Copying ASI field: " + fieldName + " = " + fieldValue);
-
         // Update target
         editAppSpecific(fieldName, fieldValue, targetCapId);
-
     } else {
         logDebug("Field " + fieldName + " is empty on source record.");
     }
 }
+
 function getASIFieldsForRecordType(capId) {
     var capResult = aa.cap.getCap(capId);
     if (!capResult.getSuccess()) {
@@ -351,25 +308,21 @@ function getASIFieldsForRecordType(capId) {
     logDebug("No ASI field mapping found for: " + recordType);
     return [];
 }
+
 function getAppSpecific(itemName,itemCap)  {
 	var updated = false;
 	var i=0;
-   	
 	if (useAppSpecificGroupName)
 	{
 		if (itemName.indexOf(".") < 0)
 			{ logDebug("**WARNING: editAppSpecific requires group name prefix when useAppSpecificGroupName is true") ; return false }
-		
-		
 		var itemGroup = itemName.substr(0,itemName.indexOf("."));
 		var itemName = itemName.substr(itemName.indexOf(".")+1);
 	}
-	
     var appSpecInfoResult = aa.appSpecificInfo.getByCapID(itemCap);
 	if (appSpecInfoResult.getSuccess())
  	{
 		var appspecObj = appSpecInfoResult.getOutput();
-		
 		if (itemName != "")
 		{
 			for (i in appspecObj)
@@ -383,22 +336,18 @@ function getAppSpecific(itemName,itemCap)  {
 	else
 		{ logDebug( "**ERROR: getting app specific info for Cap : " + appSpecInfoResult.getErrorMessage()) }
 }
+
 function editAppSpecific(itemName,itemValue,capId) {
 	var itemCap = capId;
 	var itemGroup = null;
-   	
   	if (useAppSpecificGroupName)
 	{
 		if (itemName.indexOf(".") < 0)
 			{ logDebug("**WARNING: editAppSpecific requires group name prefix when useAppSpecificGroupName is true") ; return false }
-		
-		
 		itemGroup = itemName.substr(0,itemName.indexOf("."));
 		itemName = itemName.substr(itemName.indexOf(".")+1);
 	}
-   	
    	var appSpecInfoResult = aa.appSpecificInfo.editSingleAppSpecific(itemCap,itemName,itemValue,itemGroup);
-
 	if (appSpecInfoResult.getSuccess())
 	 {
 	 	if(arguments.length < 3) //If no capId passed update the ASI Array
@@ -407,6 +356,7 @@ function editAppSpecific(itemName,itemValue,capId) {
 	else
 		{ logDebug( "WARNING: " + itemName + " was not updated."); }
 }
+
 function removeASITable(tableName,itemCap)   	{
 		RASITcapID = aa.cap.getCap(itemCap).getOutput();
 		RASITcapIDString = RASITcapID.getCapModel().getAltID();
@@ -418,6 +368,7 @@ function removeASITable(tableName,itemCap)   	{
         else
 	aa.print("Successfully removed all rows from ASI Table: " + tableName + " for record " + RASITcapIDString);
 }
+
 function CombinedEmissionFactor(itemCap) {
 var total = 0;
 var DPEF = getAppSpecific("Dispensing/Permeation Emission Factor",itemCap);
@@ -428,7 +379,8 @@ var TLEF = getAppSpecific("Transfer Losses Emission Factor",itemCap);
  total = String(Number(DPEF) + Number(OVREF) + Number(PLEF) + Number(SPEF) + Number(TLEF));
  editAppSpecific("Combined Emission Factor",total,itemCap);
 return total
-}      
+}
+
 function BSTCombinedEmissionFactor(itemCap) {
 var total = 0;
 var tp1 = getAppSpecific("Total Product #1 Annual Storage Amount",itemCap);
@@ -441,6 +393,7 @@ var tp3 = getAppSpecific("Total Product #3 Annual Storage Amount",itemCap);
 //logDebug("checkhere: "+ Number(total / 1000).toFixed(7));
 return total
 }
+
 function updateGDFCriteriaPollutant(destCapId) {
     var calc_total = String( getAppSpecific( "Total amount of gasoline dispensed in calendar year (gallons)", destCapId )    );
     calc_total = calc_total.replace(/,/g, "");
@@ -494,32 +447,18 @@ function updateGDFCriteriaPollutant(destCapId) {
     }
     addASITable( "CRITERIA POLLUTANT EMISSION", arrEmissionGDF, destCapId );
     logDebug("Updated GDF Criteria Pollutant Emissions.");
-}        
+}   
+     
 function updateBSTCriteriaPollutant(destCapId) {
-
 	var recordType = getRecordType(destCapId);
 	logDebug("recordType: " + recordType);
-var CEF = BSTCombinedEmissionFactor(destCapId);
-var calc_total = "";
-var part1 = Number((
-    Number(getAppSpecific("Deck Fitting Loss", destCapId)) +
-    Number(getAppSpecific("Deck Seam Loss", destCapId)) +
-    Number(getAppSpecific("Rim Seal Loss", destCapId)) +
-    Number(getAppSpecific("Withdrawl Loss", destCapId)) +
-    Number(getAppSpecific("Gasoline (RVP10) Deck Fitting Loss", destCapId)) +
-    Number(getAppSpecific("Gasoline (RVP10) Deck Seam Loss", destCapId)) +
-    Number(getAppSpecific("Gasoline (RVP10) Rim Seal Loss", destCapId)) +
-    Number(getAppSpecific("Gasoline (RVP10) Withdrawl Loss", destCapId))
-).toFixed(2));
-
+	var CEF = BSTCombinedEmissionFactor(destCapId);
+	var calc_total = "";
+	var part1 = Number((
+    Number(getAppSpecific("Deck Fitting Loss", destCapId)) + Number(getAppSpecific("Deck Seam Loss", destCapId)) + Number(getAppSpecific("Rim Seal Loss", destCapId)) + Number(getAppSpecific("Withdrawl Loss", destCapId)) + Number(getAppSpecific("Gasoline (RVP10) Deck Fitting Loss", destCapId)) + Number(getAppSpecific("Gasoline (RVP10) Deck Seam Loss", destCapId)) + Number(getAppSpecific("Gasoline (RVP10) Rim Seal Loss", destCapId)) + Number(getAppSpecific("Gasoline (RVP10) Withdrawl Loss", destCapId))).toFixed(2));
 var part2 = Number(Number(getAppSpecific("Total Product #1 Annual Storage Amount", destCapId)) + Number(getAppSpecific("Total Product #2 Annual Storage Amount", destCapId)) + Number(getAppSpecific("Total Product #3 Annual Storage Amount", destCapId)).toFixed(3));
-
-
-
-
 calc_total =  Number(CEF * Number(part1 / part2).toFixed(5));
 //logDebug("part1: " + part1);
-
 var bstharpef = Number(part1 / part2).toFixed(5);
 // logDebug("bstharpef: " + bstharpef);
 // logDebug("calc: " + calc_total);
@@ -547,7 +486,6 @@ var bstharpef = Number(part1 / part2).toFixed(5);
         var AEOLBGDF = emisrowGDF["Annual Emissions Override (lbs)"];
         var AETONSGDF = Number((part2 / 1000) * (part1 / part2)).toFixed(6) / 2000;
         var CALCGDF = emisrowGDF["Calculation Method"];
-		
         // Override tons if override lbs exists
         if (AEOLBGDF != null && AEOLBGDF != "" && AEOLBGDF != " ") {
             AETONSGDF = Number( Number(AEOLBGDF) / 2000 ).toFixed(10);
@@ -561,7 +499,6 @@ var ef1hrtest = Number(ef1test * part2 / 1000 / 8760).toFixed(5);
 // logDebug("ef1hrtest: "+ ef1hrtest);
 // logDebug("PRocessrate: "+ Number(Number(part2 / 1000)/10) + " * ef1hrtest " + ef1hrtest +" should be: " +  Number(Number(part2 / 1000)/10) * ef1hrtest)
 var AE= Number(Number(Number(part2 / 1000)/10) * Number(ef1hrtest).toFixed(4));
-
 logDebug("AE should be: "+ AE);
         row["Pollutant"] = PollutantGDF;
         row["EF1 (lbs/1,000 gallons)"] =  ef1test;
@@ -576,7 +513,6 @@ logDebug("AE should be: "+ AE);
         row["Annual Emissions Override (lbs)"] = AEOLBGDF || " ";
         row["Calculation Method"] = CALCGDF;		
         arrEmissionGDF.push(row);
-
 // logDebug("PollutantGDF: " + PollutantGDF);
 // logDebug("ef1lbsgallons: " + ef1test);
 // logDebug("ef1hrly: " + ef1hrtest);
@@ -589,14 +525,7 @@ logDebug("AE should be: "+ AE);
 // logDebug("override: " + AEOLBGDF);
 // logDebug("tons: " + Number((part2 / 1000) * (part1 / part2) /2000).toFixed(10));
 // logDebug("calc: " + CALCGDF);
-
-
-
-
-
-
-
-    }
+}
 // for (var k in row) {
     // logDebug(k + " = [" + row[k] + "]");
 // }
@@ -604,7 +533,6 @@ logDebug("AE should be: "+ AE);
     logDebug("Updated GDF/BST Criteria Pollutant Emissions.");
 }        
 function updateMiscCombustionCriteriaPollutant(thrucapId) {
-
     var MHIR = getAppSpecific("Max Heat Input Rating (MMBtu/hr)", thrucapId);
     var HRSORFUEL = getAppSpecific("Hours or Fuel", thrucapId);
     var TAHEU = getAppSpecific("Total Annual Hours Equipment Used", thrucapId);
@@ -617,8 +545,6 @@ function updateMiscCombustionCriteriaPollutant(thrucapId) {
     }
     var arrEmission = [];
     removeASITable("CRITERIA POLLUTANT EMISSION",thrucapId );
-
-
     for (var x in CPE) {
         var emisrow = CPE[x];
         var row = {};
@@ -658,10 +584,9 @@ function updateMiscCombustionCriteriaPollutant(thrucapId) {
     }
     addASITable("CRITERIA POLLUTANT EMISSION", arrEmission, thrucapId);
     logDebug("Updated Misc Combustion Criteria Pollutants.");
-
 }
-function updateEngineCriteriaPollutant(thrucapId) {
 
+function updateEngineCriteriaPollutant(thrucapId) {
     var MHIR = getAppSpecific("Max Heat Input Rating (MMBtu/hr)", thrucapId );
     var MRHP = getAppSpecific("Max Rated Horsepower (bhp)", thrucapId );
     var cal_tot = calccalendartotal(thrucapId);
@@ -672,7 +597,6 @@ function updateEngineCriteriaPollutant(thrucapId) {
     }
     var arrEmission = [];
     removeASITable( "CRITERIA POLLUTANT EMISSION", thrucapId );
-
     for (var x in CPE) {
         var emisrow = CPE[x];
         var row = {};
@@ -700,20 +624,16 @@ function updateEngineCriteriaPollutant(thrucapId) {
 		row["Emissions Limit"] = String(blank);
         row["EF Origin Code"] = String(emisrow["EF Origin Code"]);
         row["Calculation Method"] = String(emisrow["Calculation Method"]);
-
 		// logDebug("EF1Hourly: " + EF1Hourly);
 		// logDebug("EF2Hourly: " + EF2Hourly);
 		// logDebug("cal_tot: " + cal_tot);
 		// logDebug("annualLbs: " + annualLbs);
-		
-		
-		
         arrEmission.push(row);
     }
     addASITable("CRITERIA POLLUTANT EMISSION",arrEmission,thrucapId);
     logDebug("Updated Engine Criteria Pollutants.");
-
 }
+
 function updateCoffeeCriteriaPollutant(destCapId) {
     logDebug("Updating Coffee Criteria Pollutant Emissions");
     var LBCOFF = getAppSpecific("The total pounds of coffee", destCapId);
@@ -773,8 +693,6 @@ function updateCoffeeCriteriaPollutant(destCapId) {
         }
 		logDebug("AETONSCOFF: " + AETONSCOFF);		
 		logDebug("AEOLBCOFF: " + AEOLBCOFF);		
-
-
         row["Pollutant"] = PollutantCOFF;
         row["EF (lbs/ton)"] = Number(EF1GCOFF).toFixed(5);
         row["EF Hourly Rate (lbs/hr)"] = EF1HCOFF;
@@ -792,39 +710,34 @@ function updateCoffeeCriteriaPollutant(destCapId) {
     addASITable("CRITERIA POLLUTANT EMISSION", arrEmissionCOFF, destCapId);
     logDebug("Updated Coffee Criteria Pollutant Emissions.");
 }
+
 function loadASITable(tname,itemCap) {
-LASITcapID = aa.cap.getCap(itemCap).getOutput();
+		LASITcapID = aa.cap.getCap(itemCap).getOutput();
 		LASITcapIDString = LASITcapID.getCapModel().getAltID();
  	//
  	// Returns a single ASI Table array of arrays
 	// Optional parameter, cap ID to load from
 	//
-
 	var gm = aa.appSpecificTableScript.getAppSpecificTableGroupModel(itemCap).getOutput();
 	var ta = gm.getTablesArray()
 	var tai = ta.iterator();
-
 	while (tai.hasNext())
 	  {
 	  var tsm = tai.next();
 	  var tn = tsm.getTableName();
-
       if (!tn.equals(tname)) continue;
-
 	  if (tsm.rowIndex.isEmpty())
 	  	{
 			logDebug("Couldn't load ASI Table " + tname + " it is empty");
 			return false;
 		}
-
    	  var tempObject = new Array();
 	  var tempArray = new Array();
-logDebug("Loading ASI Table " + tname + " for record " + LASITcapIDString);
+  	  logDebug("Loading ASI Table " + tname + " for record " + LASITcapIDString);
   	  var tsmfldi = tsm.getTableField().iterator();
 	  var tsmcoli = tsm.getColumns().iterator();
       var readOnlyi = tsm.getAppSpecificTableModel().getReadonlyField().iterator(); // get Readonly filed
 	  var numrows = 1;
-
 	  while (tsmfldi.hasNext())  // cycle through fields
 		{
 		if (!tsmcoli.hasNext())  // cycle through columns
@@ -842,17 +755,16 @@ logDebug("Loading ASI Table " + tname + " for record " + LASITcapIDString);
 		}
 		var fieldInfo = new asiTableValObj(tcol.getColumnName(), tval, readOnly);
 		tempObject[tcol.getColumnName()] = fieldInfo;
-
 		}
 		tempArray.push(tempObject);  // end of record
 	  }
 	  return tempArray;
-	}	
+}	
+	
 function calccalendartotal(itemCap){
 var total = 0;
 var begin = getAppSpecific("Hour meter reading at the beginning of the calendar year",itemCap);
 var end = getAppSpecific("Hour meter reading at the end of the calendar year",itemCap);
-
 		if(begin != null && begin != "" && end != null && end != "")
 		{
 		total = String(Number(end - begin).toFixed(2));
@@ -860,37 +772,35 @@ var end = getAppSpecific("Hour meter reading at the end of the calendar year",it
 		editAppSpecific("Process Rate",total,itemCap);
 		}
 	return total		
-	}
+}
+
 function recordExists(altId) {
     var capResult = aa.cap.getCapID(altId);
-    return capResult.getSuccess() &&
-           capResult.getOutput() != null;
+    return capResult.getSuccess() && capResult.getOutput() != null;
 }
+
 function getPreviousTP(altId, yearsBack) {
     yearsBack = yearsBack || 1;
-
     return altId.replace(/^TP(\d{2})-/i, function(match, year) {
         var prevYear = parseInt(year, 10) - yearsBack;
         return "TP" + (prevYear < 10 ? "0" + prevYear : prevYear) + "-";
     });
 }
+
 function calcAMHI(itemCap){
 var value = 0;
 var fuel_hhv_other = getAppSpecific('If "Biogas/Digester Gas" or "Other" is selected as the fuel type, please include energy content of',itemCap);
 var fuel_tot = getAppSpecific("Total amount of fuel used by the permitted equipment during the reporting calendar year", itemCap);
 fuel_tot = Number(String(fuel_tot).replace(/,/g, ""));
 editAppSpecific("Total amount of fuel used by the permitted equipment during the reporting calendar year",String(fuel_tot),itemCap);
-
 var fuel_units = getAppSpecific("Select units of reported fuel usage",itemCap);
 var fuel_type = getAppSpecific("What type of fuel does the permitted equipment use",itemCap);
-
 	if(fuel_units == "MMBtu")
 	{
 				value = String(fuel_tot);
 				editAppSpecific("Annual Max Heat Input (MMBtu)",String(fuel_tot),itemCap)
 				editAppSpecific("Process Rate",String(Number(fuel_tot).toFixed(2)),itemCap);
 	}	
-
 	if(fuel_units == "MMscf" && fuel_type == "Natural Gas")
 	{
 				value = String(fuel_tot * 1020);
@@ -924,6 +834,7 @@ var fuel_type = getAppSpecific("What type of fuel does the permitted equipment u
 	}
 	return value;
 }
+
 function calcMaxFuelUsage(heatInput, fuelType) {
     var btuPerUnit = 0;
     if (fuelType == "Natural Gas") {
@@ -940,6 +851,7 @@ function calcMaxFuelUsage(heatInput, fuelType) {
     }
     return Number((heatInput * 1000000 / btuPerUnit).toFixed(3));
 }
+
 function calcMaxHourlyFuelUsage(heatInput, fuelType) {
     var btuPerUnit = 0;
     if (fuelType == "Natural Gas") {
@@ -967,6 +879,7 @@ function calcMaxHourlyFuelUsage(heatInput, fuelType) {
         .toFixed(3)
     );
 }
+
 function getParentPlacer(childcapid) 	{
 	// returns the capId object of the parent.  Assumes only one parent!
 	//
@@ -987,10 +900,10 @@ function getParentPlacer(childcapid) 	{
 		aa.print( "**WARNING: getting project parents:  " + getCapResult.getErrorMessage());
 		return false;
 		}
-	}
+}
+	
 function CalcTotalHours(itemCap) {
                 var total = 0;
-
                 var APR = getAppSpecific("Apr",itemCap);
                 var AUG = getAppSpecific("Aug",itemCap);
                 var DEC = getAppSpecific("Dec",itemCap);
@@ -1003,21 +916,7 @@ function CalcTotalHours(itemCap) {
                 var NOV = getAppSpecific("Nov",itemCap);
                 var OCT = getAppSpecific("Oct",itemCap);
                 var SEPT = getAppSpecific("Sept",itemCap);
-
                 total = String(Number(Number(APR)+Number(AUG)+Number(DEC)+Number(FEB)+Number(JAN)+Number(JUL)+Number(JUN)+Number(MAR)+Number(MAY)+Number(NOV)+Number(OCT)+Number(SEPT)).toFixed(2));
                 editAppSpecific("Total",total,itemCap);
                 return total;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
