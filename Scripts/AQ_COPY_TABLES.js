@@ -32,7 +32,7 @@ var asiFieldsByRecordType = [
             "GDF Process Type",
             "Transfer Losses Vapor Recovery Control",
             "Pressure Losses Vapor Recovery Control",
-            "Dispensing/Permeation Vapor Recovery controllers",
+            "Dispensing/Permeation Vapor Recovery control",
             "Spillage Vapor Recovery Control",
             "Other Vapor Releases",
             "Transfer Losses Emission Factor",
