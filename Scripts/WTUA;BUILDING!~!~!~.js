@@ -30,7 +30,7 @@
 |         : TDunn 11/16/2023 changed status update on parent permit for Revision creation.
 |         : TDunn 11/28/2023 updated Scope of work rules to account for all Building Residential permits. Update task name to match changes to workflow task list
 |         : TDunn 11/29/2023 updated logic for activating Triage tasks based on new scope rules. Updated logic for activating additional reviews or Distribution Reconciliation
-|         : TDunn 12/07/2023 added section for creating deferred submittals via workflow Task Inspection status
+|         : TDunn 12/07/2023 added section for creating deferred submittals via workflow Task Inspections status
 |                            added parcel attribute based criteria for activating specific tasks.
 |         : TDunn 12/08/2023 moved custom functions for workflow to INCLUDES_CUSTOM and removed from WTUA script.
 |         : TDunn 01/10/2024 added auto create PCCP child permit and notification.
@@ -1519,11 +1519,9 @@ if(wfProcess == "BLD_20230501_MAIN")
 				if(isCorrection)
 				{
 					distRecStatus = "Ready for Reconciliation - Corrections";
-					editTaskSpecific("Distribution Reconciliation","Possession Start Date",dateAdd(null,0,"Y"));
-					updateTask("Distribution Reconciliation",distRecStatus,"Possession Start Date logged by system.","");				
 				}
-				
-
+				editTaskSpecific("Distribution Reconciliation","Possession Start Date",dateAdd(null,0,"Y"));
+				updateTask("Distribution Reconciliation",distRecStatus,"Possession Start Date logged by system.","");					
 			}
 		}
 	}	
@@ -1818,10 +1816,10 @@ if(wfProcess == "BLD_20230501_MAIN")
 						
 			var sendResult = aa.sendMail("noreply@placer.ca.gov","tdunn@truepointsolutions.com", "", "Testing WTUA sent permit script ", debug);
 			
-			// Initialize Inspection task possession date and assignment
-			editTaskSpecific("Inspection","Possession Start Date",dateAdd(null,0,"Y"));
-			assignTask("Inspection","BUILDING_UNASSIGNED",wfProcess);
-			updateTask("Inspection","In Progress","Possession Start Date logged by system","",wfProcess);	
+			// Initialize Inspections task possession date and assignment
+			editTaskSpecific("Inspections","Possession Start Date",dateAdd(null,0,"Y"));
+			assignTask("Inspections","BUILDING_UNASSIGNED",wfProcess);
+			updateTask("Inspections","In Progress","Possession Start Date logged by system","",wfProcess);	
 			
 		}
 		if(wfStatus == "Payment Requested")
