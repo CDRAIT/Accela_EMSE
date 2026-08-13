@@ -476,8 +476,8 @@ if(wfProcess == "BLD_PLNCHK_20241222")
 				{
 					distRecStatus = "Ready for Reconciliation - Corrections";
 				}
-				//updateTask("Distribution Reconciliation",distRecStatus,"Status updated by script.",""); // Remarked out due to duplication of WTUA digEplan script.
 				editTaskSpecific("Distribution Reconciliation","Possession Start Date",dateAdd(null,0,"Y"));
+				updateTask("Distribution Reconciliation",distRecStatus,"Possession Start Date logged by system.","");
 			}
 		}
 	}	
@@ -542,7 +542,8 @@ if(wfProcess == "BLD_PLNCHK_20241222")
 		{
 			if(isTaskStatus("Distribution","Distribute")) {updateTask("Distribution","Distributed","Updated by script on Distribution Reconciliation Complete","");}
 			editTaskDueDate("Process for Issuance",dateAdd(null,2,"Y"),wfProcess);
-			editTaskSpecific("Process for Issuance","Possession Start Date",dateAdd(null,0,"Y"));			
+			editTaskSpecific("Process for Issuance","Possession Start Date",dateAdd(null,0,"Y"));
+			updateTask("Process for Issuance","Final Processing","Reconciliation 'Complete'. Possession Start Date logged by system","",wfProcess);					
 			thisStaff = pfiStaff;
 			thisTask = "Process for Issuance";
 			cAssigned = getTaskAssignUser(thisTask);
@@ -605,7 +606,7 @@ if(wfProcess == "BLD_PLNCHK_20241222")
 				updateAppStatus("Final Processing","All preissuance tasks Complete or inactive. Updated by script");
 				editTaskDueDate("Process for Issuance",dateAdd(null,2,"Y"),wfProcess);
 				editTaskSpecific("Process for Issuance","Possession Start Date",dateAdd(null,0,"Y"));					
-				updateTask("Process for Issuance","Final Processing","All preissuance tasks Complete or inactive. Updated by script","",wfProcess);				
+				updateTask("Process for Issuance","Final Processing","All preissuance tasks Complete or inactive. Possession Start Date logged by system","",wfProcess);				
 			}			
 		}
 	}
@@ -941,6 +942,13 @@ if(wfProcess == "BLD_PLNCHK_20241222")
 			editAppSpecific("Scope of Work",getAppSpecific("Scope of Work",pCapId),cCapId);	
 			editAppSpecific("Plan Check Type",getAppSpecific("Plan Check Type",pCapId),cCapId);
 			copyContacts(pCapId,cCapId);
+			
+			// Auto assign and set due date for Submittal Review
+			capId = cCapId;
+			assignTask("Submittal Review","PERMIT CENTER_UNASSIGNED","BLD_PLNCHK_20241222");
+			editTaskDueDate("Submittal Review",dateAdd(null,2,"Y"),"BLD_PLNCHK_20241222");
+			editTaskSpecific("Submittal Review","Possession Start Date",dateAdd(null,0,"Y"),cCapId);
+			updateTask("Submittal Review","Received","Possession Start Date logged by system","",wfProcess,cCapId);			
 
 			// Create notification to applicant for new Revision record created
 			var vEmailTemplate = "ONLINE_PERMIT_AMENDMENT_SUBMITTED";
