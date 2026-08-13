@@ -1454,9 +1454,9 @@ if(matches(appTypeArray[1],"Revision") && wfProcess == "BLD_20231116_REV")
 				if(isCorrection)
 				{
 					distRecStatus = "Ready for Reconciliation - Corrections";
-					editTaskSpecific("Distribution Reconciliation","Possession Start Date",dateAdd(null,0,"Y"));
-					updateTask("Distribution Reconciliation",distRecStatus,"Possession Start Date logged by system.","");
 				}
+				editTaskSpecific("Distribution Reconciliation","Possession Start Date",dateAdd(null,0,"Y"));
+				updateTask("Distribution Reconciliation",distRecStatus,"Possession Start Date logged by system.","");				
 			}
 		}
 	}	
