@@ -53,6 +53,7 @@
 |         : TDunn 01/22/2026 added test for null for FIREINSP parcel attributes
 |         : TDunn 03/05/2026 added Approval Notification to applicant, Owner
 |         : TDunn 07/13-15/2026 added In possession date rules and new assignments
+|         : TDunn 08/11-13/2026 updated sequencing of in possession related updates
 | 
 /---------------------------------------------------------------------------------------------------------------------------------*/
 
