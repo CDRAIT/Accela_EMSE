@@ -948,7 +948,8 @@ if(wfProcess == "BLD_PLNCHK_20241222")
 			assignTask("Submittal Review","PERMIT CENTER_UNASSIGNED","BLD_PLNCHK_20241222");
 			editTaskDueDate("Submittal Review",dateAdd(null,2,"Y"),"BLD_PLNCHK_20241222");
 			editTaskSpecific("Submittal Review","Possession Start Date",dateAdd(null,0,"Y"),cCapId);
-			updateTask("Submittal Review","Received","Possession Start Date logged by system","",wfProcess,cCapId);			
+			updateTask("Submittal Review","Received","Possession Start Date logged by system","","BLD_PLNCHK_20241222",cCapId);
+			capId = pCapId
 
 			// Create notification to applicant for new Revision record created
 			var vEmailTemplate = "ONLINE_PERMIT_AMENDMENT_SUBMITTED";
@@ -1041,6 +1042,14 @@ if(wfProcess == "BLD_PLNCHK_20241222")
 			editAppSpecific("Type of Work",getAppSpecific("Type of Work",pCapId),cCapId);
 			editAppSpecific("Scope of Work",getAppSpecific("Scope of Work",pCapId),cCapId);	
 			editAppSpecific("Plan Check Type",getAppSpecific("Plan Check Type",pCapId),cCapId);
+			
+			// Auto assign and set due date for Submittal Review
+			capId = cCapId;
+			assignTask("Submittal Review","PERMIT CENTER_UNASSIGNED","BLD_DEFERRED_20240710");
+			editTaskDueDate("Submittal Review",dateAdd(null,2,"Y"),"BLD_DEFERRED_20240710");
+			editTaskSpecific("Submittal Review","Possession Start Date",dateAdd(null,0,"Y"),cCapId);
+			updateTask("Submittal Review","Received","Possession Start Date logged by system","","BLD_DEFERRED_20240710",cCapId);
+			capId = pCapId			
 			
 			// Generate email notice to parent applicant for new Deferred Submittal application
 			var vEmailTemplate = "ONLINE_PERMIT_AMENDMENT_SUBMITTED";
