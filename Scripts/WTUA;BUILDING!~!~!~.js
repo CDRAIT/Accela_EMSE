@@ -110,6 +110,7 @@
 |         : TDunn 06/24/2026 syncd production back to nonprod1 to support updates to in possession tracking
 |         : TDunn 07/01-14/2026 added updating inpossession dates and updated assignment rules
 |         : TDunn 08/05/2026 fixed issue with precheck flag logic.
+|         : TDunn 08/11-13/2026 updated in possession date logic multiple places
 |
 /---------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 

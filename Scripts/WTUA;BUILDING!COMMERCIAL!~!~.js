@@ -265,7 +265,7 @@ if(matches(wfProcess,"BLD_20181201_DISTRIBUTION","BLD_20181201_MAIN","BLD_202305
 			editAppSpecific("Scope of Work",getAppSpecific("Scope of Work",pCapId),cCapId);	
 			editAppSpecific("Plan Check Type",getAppSpecific("Plan Check Type",pCapId),cCapId);
 			editAppSpecific("Parent Record Type",appTypeArray[1],cCapId);
-			copyContacts(pCapId,cCapId);
+			copyContacts(pCapId,cCapId);		
 
 			// Create notification to applicant for new Revision record created
 			var vEmailTemplate = "ONLINE_PERMIT_AMENDMENT_SUBMITTED";
