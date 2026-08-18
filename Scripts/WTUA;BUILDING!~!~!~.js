@@ -30,7 +30,7 @@
 |         : TDunn 11/16/2023 changed status update on parent permit for Revision creation.
 |         : TDunn 11/28/2023 updated Scope of work rules to account for all Building Residential permits. Update task name to match changes to workflow task list
 |         : TDunn 11/29/2023 updated logic for activating Triage tasks based on new scope rules. Updated logic for activating additional reviews or Distribution Reconciliation
-|         : TDunn 12/07/2023 added section for creating deferred submittals via workflow Task Inspection status
+|         : TDunn 12/07/2023 added section for creating deferred submittals via workflow Task Inspections status
 |                            added parcel attribute based criteria for activating specific tasks.
 |         : TDunn 12/08/2023 moved custom functions for workflow to INCLUDES_CUSTOM and removed from WTUA script.
 |         : TDunn 01/10/2024 added auto create PCCP child permit and notification.
@@ -91,7 +91,7 @@
 |         : TDunn 04/02/2025 changed condition type to add for Stormwater Floodplain Review Required
 |         : TDunn 08/29/2025 copied to Non-prod1
 |         : TDunn 08/29/2025 deployed to Github repository
-|         : Abe   09/10/2025 Added IT Request# 2548  
+|         : Abe   09/10/2025 Added IT Request# 2548
 |         : TDunn 10/02/2025 added new ESD Improvement plan req notification
 |         : TDunn 11/05/2025 added dynamic CDR Project Office email parameter for notifications.
 |         : TDunn 11/05/2025 updated multiple notifications to accommodate addition of project office email parameter.
@@ -100,12 +100,17 @@
 |         : TDunn 12/17/2025 added updating Plan Check Type ASI based on Building Plan Check TSI 'Plan Check Type Override' value
 |         : TDunn 12/18/2025 added new trigger to adding Sewer Permit Issuance on scope = SFD Production
 |         : TDunn 12/30/2025 added setting plan check expiration date for 'online' submittals at Submittal Acceptance
-|         : TDunn 01/08/2026 Moved EV Charging scripting to individual WTUA scripts for Residential and Commercial
-|         : TDunn 01/10/2026 Moved Staff generated Revisions and Deferred Submittals from parent record to WTUA scripts for Residential and Commercial
-|         : TDunn 01/22/2026 added test for null for FIREINSP parcel attribute.
+|         : TDunn 01/09/2026 simplified rules for Pre-check criteria for precheck distribution versus plan review Distribution
+|         : TDunn 01/10/2026 moved staff creation of Revisions and Deferred to WTUA:Building 'Residential' and 'Commercial scripts
+|         : TDunn 01/22/2026 added test for null for the FIREINSP parcel attribute
 |         : TDunn 02/05/2026 fixed issue with Fire Review - Partner Agency not activating.
 |         : TDunn 02/06/2026 added rules for activating Fire Review - Partner Agency when Fire Review TSI is checked but not Placer Fire District.
 |         : TDunn 03/19/2026 updated due date for Closure
+|         : TDunn 04/19/2026 optimized criteria logic for triage versus plan review distribution rules
+|         : TDunn 06/24/2026 syncd production back to nonprod1 to support updates to in possession tracking
+|         : TDunn 07/01-14/2026 added updating inpossession dates and updated assignment rules
+|         : TDunn 08/05/2026 fixed issue with precheck flag logic.
+|         : TDunn 08/11-13/2026 updated in possession date logic multiple places
 |
 /---------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 
@@ -132,7 +137,8 @@ if(wfTask == "Process for Issuance" && wfStatus == "Issued"){
 		}
 }
 
-if(wfTask == "Distribution" && wfStatus == "Distribute" && isTaskActive("Plan Completeness Review") && AInfo["Project Office"] == "Auburn") {
+if(wfTask == "Distribution" && wfStatus == "Distribute" && isTaskActive("Plan Completeness Review") && AInfo["Project Office"] == "Auburn") 
+{
     logDebug("******* TASK ACTIVE:" + isTaskActive("Plan Completeness Review"));
     assignTask("Plan Completeness Review", "ELECTRONIC UNASSIGNED - AUBURN");
 }
@@ -143,11 +149,7 @@ logDebug("wfProcess = " + wfProcess);
 if(matches(wfProcess,"BLD_20181201_DISTRIBUTION","BLD_20181201_MAIN","BLD_20181201_REVISIONS"))
 {
 	// Added by MBecker
-    if (
-      wfTask == "Planning Review" &&
-      matches(wfStatus, "Complete", "Plan Check Only") &&
-      AInfo["PCCP Required"] == "Yes"
-    ) 
+    if (wfTask == "Planning Review" && matches(wfStatus, "Complete", "Plan Check Only") && AInfo["PCCP Required"] == "Yes") 
 	{
       logDebug("Sending PCCP Automated notification email...");
       createNotificationTPS2(
@@ -199,8 +201,8 @@ if(wfProcess == "BLD_20230501_MAIN")
 {
 	logDebug("Running code for process BLD_20230501_MAIN");
 	// Initialize defaults and flags
-	var closureStaff = "CDRA_UNASSIGNED";
-	var pfiStaff = "CDRA_UNASSIGNED";
+	var closureStaff = "PERMIT CENTER_UNASSIGNED";
+	var pfiStaff = "PERMIT CENTER_UNASSIGNED";
 	var defaultStaff = "";
 	var cdrEmail = "OnlineBLDPermits@placer.ca.gov";
 	var stmTemplate = "TASK_REVIEW_STMWTR";
@@ -337,13 +339,7 @@ if(wfProcess == "BLD_20230501_MAIN")
 			if(thisReview == "TRPA Completeness Review") {triageThree = true;}
 		}
 	}
-	//Remarked out 'universal 'preset' for TRPA tasks to avoid resetting a manual override.
-	// if(trpaFlag.indexOf("Tahoe Regional") > -1)
-	// {
-		// editTaskSpecific("Distribution","TRPA Review","Y");
-		// editTaskSpecific("Distribution","TRPA Completeness Review","Y");
-		// triageThree = true;	
-	// }
+
 	logDebug("triageOne = " + triageOne + "; triageTwo = " + triageTwo + "; triageThree = " + triageThree);
 
 	// Setting dueDate lookup criteria
@@ -448,7 +444,7 @@ if(wfProcess == "BLD_20230501_MAIN")
 				{
 					editTaskSpecific("Distribution",srvwListArray[xy],"N");
 					editTaskSpecific("Distribution","Fire Review - Partner Agency","Y");
-				}				
+				}
 			}
 			if(reFlag == "County Property")
 			{
@@ -471,11 +467,14 @@ if(wfProcess == "BLD_20230501_MAIN")
 			if(isDriveway && !isPlacerFire)
 			{
 				editTaskSpecific("Distribution","Fire Review - Partner Agency","Y");
-			}			
+			}
 			editTaskDueDate("Distribution",dateAdd(null,1,"Y"),wfProcess);
-			assignThisTask("Distribution",wfProcess);			
+			assignThisTask("Distribution",wfProcess);
 			if(AInfo["Application Received"] == "Online" && AInfo["Code Enforcement Action"] != "Yes") editAppSpecific("Plan Check Expiration",dateAdd(null,365));
 			if(AInfo["Application Received"] == "Online" && AInfo["Code Enforcement Action"] == "Yes") editAppSpecific("Plan Check Expiration",dateAdd(null,182));
+			/*****  New for in possession ****/
+			editTaskSpecific("Distribution","Possession Start Date",dateAdd(null,0,"Y"));
+			updateTask("Distribution","Submittal Received","Possession Start Date logged by system","",wfProcess);
 		}
 		// End review preset rules -----------------
 
@@ -528,8 +527,7 @@ if(wfProcess == "BLD_20230501_MAIN")
 				showMessage = true;
 				comment("<font size = 4 color=ff000><b>No applicant email address found. Applicant Request for Information was NOT sent.</b></font><br><br>Please review applicant contact record for a valid email address");
 			}			
-			// createNotificationTPS2("NOTICE_BLD_ADDITIONAL_INFORMATION_REQUIRED","Y","Applicant,Owner","N","","N","N","N","Y","N","N","");
-			
+			// createNotificationTPS2("NOTICE_BLD_ADDITIONAL_INFORMATION_REQUIRED","Y","Applicant,Owner","N","","N","N","N","Y","N","N","");														 
 			updateTask("Submittal Review","Pending Resubmittal","Submittal incomplete. Updated by script","Pending Resubmittal");
 			editTaskDueDate("Distribution",dateAdd(null,2,"Y"),wfProcess);
 			editTaskDueDate("Submittal Review",dateAdd(null,1,"Y"),wfProcess);
@@ -623,301 +621,31 @@ if(wfProcess == "BLD_20230501_MAIN")
 			// TRPA Completeness Review statuses: Cleared, Corrections Required
 			if(isTaskStatusNull("Initial Planning Review") && isTaskStatusNull("Plan Completeness Review") && isTaskStatusNull("TRPA Completeness Review"))
 			{
-				if(!matches(AInfo["Initial Planning Review"],"Y","Yes","YES") && triageOne)
-				{
-					triageOne = false;
-				}
-				if(!matches(AInfo["Plan Completeness Review"],"Y","Yes","YES") && triageTwo)
-				{
-					triageTwo = false;
-				}				
-				if(!matches(AInfo["TRPA Completeness Review"],"Y","Yes","YES") && triageThree)
-				{
-					triageThree = false;
-				}			
+				autoRouteReviewsPCO("P", "Y","BLDPERMIT","BTRIAGE");
 			}
-			if(triageOne && triageTwo && triageThree)
+			if(isTaskStatus("Initial Planning Review",failStatus) || isTaskStatus("Plan Completeness Review",failStatus) || isTaskStatus("Plan Completeness Review",failStatus))
 			{
-				if(isTaskStatusNull("Initial Planning Review") && isTaskStatusNull("Plan Completeness Review") && isTaskStatusNull("TRPA Completeness Review"))
-				{
-					autoRouteReviewsPCO("P", "Y","BLDPERMIT","BTRIAGE");
-				}
-				if(isTaskStatus("Initial Planning Review",failStatus) || isTaskStatus("Plan Completeness Review",failStatus) || isTaskStatus("Plan Completeness Review",failStatus))
-				{
-					autoRouteReviewsPCO("P", "Y","BLDPERMIT","BTRIAGE");
-				}				
-			}
-			if(triageOne && triageTwo && !triageThree)
-			{
-				if(isTaskStatusNull("Initial Planning Review") && isTaskStatusNull("Plan Completeness Review"))
-				{
-					autoRouteReviewsPCO("P", "Y","BLDPERMIT","BTRIAGE");
-				}
-				if(isTaskStatus("Initial Planning Review",failStatus) || isTaskStatus("Plan Completeness Review",failStatus))
-				{
-					autoRouteReviewsPCO("P", "Y","BLDPERMIT","BTRIAGE");
-				}
-			}
-			if(triageOne && !triageTwo && triageThree)
-			{
-				if(isTaskStatusNull("Initial Planning Review") && isTaskStatusNull("TRPA Completeness Review"))
-				{
-					autoRouteReviewsPCO("P", "Y","BLDPERMIT","BTRIAGE");
-				}
-				if(isTaskStatus("Initial Planning Review",failStatus) || isTaskStatus("TRPA Completeness Review",failStatus))
-				{
-					autoRouteReviewsPCO("P", "Y","BLDPERMIT","BTRIAGE");			
-				}
-			}			
-			if(triageOne && !triageTwo && !triageThree)
-			{
-				if(isTaskStatusNull("Initial Planning Review"))
-				// Initial Planning Review Statuses: Cleared, Correction Required
-				{
-					autoRouteReviewsPCO("P", "Y","BLDPERMIT","BTRIAGE");
-				}
-				if(isTaskStatus("Initial Planning Review",failStatus))
-				{
-					autoRouteReviewsPCO("P", "Y","BLDPERMIT","BTRIAGE");			
-				}
-			}
-			if(!triageOne && triageTwo && triageThree)
-			{
-				if(isTaskStatusNull("Plan Completeness Review") && isTaskStatusNull("TRPA Completeness Review"))
-				{
-					autoRouteReviewsPCO("P", "Y","BLDPERMIT","BTRIAGE");
-				}
-				if(isTaskStatus("Plan Completeness Review",failStatus) || isTaskStatus("TRPA Completeness Review",failStatus))
-				{
-					autoRouteReviewsPCO("P", "Y","BLDPERMIT","BTRIAGE");
-				}
-			}			
-			if(!triageOne && triageTwo && !triageThree)
-			{
-				if(isTaskStatusNull("Plan Completeness Review"))
-				// Plan Completeness Review statuses: Cleared, Corrections Required
-				{
-					autoRouteReviewsPCO("P", "Y","BLDPERMIT","BTRIAGE");
-				}
-				if(isTaskStatus("Plan Completeness Review",failStatus))
-				{
-					autoRouteReviewsPCO("P", "Y","BLDPERMIT","BTRIAGE");			
-				}
-			}
-			if(!triageOne && !triageTwo && triageThree)
-			{
-				if(isTaskStatusNull("TRPA Completeness Review"))
-				// TRPA Completeness Review statuses: Cleared, Corrections Required
-				{
-					autoRouteReviewsPCO("P", "Y","BLDPERMIT","BTRIAGE");
-				}
-				if(isTaskStatus("TRPA Completeness Review",failStatus))
-				{
-					autoRouteReviewsPCO("P", "Y","BLDPERMIT","BTRIAGE");			
-				}
-			}
+				autoRouteReviewsPCO("P", "Y","BLDPERMIT","BTRIAGE");
+			}				
+			
 			// assign triage tasks and set due dates
 			for(xx in preTriageListArray)
 			{
 				thisReview = preTriageListArray[xx];
 				if(matches(AInfo[thisReview],"Y","Yes"))
 				{
-					if(thisReview == "Initial Planning Review") 
-					{
-						assignThisTask(thisReview,wfProcess);
-						editTaskDueDate(thisReview,dateAdd(null,addNumDays,"Y"),wfProcess);
-					}
-					if(thisReview == "Plan Completeness Review") 
-					{
-						defaultStaff = lookup("SDL:BLD Default Assignment",thisReview);
-						assignTask(thisReview,defaultStaff,wfProcess);
-						editTaskDueDate(thisReview,dateAdd(null,addNumDays,"Y"),wfProcess);
-					}
-					if(thisReview == "TRPA Completeness Review") 
-					{
-						assignThisTask(thisReview,wfProcess);
-						editTaskDueDate(thisReview,dateAdd(null,addNumDays,"Y"),wfProcess);
-					}				
+					assignThisTask(thisReview,wfProcess);
+					editTaskDueDate(thisReview,dateAdd(null,addNumDays,"Y"),wfProcess);
+					editTaskSpecific(thisReview,"Possession Start Date",dateAdd(null,0,"Y"));
+					updateTask(thisReview,"Submittal Received","Possession Start Date logged by system","",wfProcess);
 				}
 			}
 		}
-		// Rules for activating other review task on Distribution task result when all triage tasks are cleared
+		
+		// Rules for activating other review task on Distribution task result when all triage tasks are cleared or 'noScope'
 		var preIssueFlag = false; 
 		logDebug("Rules for activating other review task on Distribution task result when all triage tasks are cleared")
 		logDebug("triageOne: " + triageOne + "; triageTwo: " + triageTwo + "; triageThree: " + triageThree);
-		if(!triageOne)
-		{
-			if((triageThree && !triageTwo && matches(getTaskStatus("TRPA Completeness Review"),"Cleared")) || (!triageThree && triageTwo && matches(getTaskStatus("Plan Completeness Review"),"Cleared")) || (triageThree && triageTwo && matches(getTaskStatus("TRPA Completeness Review"),"Cleared") && isTaskStatus("Plan Completeness Review","Cleared")) || !triageDo)
-			{
-				preIssueFlag = true;
-				autoRouteReviewsTD("P", "Y","BLDPERMIT");
-				// for setting review task dates and staff assignment during autoRouteReviewsTD();
-				resubNum = AInfo["Resubmittal Number"];
-				if(resubNum <= 1)
-				{
-					addNumDays = getDueInDays("SDL:DueDates","Reviews|" + dueDateRecType,0);	
-				}
-				if(resubNum > 1)
-				{
-					addNumDays = getDueInDays("SDL:DueDates","Reviews|" + dueDateRecType,1);	
-				}
-				setDueDate("BLDPERMIT",addNumDays,wfProcess);
-				assignConcurrent("BLDPERMIT",wfProcess,resubNum);
-				
-				// Generate required staff notifications for target activated reviews
-				if(matches(AInfo["Stormwater and Floodplain Review"],"Y","Yes","YES"))
-				{
-					stmDueDate = dateAdd(null,addNumDays,"Y");
-					sentStormNotice = generateNoticeToStaff(stmTemplate,stmToEmail,stmDueDate);	
-					if(sentStormNotice)
-					{
-						logDebug("Send Stormwater notification is " + sentStormNotice);
-					} else {
-						logDebug("Failed to send Stormwater notification");
-					}
-				}
-				if(matches(AInfo["Air Pollution Control Review"],"Y","Yes","YES"))
-				{
-					apcdDueDate = dateAdd(null,addNumDays,"Y");
-					sentAPCDNotice = generateNoticeToStaff(apcdTemplate,apcdToEmail,apcdDueDate);
-					if(sentAPCDNotice)
-					{
-						logDebug("Sent APCD Review notification is " + sentAPCDNotice);
-					} else {
-						logDebug("Failed to send APCD notification");
-					}
-				}				
-			}			
-		}
-		if(!triageTwo)
-		{
-			if((triageOne && !triageThree && matches(getTaskStatus("Initial Planning Review"),"Cleared")) || (!triageOne && triageThree && matches(getTaskStatus("TRPA Completeness Review"),"Cleared")) || (triageOne && triageThree && matches(getTaskStatus("Initial Planning Review"),"Cleared") && isTaskStatus("TRPA Completeness Review","Cleared")) || !triageDo)
-			{
-				preIssueFlag = true;
-				autoRouteReviewsTD("P", "Y","BLDPERMIT");
-				// for setting review task dates and staff assignment during autoRouteReviewsTD();
-				resubNum = AInfo["Resubmittal Number"];
-				if(resubNum <= 1)
-				{
-					addNumDays = getDueInDays("SDL:DueDates","Reviews|" + dueDateRecType,0);	
-				}
-				if(resubNum > 1)
-				{
-					addNumDays = getDueInDays("SDL:DueDates","Reviews|" + dueDateRecType,1);	
-				}
-				setDueDate("BLDPERMIT",addNumDays,wfProcess);
-				assignConcurrent("BLDPERMIT",wfProcess,resubNum);
-				
-				// Generate required staff notifications for target activated reviews
-				if(matches(AInfo["Stormwater and Floodplain Review"],"Y","Yes","YES"))
-				{
-					stmDueDate = dateAdd(null,addNumDays,"Y");
-					sentStormNotice = generateNoticeToStaff(stmTemplate,stmToEmail,stmDueDate);	
-					if(sentStormNotice)
-					{
-						logDebug("Send Stormwater notification is " + sentStormNotice);
-					} else {
-						logDebug("Failed to send Stormwater notification");
-					}
-				}
-				if(matches(AInfo["Air Pollution Control Review"],"Y","Yes","YES"))
-				{
-					apcdDueDate = dateAdd(null,addNumDays,"Y");
-					sentAPCDNotice = generateNoticeToStaff(apcdTemplate,apcdToEmail,apcdDueDate);
-					if(sentAPCDNotice)
-					{
-						logDebug("Sent APCD Review notification is " + sentAPCDNotice);
-					} else {
-						logDebug("Failed to send APCD notification");
-					}
-				}
-			}
-		}		
-		if(!triageThree)
-		{
-			if((triageOne && !triageTwo && matches(getTaskStatus("Initial Planning Review"),"Cleared")) || (!triageOne && triageTwo && matches(getTaskStatus("Plan Completeness Review"),"Cleared")) || (triageOne && triageTwo && matches(getTaskStatus("Initial Planning Review"),"Cleared") && isTaskStatus("Plan Completeness Review","Cleared")) || !triageDo)
-			{
-				preIssueFlag = true;
-				autoRouteReviewsTD("P", "Y","BLDPERMIT");
-				// for setting review task dates and staff assignment during autoRouteReviewsTD();
-				resubNum = AInfo["Resubmittal Number"];
-				if(resubNum <= 1)
-				{
-					addNumDays = getDueInDays("SDL:DueDates","Reviews|" + dueDateRecType,0);	
-				}
-				if(resubNum > 1)
-				{
-					addNumDays = getDueInDays("SDL:DueDates","Reviews|" + dueDateRecType,1);	
-				}
-				setDueDate("BLDPERMIT",addNumDays,wfProcess);
-				assignConcurrent("BLDPERMIT",wfProcess,resubNum);
-
-				// Generate required staff notifications for target activated reviews
-				if(matches(AInfo["Stormwater and Floodplain Review"],"Y","Yes","YES"))
-				{
-					stmDueDate = dateAdd(null,addNumDays,"Y");
-					sentStormNotice = generateNoticeToStaff(stmTemplate,stmToEmail,stmDueDate);	
-					if(sentStormNotice)
-					{
-						logDebug("Send Stormwater notification is " + sentStormNotice);
-					} else {
-						logDebug("Failed to send Stormwater notification");
-					}
-				}
-				if(matches(AInfo["Air Pollution Control Review"],"Y","Yes","YES"))
-				{
-					apcdDueDate = dateAdd(null,addNumDays,"Y");
-					sentAPCDNotice = generateNoticeToStaff(apcdTemplate,apcdToEmail,apcdDueDate);
-					if(sentAPCDNotice)
-					{
-						logDebug("Sent APCD Review notification is " + sentAPCDNotice);
-					} else {
-						logDebug("Failed to send APCD notification");
-					}
-				}				
-			}
-		}
-		if(triageOne && triageTwo && triageThree && matches(getTaskStatus("Initial Planning Review"),"Cleared") && matches(getTaskStatus("Plan Completeness Review"),"Cleared") && matches(getTaskStatus("TRPA Completeness Review"),"Cleared"))
-		{
-			preIssueFlag = true;
-			autoRouteReviewsTD("P", "Y","BLDPERMIT");
-			// for setting review task dates and staff assignment during autoRouteReviewsTD();
-			resubNum = AInfo["Resubmittal Number"];
-			if(resubNum <= 1)
-			{
-				addNumDays = getDueInDays("SDL:DueDates","Reviews|" + dueDateRecType,0);	
-			}
-			if(resubNum > 1)
-			{
-				addNumDays = getDueInDays("SDL:DueDates","Reviews|" + dueDateRecType,1);	
-			}
-			setDueDate("BLDPERMIT",addNumDays,wfProcess);
-			assignConcurrent("BLDPERMIT",wfProcess,resubNum);
-			
-			// Generate required staff notifications for target activated reviews
-			if(matches(AInfo["Stormwater and Floodplain Review"],"Y","Yes","YES"))
-			{
-				stmDueDate = dateAdd(null,addNumDays,"Y");
-				sentStormNotice = generateNoticeToStaff(stmTemplate,stmToEmail,stmDueDate);	
-				if(sentStormNotice)
-				{
-					logDebug("Send Stormwater notification is " + sentStormNotice);
-				} else {
-					logDebug("Failed to send Stormwater notification");
-				}
-			}
-			if(matches(AInfo["Air Pollution Control Review"],"Y","Yes","YES"))
-			{
-				apcdDueDate = dateAdd(null,addNumDays,"Y");
-				sentAPCDNotice = generateNoticeToStaff(apcdTemplate,apcdToEmail,apcdDueDate);
-				if(sentAPCDNotice)
-				{
-					logDebug("Sent APCD Review notification is " + sentAPCDNotice);
-				} else {
-					logDebug("Failed to send APCD notification");
-				}
-			}			
-		}
 
 		// When Distribution is Distribute and no default review tasks are defined and no TSI have manually been set to 'Y', force activation of 'Process for Issuance'	
 		if(noScope)
@@ -940,9 +668,11 @@ if(wfProcess == "BLD_20230501_MAIN")
 				activateTask("Process for Issuance",wfProcess);
 				thisTask = "Process for Issuance";
 				editTaskDueDate("Process for Issuance",dateAdd(null,2,"Y"),wfProcess);
+				editTaskSpecific("Process for Issuance","Possession Start Date",dateAdd(null,0,"Y"));
+				updateTask("Process for Issuance","Final Processing","Possession Start date logged. Updated by script","",wfProcess);				
 				thisStaff = lookup("SDL:BLD Default Assignment",thisTask);
 				assignTask(thisTask,thisStaff,wfProcess);
-				logDebug("Process for Issuance assigned to " + thisStaff);					
+				logDebug("Process for Issuance assigned to " + thisStaff);
 			}
 		}
 		
@@ -961,6 +691,7 @@ if(wfProcess == "BLD_20230501_MAIN")
 			}
 			setDueDate("BLDPERMIT",addNumDays,wfProcess);
 			assignConcurrent("BLDPERMIT",wfProcess,resubNum);				
+			setConcurrentStatusAndPossDate("BLDPERMIT",wfProcess);
 			
 			preIssueFlag = true;
 			
@@ -1056,10 +787,12 @@ if(wfProcess == "BLD_20230501_MAIN")
 		activateTask("Building Plan Check",wfProcess);
 		assignThisTask(thisTask,wfProcess);
 		editTaskDueDate(thisTask,dateAdd(null,addNumDays,"Y"));
-        if(isTaskStatus(thisTask,"Corrections Required") || isTaskStatus(thisTask,"Approved Pending Resubmittal"))
+		editTaskSpecific("Building Plan Check","Possession Start Date",dateAdd(null,0,"Y"));
+		updateTask("Building Plan Check","Submittal Received","Possession Start date logged. Updated by script","",wfProcess);		
+		if(isTaskStatus(thisTask,"Corrections Required") || isTaskStatus(thisTask,"Approved Pending Resubmittal"))
 		{
 			updateTask(thisTask,"Resubmittal Received","",""); 
-		}		
+		}
 		if(matches(AInfo["Scope of Work"],"SFD Production") && !isTaskActive("Sewer Permit Issuance") && !isTaskStatus("Sewer Permit Issuance","Complete"))
 		{
 			activateTask("Sewer Permit Issuance",wfProcess);
@@ -1073,6 +806,8 @@ if(wfProcess == "BLD_20230501_MAIN")
 	if (matches(wfTask, "Distribution") && matches(wfStatus, "Not Required - Process for Issuance"))
 	{
 		editTaskDueDate("Process for Issuance",dateAdd(null,2,"Y"),wfProcess);
+		editTaskSpecific("Process for Issuance","Possession Start Date",dateAdd(null,0,"Y"));
+		updateTask("Process for Issuance","Final Processing","Possession Start date logged. Updated by script","",wfProcess);		
 		thisTask = "Process for Issuance";
 		thisStaff = lookup("SDL:BLD Default Assignment",thisTask);
 		assignTask(thisTask,thisStaff,wfProcess);
@@ -1128,10 +863,10 @@ if(wfProcess == "BLD_20230501_MAIN")
 	}
 	
 	// Rules for activating other reviews from triage task result
-	// Test current TSI values for Triage tasks for if manual activation to reset triage task active flags
-	logDebug("Rules for activating other reviews from triage task result");
+	logDebug("Running rules for activating other reviews from triage task result");
 	if(matches(wfTask,"Initial Planning Review","Plan Completeness Review","TRPA Completeness Review"))
 	{
+		// Test current TSI values for Triage tasks for if manual activation to reset triage task active flags
 		for(xx in preTriageListArray)
 		{
 			thisReview = preTriageListArray[xx];
@@ -1153,6 +888,7 @@ if(wfProcess == "BLD_20230501_MAIN")
 		logDebug("triageOne: " + triageOne + "; triageTwo: " + triageTwo + "; triageThree: " + triageThree);
 		preIssueFlag = false;
 		logDebug("current task: " + wfTask + ", " + wfStatus);
+		var precheckFlag = false;
 		if(matches(wfTask,"Initial Planning Review"))
 		{
 			logDebug("Inside Initial Planning Review Clause");
@@ -1160,55 +896,8 @@ if(wfProcess == "BLD_20230501_MAIN")
 			logDebug("TRPA Completeness is cleared = " + isTaskStatus("TRPA Completeness Review",clearStatus));			
 			if(matches(wfStatus,clearStatus) && ((!triageTwo && !triageThree) || (triageTwo && isTaskStatus("Plan Completeness Review",clearStatus) && !triageThree) || (triageThree && isTaskStatus("TRPA Completeness Review",clearStatus) && !triageTwo) || (triageTwo && isTaskStatus("Plan Completeness Review",clearStatus) && triageThree && isTaskStatus("TRPA Completeness Review",clearStatus))))
 			{
-				logDebug("Inside cleared clause")
-				editTaskSpecific("Distribution","Initial Planning Review","N");			
-				editTaskSpecific("Distribution","Plan Completeness Review","N");
-				editTaskSpecific("Distribution","TRPA Completeness Review","N");
-				AInfo["Plan Completeness Review"] = "No";
-				AInfo["Initial Planning Review"] = "No";
-				AInfo["TRPA Completeness Review"] = "No";			
-				autoRouteReviewsTD("P", "Y","BLDPERMIT");
-				// for setting review task dates and staff assignment during autoRouteReviewsTD();
-				resubNum = AInfo["Resubmittal Number"];
-				if(resubNum <= 1)
-				{
-					addNumDays = getDueInDays("SDL:DueDates","Reviews|" + dueDateRecType,0);	
-				}
-				if(resubNum > 1)
-				{
-					addNumDays = getDueInDays("SDL:DueDates","Reviews|" + dueDateRecType,1);	
-				}
-				setDueDate("BLDPERMIT",addNumDays,wfProcess);
-				assignConcurrent("BLDPERMIT",wfProcess,resubNum);				
-				
-				preIssueFlag = true;
-				
-				// Generate required staff notifications for target activated reviews
-				if(matches(AInfo["Stormwater and Floodplain Review"],"Y","Yes","YES"))
-				{
-					stmDueDate = dateAdd(null,addNumDays,"Y");
-					sentStormNotice = generateNoticeToStaff(stmTemplate,stmToEmail,stmDueDate);	
-					if(sentStormNotice)
-					{
-						logDebug("Send Stormwater notification is " + sentStormNotice);
-					} else {
-						logDebug("Failed to send Stormwater notification");
-					}
-				}
-				if(matches(AInfo["Air Pollution Control Review"],"Y","Yes","YES"))
-				{
-					apcdDueDate = dateAdd(null,addNumDays,"Y");
-					sentAPCDNotice = generateNoticeToStaff(apcdTemplate,apcdToEmail,apcdDueDate);
-					if(sentAPCDNotice)
-					{
-						logDebug("Sent APCD Review notification is " + sentAPCDNotice);
-					} else {
-						logDebug("Failed to send APCD notification");
-					}
-				}
-				
-				if(matches(AInfo["Planning Review Type"],"Back Office Planning Review")) {assignTask("Planning Review","PLN_UNASSIGNED_BACKOFFICE",wfProcess);}
-				if(matches(AInfo["Planning Review Type"],"Counter Planning Review")) {assignTask("Planning Review","PLN_UNASSIGNED_COUNTER",wfProcess);}
+				logDebug("Inside Initial Planning Review cleared clause");
+				precheckFlag = true;
 			}
 		}
 		
@@ -1219,58 +908,8 @@ if(wfProcess == "BLD_20230501_MAIN")
 			logDebug("TRPA Completeness is cleared = " + isTaskStatus("TRPA Completeness Review",clearStatus));		
 			if(matches(wfStatus,clearStatus) && ((!triageOne && !triageThree) || (triageOne && isTaskStatus("Initial Planning Review",clearStatus) && !triageThree) || (triageThree && isTaskStatus("TRPA Completeness Review",clearStatus) && !triageOne) || (triageOne && isTaskStatus("Initial Planning Review",clearStatus) && triageThree && isTaskStatus("TRPA Completeness Review",clearStatus))))
 			{
-				logDebug("Inside Completeness Review cleared")
-				editTaskSpecific("Distribution","Plan Completeness Review","N");
-				editTaskSpecific("Distribution","Initial Planning Review","N");
-				editTaskSpecific("Distribution","TRPA Completeness Review","N");			
-				AInfo["Plan Completeness Review"] = "No";
-				AInfo["TRPA Completeness Review"] = "No";
-				AInfo["Initial Planning Review"] = "No";
-				autoRouteReviewsTD("P", "Y","BLDPERMIT");
-				// for setting review task dates and staff assignment during autoRouteReviewsTD();
-				resubNum = AInfo["Resubmittal Number"];
-				if(resubNum <= 1)
-				{
-					addNumDays = getDueInDays("SDL:DueDates","Reviews|" + dueDateRecType,0);	
-				}
-				if(resubNum > 1)
-				{
-					addNumDays = getDueInDays("SDL:DueDates","Reviews|" + dueDateRecType,1);	
-				}
-				setDueDate("BLDPERMIT",addNumDays,wfProcess);
-				assignConcurrent("BLDPERMIT",wfProcess,resubNum);				
-				
-				preIssueFlag = true;
-				
-				// Generate required staff notifications for target activated reviews
-				if(matches(AInfo["Stormwater and Floodplain Review"],"Y","Yes","YES"))
-				{
-					stmDueDate = dateAdd(null,addNumDays,"Y");
-					sentStormNotice = generateNoticeToStaff(stmTemplate,stmToEmail,stmDueDate);	
-					if(sentStormNotice)
-					{
-						logDebug("Send Stormwater notification is " + sentStormNotice);
-					} else {
-						logDebug("Failed to send Stormwater notification");
-					}
-				}
-				if(matches(AInfo["Air Pollution Control Review"],"Y","Yes","YES"))
-				{
-					apcdDueDate = dateAdd(null,addNumDays,"Y");
-					sentAPCDNotice = generateNoticeToStaff(apcdTemplate,apcdToEmail,apcdDueDate);
-					if(sentAPCDNotice)
-					{
-						logDebug("Sent APCD Review notification is " + sentAPCDNotice);
-					} else {
-						logDebug("Failed to send APCD notification");
-					}
-				}
-				
-				if(isTaskStatus("Initial Planning Review",clearStatus))
-				{
-					if(matches(AInfo["Planning Review Type"],"Back Office Planning Review")) {assignTask("Planning Review","PLN_UNASSIGNED_BACKOFFICE",wfProcess);}
-					if(matches(AInfo["Planning Review Type"],"Counter Planning Review")) {assignTask("Planning Review","PLN_UNASSIGNED_COUNTER",wfProcess);}					
-				}
+				logDebug("Inside Plan Completeness Review cleared");
+				precheckFlag = true;
 			}
 		}
 		if(matches(wfTask,"TRPA Completeness Review"))
@@ -1281,60 +920,63 @@ if(wfProcess == "BLD_20230501_MAIN")
 			if(matches(wfStatus,clearStatus) && ((!triageOne && !triageTwo) || (triageOne && isTaskStatus("Initial Planning Review",clearStatus) && !triageTwo) || (triageTwo && isTaskStatus("Plan Completeness Review",clearStatus) && !triageOne) || (triageOne && isTaskStatus("Initial Planning Review",clearStatus) && triageTwo && isTaskStatus("Plan Completeness Review",clearStatus))))
 			{
 				logDebug("Inside TRPA Completeness Review cleared")
-				editTaskSpecific("Distribution","Plan Completeness Review","N");
-				editTaskSpecific("Distribution","Initial Planning Review","N");
-				editTaskSpecific("Distribution","TRPA Completeness Review","N");			
-				AInfo["Plan Completeness Review"] = "No";
-				AInfo["TRPA Completeness Review"] = "No";			
-				AInfo["Initial Planning Review"] = "No";
-				autoRouteReviewsTD("P", "Y","BLDPERMIT");
-				// for setting review task dates and staff assignment during autoRouteReviewsTD();
-				resubNum = AInfo["Resubmittal Number"];
-				if(resubNum <= 1)
-				{
-					addNumDays = getDueInDays("SDL:DueDates","Reviews|" + dueDateRecType,0);	
-				}
-				if(resubNum > 1)
-				{
-					addNumDays = getDueInDays("SDL:DueDates","Reviews|" + dueDateRecType,1);	
-				}
-				setDueDate("BLDPERMIT",addNumDays,wfProcess);
-				assignConcurrent("BLDPERMIT",wfProcess,resubNum);				
-				
-				preIssueFlag = true;
-				
-				// Generate required staff notifications for target activated reviews
-				if(matches(AInfo["Stormwater and Floodplain Review"],"Y","Yes","YES"))
-				{
-					stmDueDate = dateAdd(null,addNumDays,"Y");
-					sentStormNotice = generateNoticeToStaff(stmTemplate,stmToEmail,stmDueDate);	
-					if(sentStormNotice)
-					{
-						logDebug("Send Stormwater notification is " + sentStormNotice);
-					} else {
-						logDebug("Failed to send Stormwater notification");
-					}
-				}
-				if(matches(AInfo["Air Pollution Control Review"],"Y","Yes","YES"))
-				{
-					apcdDueDate = dateAdd(null,addNumDays,"Y");
-					sentAPCDNotice = generateNoticeToStaff(apcdTemplate,apcdToEmail,apcdDueDate);
-					if(sentAPCDNotice)
-					{
-						logDebug("Sent APCD Review notification is " + sentAPCDNotice);
-					} else {
-						logDebug("Failed to send APCD notification");
-					}
-				}
-				
-				if(isTaskStatus("Initial Planning Review",clearStatus))
-				{
-					if(matches(AInfo["Planning Review Type"],"Back Office Planning Review")) {assignTask("Planning Review","PLN_UNASSIGNED_BACKOFFICE",wfProcess);}
-					if(matches(AInfo["Planning Review Type"],"Counter Planning Review")) {assignTask("Planning Review","PLN_UNASSIGNED_COUNTER",wfProcess);}					
-				}				
+				precheckFlag = true;
 			}
 		}
+		if(precheckFlag)
+		{
+			editTaskSpecific("Distribution","Initial Planning Review","N");
+			editTaskSpecific("Distribution","Plan Completeness Review","N");
+			editTaskSpecific("Distribution","TRPA Completeness Review","N");
+			AInfo["Initial Planning Review"] = "No";
+			AInfo["Plan Completeness Review"] = "No";
+			AInfo["TRPA Completeness Review"] = "No";
+			autoRouteReviewsTD("P", "Y","BLDPERMIT");
+			// for setting review task dates and staff assignment during autoRouteReviewsTD();
+			resubNum = AInfo["Resubmittal Number"];
+			if(resubNum <= 1)
+			{
+				addNumDays = getDueInDays("SDL:DueDates","Reviews|" + dueDateRecType,0);	
+			}
+			if(resubNum > 1)
+			{
+				addNumDays = getDueInDays("SDL:DueDates","Reviews|" + dueDateRecType,1);	
+			}
+			setDueDate("BLDPERMIT",addNumDays,wfProcess);
+			assignConcurrent("BLDPERMIT",wfProcess,resubNum);
+			setConcurrentStatusAndPossDate("BLDPERMIT",wfProcess);			
+
+			preIssueFlag = true;
+
+			// Generate required staff notifications for target activated reviews
+			if(matches(AInfo["Stormwater and Floodplain Review"],"Y","Yes","YES"))
+			{
+				stmDueDate = dateAdd(null,addNumDays,"Y");
+				sentStormNotice = generateNoticeToStaff(stmTemplate,stmToEmail,stmDueDate);	
+				if(sentStormNotice){
+					logDebug("Send Stormwater notification is " + sentStormNotice);
+				} else {
+					logDebug("Failed to send Stormwater notification");
+				}
+			}
+			if(matches(AInfo["Air Pollution Control Review"],"Y","Yes","YES"))
+			{
+				apcdDueDate = dateAdd(null,addNumDays,"Y");
+				sentAPCDNotice = generateNoticeToStaff(apcdTemplate,apcdToEmail,apcdDueDate);
+				if(sentAPCDNotice) {
+					logDebug("Sent APCD Review notification is " + sentAPCDNotice);
+				} else {
+					logDebug("Failed to send APCD notification");
+				}
+			}
+			if(isTaskStatus("Initial Planning Review",clearStatus))
+			{
+				if(matches(AInfo["Planning Review Type"],"Back Office Planning Review")) {assignTask("Planning Review","PLN_UNASSIGNED_BACKOFFICE",wfProcess);}
+				if(matches(AInfo["Planning Review Type"],"Counter Planning Review")) {assignTask("Planning Review","PLN_UNASSIGNED_COUNTER",wfProcess);}
+			}			
+		}
 	}
+	
 	if(preIssueFlag)
 	{
 		if(matches(AInfo["Real Estate Services Review"],"Y","Yes") && !isTaskStatus("Real Estate Services Review","Complete"))
@@ -1389,6 +1031,7 @@ if(wfProcess == "BLD_20230501_MAIN")
 		if((!triageThree && triageTwo && isTaskStatus("Plan Completeness Review",failStatus) && !isTaskActive("Plan Completeness Review")) || (!triageTwo && triageThree && isTaskStatus("TRPA Completeness Review",failStatus) && !isTaskActive("TRPA Completeness Review")) || (triageTwo && triageThree && (isTaskStatus("Plan Completeness Review",failStatus) || isTaskStatus("TRPA Completeness Review",failStatus)) && !isTaskActive("Plan Completeness Review") && !isTaskActive("TRPA Completeness Review")))
 		{
 			activateTask("Distribution Reconciliation",wfProcess);
+			editTaskSpecific("Distribution Reconciliation","Possession Start Date",dateAdd(null,0,"Y"));		
 			updateTask("Distribution Reconciliation","Ready for Reconciliation - Corrections","One or more readiness tasks require corrections.","");
 			editTaskDueDate("Distribution Reconciliation",dateAdd(null,1,"Y"),wfProcess);
 		}
@@ -1400,6 +1043,7 @@ if(wfProcess == "BLD_20230501_MAIN")
 		if((!triageThree && triageOne && isTaskStatus("Initial Planning Review",failStatus) && !isTaskActive("Initial Planning Review")) || (!triageOne && triageThree && isTaskStatus("TRPA Completeness Review",failStatus) && !isTaskActive("TRPA Completeness Review")) || (triageOne && triageThree && (isTaskStatus("Initial Planning Review",failStatus) || isTaskStatus("TRPA Completeness Review",failStatus)) && !isTaskActive("Intial Planning Review") && !isTaskActive("TRPA Completeness Review")))
 		{
 			activateTask("Distribution Reconciliation",wfProcess);
+			editTaskSpecific("Distribution Reconciliation","Possession Start Date",dateAdd(null,0,"Y"));		
 			updateTask("Distribution Reconciliation","Ready for Reconciliation - Corrections","One or more readiness tasks require corrections.","");
 			editTaskDueDate("Distribution Reconciliation",dateAdd(null,1,"Y"),wfProcess);
 		}
@@ -1411,6 +1055,7 @@ if(wfProcess == "BLD_20230501_MAIN")
 		if((!triageTwo && triageOne && isTaskStatus("Initial Planning Review",failStatus) && !isTaskActive("Initial Planning Review")) || (!triageOne && triageTwo && isTaskStatus("Plan Completeness Review",failStatus) && !isTaskActive("Plan Completeness Review")) || (triageOne && triageThree && (isTaskStatus("Initial Planning Review",failStatus) || isTaskStatus("Plan Completeness Review",failStatus)) && !isTaskActive("Intial Planning Review") && !isTaskActive("Plan Completeness Review")))
 		{
 			activateTask("Distribution Reconciliation",wfProcess);
+			editTaskSpecific("Distribution Reconciliation","Possession Start Date",dateAdd(null,0,"Y"));					
 			updateTask("Distribution Reconciliation","Ready for Reconciliation - Corrections","One or more readiness tasks require corrections.","");
 			editTaskDueDate("Distribution Reconciliation",dateAdd(null,1,"Y"),wfProcess);
 		}
@@ -1420,6 +1065,7 @@ if(wfProcess == "BLD_20230501_MAIN")
 	{
 		if((!triageThree && !triageTwo) || (!triageThree && triageTwo && isTaskStatus("Plan Completeness Review",failStatus) && !isTaskActive("Plan Completeness Review")) || (!triageTwo && triageThree && isTaskStatus("TRPA Completeness Review",failStatus) && !isTaskActive("TRPA Completeness Review")) || (triageTwo && triageThree && (isTaskStatus("Plan Completeness Review",failStatus) && isTaskStatus("TRPA Completeness Review",failStatus)) && !isTaskActive("Plan Completeness Review") && !isTaskActive("TRPA Completeness Review")))
 		{
+			editTaskSpecific("Distribution Reconciliation","Possession Start Date",dateAdd(null,0,"Y"));
 			updateTask("Distribution Reconciliation","Ready for Reconciliation - Corrections","One or more readiness tasks require corrections.","");
 			editTaskDueDate("Distribution Reconciliation",dateAdd(null,1,"Y"),wfProcess);
 		}
@@ -1430,6 +1076,7 @@ if(wfProcess == "BLD_20230501_MAIN")
 		logDebug("Initial Planning status is Corrections Required = " + isTaskStatus("Initial Planning Review",failStatus) + " isTaskActive = " + isTaskActive("Initial Planning Review"));
 		if((!triageThree && !triageOne) || (!triageThree && triageOne && isTaskStatus("Initial Planning Review",failStatus) && !isTaskActive("Initial Planning Review")) || (!triageOne && triageThree && isTaskStatus("TRPA Completeness Review",failStatus) && !isTaskActive("TRPA Completeness Review")) || (triageOne && triageThree && (isTaskStatus("Initial Planning Review",failStatus) && isTaskStatus("TRPA Completeness Review",failStatus)) && !isTaskActive("Intial Planning Review") && !isTaskActive("TRPA Completeness Review")))
 		{
+			editTaskSpecific("Distribution Reconciliation","Possession Start Date",dateAdd(null,0,"Y"));
 			updateTask("Distribution Reconciliation","Ready for Reconciliation - Corrections","One or more readiness tasks require corrections.","");
 			editTaskDueDate("Distribution Reconciliation",dateAdd(null,1,"Y"),wfProcess);
 		}
@@ -1440,6 +1087,7 @@ if(wfProcess == "BLD_20230501_MAIN")
 		logDebug("Initial Planning status is Corrections Required = " + isTaskStatus("Initial Planning Review",failStatus) + " isTaskActive = " + isTaskActive("Initial Planning Review"));
 		if((!triageTwo && !triageOne) || (!triageTwo && triageOne && isTaskStatus("Initial Planning Review",failStatus) && !isTaskActive("Initial Planning Review")) || (!triageOne && triageTwo && isTaskStatus("Plan Completeness Review",failStatus) && !isTaskActive("Plan Completeness Review")) || (triageOne && triageThree && (isTaskStatus("Initial Planning Review",failStatus) && isTaskStatus("Plan Completeness Review",failStatus)) && !isTaskActive("Intial Planning Review") && !isTaskActive("Plan Completeness Review")))
 		{
+			editTaskSpecific("Distribution Reconciliation","Possession Start Date",dateAdd(null,0,"Y"));
 			updateTask("Distribution Reconciliation","Ready for Reconciliation - Corrections","One or more readiness tasks require corrections.","");
 			editTaskDueDate("Distribution Reconciliation",dateAdd(null,1,"Y"),wfProcess);
 		}
@@ -1529,6 +1177,7 @@ if(wfProcess == "BLD_20230501_MAIN")
 				activateTask(thisTask,wfProcess);
 				updateTask(thisTask,"Completion Pending","","(Preissuance Requirement)",wfProcess);
 				assignPreissue(thisTask,wfProcess);
+				editTaskSpecific(thisTask,"Possession Start Date",dateAdd(null,0,"Y"));
 			}
 		}
 		if(addlPermitRequiredFlag)
@@ -1693,7 +1342,7 @@ if(wfProcess == "BLD_20230501_MAIN")
 			}
 		}
 		if(wfStatus == "Approved Pending Resubmittal")
-		{			
+		{
 			if(matches(AInfo["LPG Tank"],"Above Ground","Underground"))
 			{
 				if(!appHasCondition("Fire - Prevent Final / Completion",null,"Fire LPG Article 15.12 Inspections Required",null))
@@ -1707,13 +1356,13 @@ if(wfProcess == "BLD_20230501_MAIN")
 				if(AInfo["LPG Tank"] == "Underground")
 				{
 					updateFee("9014","FIRE PLANNER FEES","FINAL",1,"N");
-				}	
+				}
 			}
 		}		
 	}
 	
 	// Special Actions for individual review tasks
-	//==============================================
+	//==========================================================================
 	
 	// Stormwater and Floodplain Review actions --------------------------------
 	if(matches(wfTask,"Stormwater and Floodplain Review"))
@@ -1770,7 +1419,7 @@ if(wfProcess == "BLD_20230501_MAIN")
 					addStdCondition("Fire - Prevent Final / Completion","Fire Driveway Inspection Required");
 				}
 			}
-		}		
+		}
 	}	
 	
 	// Update Cycle for all review tasks -----------------
@@ -1797,6 +1446,24 @@ if(wfProcess == "BLD_20230501_MAIN")
 		useTaskSpecificGroupName = false;
 	}
 	
+	// Update Assigned To for all tasks with initial generic staff default assignment ----------------------
+	/*  Designated defaults to update: PERMIT CENTER_UNASSIGNED,APCD_UNASSIGNED,PLANNING_UNASSIGNED_COUNTER,DPW_UNASSIGNED,STORMWATER_UNASSIGNED  */
+	/*  This was in the nonprod1 but not present in production.
+	logDebug("Action by is " + wfActionByUserID);
+	var currAssigned = getTaskAssignUser(wfTask,wfProcess);
+	logDebug("Assigned to: " + currAssigned)
+	var dAssignListArray = new Array();
+	dAssignList = lookup("SDL:DefaultAssignmentArray", "Building"); //List of default generic staff for auto-assignment
+	dAssignListArray = dAssignList.split(",");
+	for(dal in dAssignListArray)
+	{
+		dAssigned = dAssignListArray[dal];
+		if(dAssigned == currAssigned)
+		{
+			assignTask(wfTask,wfActionByUserID,wfProcess);
+		}
+	}
+	/----------------------------------------------------------------------------------------------------------------------------*/
 	// Rules for updating Dist Recon task when all Plan Review tasks are complete
 	if((wfTask.indexOf("Review") > -1 || wfTask == "Building Plan Check") && !matches(wfTask,"Submittal Review","Traffic Fee Review","Placer County Fire Fee Review","Real Estate Services Review","ADU Review","ADU Addressing Review"))
 	{
@@ -1822,7 +1489,7 @@ if(wfProcess == "BLD_20230501_MAIN")
 				editTaskDueDate(thisTask,dateAdd(null,1,"Y"));
 				assignThisTask(thisTask,wfProcess);				
 			}
-		}				
+		}
 		
 		var distRecStatus = "Ready for Reconciliation - Approved";
 		if(matches(wfStatus,"Approved","Approved Pending Resubmittal","Corrections Required")) 
@@ -1854,7 +1521,8 @@ if(wfProcess == "BLD_20230501_MAIN")
 				{
 					distRecStatus = "Ready for Reconciliation - Corrections";
 				}
-				//updateTask("Distribution Reconciliation",distRecStatus,"Status updated by script.",""); // Remarked out due to duplication of WTUA digEplan script.
+				editTaskSpecific("Distribution Reconciliation","Possession Start Date",dateAdd(null,0,"Y"));
+				updateTask("Distribution Reconciliation",distRecStatus,"Possession Start Date logged by system.","");					
 			}
 		}
 	}	
@@ -1865,7 +1533,7 @@ if(wfProcess == "BLD_20230501_MAIN")
 
 		// Determine if from Triage tasks
 		recFromTriage = false;
-		failTask = "";		
+		failTask = "";
 		for(xx in preTriageListArray)
 		{
 			thisReview = preTriageListArray[xx];
@@ -1906,6 +1574,8 @@ if(wfProcess == "BLD_20230501_MAIN")
 				showMessage = true;
 				comment("<font size = 4 color=ff000><b>No applicant email address found. " + wfStatus + " email notification cannot be sent.</b></font><br><br>A status of " + wfStatus + " for the " + wfTask + " task will send a " + wfStatus + " notification to the applicant.<br>The email notification cannot be sent without a valid applicant email address.<br> Please review applicant contact record for a valid email address.");
 			}
+			editTaskSpecific("Distribution","Possession Start Date",dateAdd(null,0,"Y"));
+			updateTask("Distribution","Pending Resubmittal","Corrections required. Possession Start date updated by system","");
 			if(recFromTriage)
 			{
 				updateTask("Distribution","Pending Resubmittal","Corrections required for " + failTask + ". Updated by script","Pending Resubmittal from Pre-screen");
@@ -1929,6 +1599,7 @@ if(wfProcess == "BLD_20230501_MAIN")
 			thisTask = "Distribution";
 			assignThisTask(thisTask,wfProcess);
 			editTaskDueDate("Distribution",dateAdd(null,1,"Y"),wfProcess);
+
 			presetTSIpco("BLDPERMIT","Distribution","Approved","Cleared","ThirdStatus");
 		}
 		
@@ -1937,6 +1608,8 @@ if(wfProcess == "BLD_20230501_MAIN")
 		{
 			if(isTaskStatus("Distribution","Distribute")) {updateTask("Distribution","Distributed","Updated by script on Distribution Reconciliation Complete","");}
 			editTaskDueDate("Process for Issuance",dateAdd(null,2,"Y"),wfProcess);
+			editTaskSpecific("Process for Issuance","Possession Start Date",dateAdd(null,0,"Y"));
+			updateTask("Process for Issuance","Final Processing","Reconciliation 'Complete'. Possession Start Date logged by system","",wfProcess);			
 			thisTask = "Process for Issuance";
 			thisStaff = lookup("SDL:BLD Default Assignment",thisTask);
 			assignTask(thisTask,thisStaff,wfProcess);
@@ -1949,7 +1622,13 @@ if(wfProcess == "BLD_20230501_MAIN")
 			{
 				cTask = preTasksArraySD[thisPI];
 				logDebug("For setting date, current cTask = " + cTask);
-				if(isTaskActive(cTask)) { editTaskDueDate(cTask,dateAdd(null,1,"Y"),wfProcess); }
+				if(isTaskActive(cTask)) 
+				{ 
+					editTaskDueDate(cTask,dateAdd(null,1,"Y"),wfProcess); 
+					editTaskSpecific(cTask,"Possession Start Date",dateAdd(null,0,"Y"));
+					updateTask(cTask,"Awaiting Review","Possession Start Date logged by system","",wfProcess);				
+				}
+				
 			}
 			// Generate notification for active preissuance tasks to assigned staff
 			var preIssueToStaffTemplate = "OUTSTANDING _PREISSUANCE_TASK";
@@ -2041,9 +1720,10 @@ if(wfProcess == "BLD_20230501_MAIN")
 			}
 			if(allPreComplete)
 			{
-				updateAppStatus("Final Processing","All preissuance tasks Complete or inactive. Updated by script");
+				editTaskSpecific("Process for Issuance","Possession Start Date",dateAdd(null,0,"Y"));
 				updateTask("Process for Issuance","Final Processing","All preissuance tasks Complete or inactive. Updated by script","",wfProcess);
 				editTaskDueDate("Process for Issuance",dateAdd(null,2,"Y"),wfProcess);
+				updateAppStatus("Final Processing","All preissuance tasks Complete or inactive. Updated by script");				
 			}
 		}
 	}
@@ -2135,7 +1815,12 @@ if(wfProcess == "BLD_20230501_MAIN")
 			// var	emailResult = sendNotification(vFromEmail,vToEmail,vCcEmail,emailTemplate,emailParameters, new Array(report));
 			var	emailResult = sendNotification(vFromEmail,vToEmail,vCcEmail,emailTemplate,emailParameters, null);
 						
-			var sendResult = aa.sendMail("noreply@placer.ca.gov","tdunn@truepointsolutions.com", "", "Testing WTUA sent permit script ", debug);	
+			var sendResult = aa.sendMail("noreply@placer.ca.gov","tdunn@truepointsolutions.com", "", "Testing WTUA sent permit script ", debug);
+			
+			// Initialize Inspections task possession date and assignment
+			editTaskSpecific("Inspections","Possession Start Date",dateAdd(null,0,"Y"));
+			assignTask("Inspections","BUILDING_UNASSIGNED",wfProcess);
+			updateTask("Inspections","In Progress","Possession Start Date logged by system","",wfProcess);	
 			
 		}
 		if(wfStatus == "Payment Requested")
@@ -2374,18 +2059,50 @@ if(wfProcess == "BLD_20230501_MAIN")
 			// createNotificationTPS2("SIG_REQUEST","Y","Applicant,Owner","N","","N","N","N","Y","N","N","");
 		
 	}
+
 	
-	// Inspection/Construction Complete: update dueDate and staff
-	if(wfTask == "Inspection")
+	if(matches(wfTask,"Inspections","Inspection"))
 	{
-	
 		// Contruction Complete Actions
 		if(wfStatus == "Construction Complete")
 		{
 			editTaskDueDate("Closure",dateAdd(null,180),wfProcess);
-			thisStaff = closureStaff;
-			thisTask = "Closure";
-			assignTask(thisTask,thisStaff,wfProcess);
+			assignTask("Closure",closureStaff,wfProcess);
+			editTaskSpecific("Closure","Possession Start Date",dateAdd(null,0,"Y"));
+			updateTask("Closure","Ready for File Cleanup","Possession Start Date logged by system","",wfProcess);
+		}
+	}
+}
+
+
+/***************************************
+| Required internal functions          |
+\**************************************/
+function setConcurrentStatusAndPossDate(lkupCriteria,tprocess)
+{
+	
+	/* Retrieve concurrent list */
+	taskListArray = new Array();
+	taskList = lookup("PLAN REVIEW - REQUIRED REVIEWS", lkupCriteria); //requiredReviewsStdChoice ... Get Reviews Required by Record Type from Standard Choice
+	taskListArray = taskList.split(",");
+	resubNum = AInfo["Resubmittal Number"];
+	newStatus = "Submittal Received";	
+	if(resubNum <= 1)
+	{
+		newStatus = "Submittal Received";
+	}
+	if(resubNum > 1)
+	{
+		newStatus = "Resubmittal Received";
+	}	
+	/* Find tasks to activate */
+	for(tla in taskListArray)
+	{
+		thisTask = taskListArray[tla];
+		if (matches(AInfo[thisTask],"Yes","Y","YES"))
+		{
+			editTaskSpecific(thisTask,"Possession Start Date",dateAdd(null,0,"Y"));
+			updateTask(thisTask,newStatus,"Possession Start Date logged by system","",wfProcess);
 		}
 	}
 }
