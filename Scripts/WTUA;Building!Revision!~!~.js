@@ -695,7 +695,8 @@ if(matches(appTypeArray[1],"Revision") && wfProcess == "BLD_20231116_REV")
 		updateTask("Building Plan Check","Submittal Received","Possession Start date logged. Updated by script","",wfProcess);		
 		if(isTaskStatus(thisTask,"Corrections Required") || isTaskStatus(thisTask,"Approved Pending Resubmittal"))
 		{
-			updateTask(thisTask,"Resubmittal Received","",""); 
+			updateTask(thisTask,"Resubmittal Received","","");
+		}
 		if(matches(AInfo["Scope of Work"],"SFD Production") && !isTaskActive("Sewer Permit Issuance") && !isTaskStatus("Sewer Permit Issuance","Complete"))
 		{
 			activateTask("Sewer Permit Issuance",wfProcess);
@@ -1561,6 +1562,7 @@ if(matches(appTypeArray[1],"Revision") && wfProcess == "BLD_20231116_REV")
 					editTaskSpecific(cTask,"Possession Start Date",dateAdd(null,0,"Y"));
 					updateTask(cTask,"Awaiting Review","Possession Start Date logged by system","",wfProcess);				
 				}
+			}
 			// Generate notification for active preissuance tasks to assigned staff
 			var preIssueToStaffTemplate = "OUTSTANDING _PREISSUANCE_TASK";
 			var thisPreToEmail = null;
@@ -1605,6 +1607,7 @@ if(matches(appTypeArray[1],"Revision") && wfProcess == "BLD_20231116_REV")
 		}
 		/* Notes:  Set task to complete and not active */
 	}
+	
 	
 	// Preissuance tasks section ===========================================
 	// Preissuance tasks: Traffic Fee Review,Placer County fire Fee Review,Sewer Permit Issuance,Grading Permit Issuance,Improvement Plan Approval,DPW Encroachment Permit Issuance,Real Estate Services Review,ADU Review,ADU Addressing Review,Fire Review Partner Agency
