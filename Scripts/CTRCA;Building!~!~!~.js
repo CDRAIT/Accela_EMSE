@@ -24,6 +24,7 @@
 |         : TDunn 11/17/2025 fixed issue with email parameters
 |         : Abe   07/01/2026 Replaced all noreply@placer.ca.gov emails to defaultFrom (INCLUDES_CUSTOM_GLOBALS)
 |         : Abe   07/29/2026 Updated "Plan Check Expiration" to 365 days from submittal
+|         : Abe   08/24/2026 Added Electric Utility Company to workDesc for MobileApp users on Electrical SoW
 |
 /======================================================================================================*/
 showDebug = 1
@@ -102,7 +103,7 @@ if(publicUser)
 		varUpdateWorkDesc = true;
 		varNewWorkDesc = workDescGet(capId) + "\n\n" + "CURRENT PANEL AMPERAGE: " + AInfo['ELECTRICAL- Current Panel Amperage'] + "\n\n" 
 		+ "PROPOSED PANEL AMPERAGE: " + AInfo['ELECTRICAL - Proposed Panel Amperage'] + "\n\n" + "CHANGE OUT / NEW: " 
-		+ AInfo['ELECTRICAL - Change Out or New'] + " - " + AInfo['ELECTRICAL - Work Being Performed'];
+		+ AInfo['ELECTRICAL - Change Out or New'] + " - " + AInfo['ELECTRICAL - Work Being Performed'] + "\n" + "ELECTRIC UTILITY COMPANY: " + AInfo['ParcelAttribute.ELECTRIC'];
 	}
 
 	if (AInfo['Scope of Work ACA'] == "Mechanical") 
