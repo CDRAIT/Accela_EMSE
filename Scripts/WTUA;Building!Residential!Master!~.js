@@ -59,8 +59,8 @@ if(wfProcess == "BLD_PLNCHK_20241222")
 {
 	logDebug("Running code for process BLD_PLNCHK_20241222");
 	// Initialize defaults and flags
-	var closureStaff = "CDRA_UNASSIGNED";
-	var pfiStaff = "CDRA_UNASSIGNED";
+	var closureStaff = "PERMIT CENTER_UNASSIGNED";
+	var pfiStaff = "PERMIT CENTER_UNASSIGNED";
 	var doLimited = false;
 	var pcheckType = "Full";
 	var dueDateRecType = "";
