@@ -25,6 +25,7 @@
 |         : Abe   07/01/2026 Replaced all noreply@placer.ca.gov emails to defaultFrom (INCLUDES_CUSTOM_GLOBALS)
 |         : Abe   07/29/2026 Updated "Plan Check Expiration" to 365 days from submittal
 |         : Abe   08/24/2026 Added Electric Utility Company to workDesc for MobileApp users on Electrical SoW
+|         : TDunn 08/26/2026 added tracking in possession dates
 |
 /======================================================================================================*/
 showDebug = 1
@@ -65,10 +66,10 @@ try
 }
 
 // Auto assign and set due date for Submittal Review
-assignTask("Submittal Review","CDRA_UNASSIGNED");
+assignTask("Submittal Review","PERMIT CENTER_UNASSIGNED");
 editTaskDueDate("Submittal Review",dateAdd(null,2,"Y"));
-
-
+editTaskSpecific("Submittal Review","Possession Start Date",dateAdd(null,0,"Y"));
+updateTask("Submittal Review","Received","Possession Start Date logged by system","",wfProcess);
 //IT Request# 1911 - EV Charging Station
 //when publicUser fileDate doesnt represent the actual submission date, then deadlines are incorrect. so used current sysDate string
 if(publicUser)
