@@ -40,8 +40,6 @@ var maxFee = (lookup("lkupFeeFactor","techMax") *1); // New value effective 7/23
 var maxFeeAdj = (maxFee * 1) - .1;
 logDebug("Current Tech fee maximum amount is " + maxFee);
 
-/*
-
 // Test for exempt record types
 if(!matches(appTypeArray[1],"Improvement Plan") || (appTypeArray[1] == "Improvement Plan" && matches(AInfo["Improvement Plan Type"],"Utility","BFAT")))
 {
@@ -166,4 +164,3 @@ if(!matches(appTypeArray[1],"Improvement Plan") || (appTypeArray[1] == "Improvem
 	comment("Tech fee does not apply to " + appTypeArray[1])
 }
 
-*/
