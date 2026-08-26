@@ -21,6 +21,8 @@
 |         : TDunn 12/30/2025 updated criteria for setting Plan Check Expiration date
 |         : TDunn 01/10/2026 Moved Revisions and Deferred Submittal from Parent by staff from WTUA:Building to here
 |         : TDunn 01/23/2026 added updating Revisions and Deferred with Parent record type (Res or Com)
+|         : TDunn 07/29/2026 added updating in possession date for revision and deferred Submittal Review
+|         : TDunn 08/25/2026 deployed to production
 |
 /-----------------------------------------------------------------------------------------------------------------------*/
 if (matches(currentUserID, "TDUNN", "EAFTAHI", "MHELVIC")) {
@@ -249,9 +251,11 @@ if(matches(wfProcess,"BLD_20181201_DISTRIBUTION","BLD_20181201_MAIN","BLD_202305
 			copyOwnerTPS(pCapId,cCapId);
 			var assignedTo = getAssignedToStaff(pCapId); 
 			// Auto assign and set due date for Submittal Review
-			capId = cCapId;			
-			assignTask("Submittal Review","CDRA_UNASSIGNED","BLD_20231116_REV");
+			capId = cCapId;
 			editTaskDueDate("Submittal Review",dateAdd(null,2,"Y"),"BLD_20231116_REV");
+			assignTask("Submittal Review","PERMIT CENTER_UNASSIGNED","BLD_20231116_REV");
+			editTaskSpecific("Submittal Review","Possession Start Date",dateAdd(null,0,"Y"),cCapId);
+			updateTask("Submittal Review","Received","Possession Start Date logged by system","","BLD_20231116_REV",cCapId);				
 			capId = pCapId;
 			copyAddresses(pCapId,cCapId);
 			copyParcels(pCapId,cCapId);
@@ -262,7 +266,7 @@ if(matches(wfProcess,"BLD_20181201_DISTRIBUTION","BLD_20181201_MAIN","BLD_202305
 			editAppSpecific("Scope of Work",getAppSpecific("Scope of Work",pCapId),cCapId);	
 			editAppSpecific("Plan Check Type",getAppSpecific("Plan Check Type",pCapId),cCapId);
 			editAppSpecific("Parent Record Type",appTypeArray[1],cCapId);
-			copyContacts(pCapId,cCapId);
+			copyContacts(pCapId,cCapId);		
 
 			// Create notification to applicant for new Revision record created
 			var vEmailTemplate = "ONLINE_PERMIT_AMENDMENT_SUBMITTED";
@@ -348,9 +352,13 @@ if(matches(wfProcess,"BLD_20181201_DISTRIBUTION","BLD_20181201_MAIN","BLD_202305
 			
 			copyOwnerTPS(pCapId,cCapId);
 			// Auto assign and set due date for Submittal Review
-			capId = cCapId;			
-			assignTask("Submittal Review","CDRA_UNASSIGNED","BLD_DEFERRED_20240710");
+			capId = cCapId;
 			editTaskDueDate("Submittal Review",dateAdd(null,2,"Y"),"BLD_DEFERRED_20240710");
+			assignTask("Submittal Review","PERMIT CENTER_UNASSIGNED","BLD_DEFERRED_20240710");
+			editTaskSpecific("Submittal Review","Possession Start Date",dateAdd(null,0,"Y"),cCapId);
+			updateTask("Submittal Review","Received","Possession Start Date logged by system","","BLD_DEFERRED_20240710",cCapId);
+			editTaskSpecific("Submittal Review","Possession Start Date",dateAdd(null,0,"Y"),cCapId);
+			updateTask("Submittal Review","Received","Possession Start Date logged by system","","BLD_DEFERRED_20240710",cCapId);					
 			capId = pCapId;
 			copyAddresses(pCapId,cCapId);
 			copyParcels(pCapId,cCapId);	
