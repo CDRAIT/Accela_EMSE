@@ -14,6 +14,8 @@
 |         : TDunn 01/10/2026 moved Revision and Deferred submittal creation from parent from WTUA:Building here
 |         : TDunn 01/22/2026 updated Revisions to use the new 'Master/Revision' for the legacy Master < 3000 and > 3000 plan check only record types.
 |         : TDunn 01/23/2026 added updating Revisions and Deferred with Parent record type (Res or Com)
+|         : TDunn 07/29/2026 added updating in possession date for revision and deferred Submittal Review
+|         : TDunn 08/25/2026 moved to production
 |
 /---------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 
@@ -109,8 +111,10 @@ if(matches(wfProcess,"BLD_20181201_DISTRIBUTION","BLD_20181201_MAIN","BLD_202305
 
 			// Auto assign and set due date for Submittal Review
 			capId = cCapId;			
-			assignTask("Submittal Review","CDRA_UNASSIGNED","BLD_20231116_REV");
 			editTaskDueDate("Submittal Review",dateAdd(null,2,"Y"),"BLD_20231116_REV");
+			assignTask("Submittal Review","PERMIT CENTER_UNASSIGNED","BLD_20231116_REV");
+			editTaskSpecific("Submittal Review","Possession Start Date",dateAdd(null,0,"Y"),cCapId);
+			updateTask("Submittal Review","Received","Possession Start Date logged by system","","BLD_20231116_REV",cCapId);
 			capId = pCapId;
 			copyAddresses(pCapId,cCapId);
 			copyParcels(pCapId,cCapId);
@@ -208,8 +212,10 @@ if(matches(wfProcess,"BLD_20181201_DISTRIBUTION","BLD_20181201_MAIN","BLD_202305
 
 			// Auto assign and set due date for Submittal Review
 			capId = cCapId;			
-			assignTask("Submittal Review","CDRA_UNASSIGNED","BLD_DEFERRED_20240710");
 			editTaskDueDate("Submittal Review",dateAdd(null,2,"Y"),"BLD_DEFERRED_20240710");
+			assignTask("Submittal Review","PERMIT CENTER_UNASSIGNED","BLD_DEFERRED_20240710");
+			editTaskSpecific("Submittal Review","Possession Start Date",dateAdd(null,0,"Y"),cCapId);
+			updateTask("Submittal Review","Received","Possession Start Date logged by system","","BLD_DEFERRED_20240710",cCapId);
 			capId = pCapId;
 			copyAddresses(pCapId,cCapId);
 			copyParcels(pCapId,cCapId);	
@@ -303,6 +309,13 @@ if(matches(wfProcess,"BLD_20181201_DISTRIBUTION","BLD_20181201_MAIN","BLD_202305
 			logDebug("Child AltID = " + newAltID);
 			
 			// copyOwnerTPS(pCapId,cCapId);
+			// Auto assign and set due date for Submittal Review
+			capId = cCapId;			
+			editTaskDueDate("Submittal Review",dateAdd(null,2,"Y"),"BLD_PLNCHK_20241222");
+			assignTask("Submittal Review","PERMIT CENTER_UNASSIGNED","BLD_PLNCHK_20241222");
+			editTaskSpecific("Submittal Review","Possession Start Date",dateAdd(null,0,"Y"),cCapId);
+			updateTask("Submittal Review","Received","Possession Start Date logged by system","","BLD_PLNCHK_20241222",cCapId);
+			capId = pCapId;			
 			var assignedTo = getAssignedToStaff(pCapId); 
 			if(assignedTo != null && assignedTo != "") {
 				assignCap(assignedTo,cCapId);
