@@ -22,6 +22,7 @@
 |         : TDunn 01/10/2026 Moved Revisions and Deferred Submittal from Parent by staff from WTUA:Building to here
 |         : TDunn 01/23/2026 added updating Revisions and Deferred with Parent record type (Res or Com)
 |         : TDunn 07/29/2026 added updating in possession date for revision and deferred Submittal Review
+|         : TDunn 08/25/2026 deployed to production
 |
 /-----------------------------------------------------------------------------------------------------------------------*/
 if (matches(currentUserID, "TDUNN", "EAFTAHI", "MHELVIC")) {
