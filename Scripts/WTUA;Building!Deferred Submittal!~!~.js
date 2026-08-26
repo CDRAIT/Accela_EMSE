@@ -24,7 +24,7 @@
 |         : TDunn 12/26/2025 removed getTaskAssignUserHistTD() function script and added to INCLUDES_CUSTOM
 |         : TDunn 12/26/2025 corrected parameters for call to getTaskAssignUserHistTD
 |         : TDunn 03/05/2026 added Approval notification to applicant, owner
-|         : TDunn 03/19/2026 deployed to production
+|         : TDunn 07/28/2026 added tracking in possession dates
 |
 \-------------------------------------------------------------------------------------------------------------------------*/
 if(matches(currentUserID,"TDUNN")) {showDebug = 1;}
@@ -194,7 +194,9 @@ if(wfProcess == "BLD_DEFERRED_20240710")
 					assignTask(thisTask,thisStaff,wfProcess);
 				}				
 			}
-			editTaskDueDate(thisTask,dateAdd(null,addNumDays,"Y"),wfProcess);		
+			editTaskDueDate(thisTask,dateAdd(null,addNumDays,"Y"),wfProcess);
+			editTaskSpecific("Building Plan Check","Possession Start Date",dateAdd(null,0,"Y"));
+			updateTask("Building Plan Check","Submittal Received","Possession Start date logged. Updated by script","",wfProcess);			
 		}
 	}
 
@@ -257,6 +259,8 @@ if(wfProcess == "BLD_DEFERRED_20240710")
 			thisStaff = lookup("SDL:BLD Default Assignment","Process for Issuance");
 			editTaskDueDate("Process for Issuance",dateAdd(null,2,"Y"),wfProcess);
 			assignTask("Process for Issuance",thisStaff);
+			editTaskSpecific("Process for Issuance","Possession Start Date",dateAdd(null,0,"Y"));
+			updateTask("Process for Issuance","Final Processing","Possession Start date logged. Updated by script","",wfProcess);			
 		}
 
 	}
@@ -319,6 +323,16 @@ if(wfProcess == "BLD_DEFERRED_20240710")
 		{
 			if (pCapId != null) 
 			{
+				var cWorkDesc = workDescGet(capId);
+				var typeSuffix = " # ";
+				var newWorkDesc = "";
+				
+				newWorkDesc = pWorkDesc + "\n\n"
+				+ "*** " + appTypeArray[1] + typeSuffix + capIDString + " - Complete on " + dateAdd(null,0) + "\n\n" 
+				+ "Description: " + cWorkDesc + "\n\n";
+				newLength = newWorkDesc.length;
+				logDebug("new description character length: " + newLength);
+				updateWorkDesc(newWorkDesc,pCapId);
 				
 				// Determine if this on the last/only Deferred Submittal for parent permit. If true, remove capCondition
 				//-------------------------------------------------------------------------------------------------------
@@ -527,20 +541,6 @@ if(wfProcess == "BLD_DEFERRED_20240710")
 		// Generate signature requested notification
 		if(wfStatus == "Signature Requested")
 		{
-			if(pCapId != null)
-			{
-				var cWorkDesc = workDescGet(capId);
-				var typeSuffix = " # ";
-				var newWorkDesc = "";
-				
-				newWorkDesc = pWorkDesc + "\n\n"
-				+ "*** " + appTypeArray[1] + typeSuffix + capIDString + " - Complete on " + dateAdd(null,0) + "\n\n" 
-				+ "Description: " + cWorkDesc + "\n\n";
-				newLength = newWorkDesc.length;
-				logDebug("new description character length: " + newLength);
-				updateWorkDesc(newWorkDesc,pCapId);
-			}
-				
 			if(checkForContactEmail("Applicant"))
 			{
 				showMessage = true;
