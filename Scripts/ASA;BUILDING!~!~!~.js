@@ -30,7 +30,7 @@
 |         : TDunn 11/05/2025 added dynamic parameter for Project Office email address.
 |         : TDunn 01/02/2025 added new try clause
 |         : Abe   07/01/2026 Replaced all noreply@placer.ca.gov emails to defaultFrom (INCLUDES_CUSTOM_GLOBALS)
-
+|         : TDunn 07/27/2026 added setting in possession date for back office creation
 |
 /=============================================================================================*/
 if(matches(currentUserID,"TDUNN","JMCKENZI","EAFTAHI")) { showDebug = 1;}
@@ -365,8 +365,10 @@ try
 	if(AInfo['ParcelAttribute.FIRE'] == "Sacramento Metropolitan Fire District") {addStdCondition("Fire - Prevent Issuance / Approval", "Review by Sac Metro Fire may be required");}
 	if(!publicUser)
 	{
-		assignTask("Submittal Review","CDRA_UNASSIGNED");
+		assignTask("Submittal Review","PERMIT CENTER_UNASSIGNED");
 		editTaskDueDate("Submittal Review",dateAdd(null,2,"Y"));
+		editTaskSpecific("Submittal Review","Possession Start Date",dateAdd(null,0,"Y"));
+		updateTask("Submittal Review","Received","Possession Start Date logged by system","",wfProcess);																										
 	}
 	
 	//IT Request# 1911 - EV Charging Station
