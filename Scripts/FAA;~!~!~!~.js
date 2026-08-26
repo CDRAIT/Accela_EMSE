@@ -18,7 +18,7 @@
 |         : TDunn 07/20/2022 updated maximum tech fee value to use a lookup.
 |         : TDunn 05/16/2024 fixed calculation error for TECH-ADJ amount on exempt fees.
 |         : TDunn 04/16/2026 added excluding PW Imp Plan record 
-|         : TDunn 05/19/2026 added Improvement Plan Type as part of exclusion rule Imp Plan records
+|         : TDunn 05/19/2026 added Improvement Plan Type as part of exclution rule Imp Plan records
 |
 /---------------------------------------------------------------------------------------------------------------------*/
 
@@ -39,6 +39,8 @@ var vLkupCriteria = "Exempt"
 var maxFee = (lookup("lkupFeeFactor","techMax") *1); // New value effective 7/23/22 is 498.07
 var maxFeeAdj = (maxFee * 1) - .1;
 logDebug("Current Tech fee maximum amount is " + maxFee);
+
+/*
 
 // Test for exempt record types
 if(!matches(appTypeArray[1],"Improvement Plan") || (appTypeArray[1] == "Improvement Plan" && matches(AInfo["Improvement Plan Type"],"Utility","BFAT")))
@@ -163,3 +165,5 @@ if(!matches(appTypeArray[1],"Improvement Plan") || (appTypeArray[1] == "Improvem
 	showMessage = true;
 	comment("Tech fee does not apply to " + appTypeArray[1])
 }
+
+*/
