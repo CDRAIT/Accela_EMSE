@@ -23,6 +23,9 @@
 |         : TDunn 08/31/2025 deployed to Github
 |         : TDunn 03/20/2026 reenabled update to Expiration Date and updated period to 120 months for dateAddMonths
 |         : TDunn 03/20/2026 deployed to production
+|         : TDunn 07/15/2026 added in possession date rules
+|         : TDunn 08/13/2026 added in possession date rules for Submittal Review for Revisions and Deferred creation
+|         : TDunn 08/25/2026 deployed to production
 |
 /--------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 
@@ -57,8 +60,8 @@ if(wfProcess == "BLD_PLNCHK_20241222")
 {
 	logDebug("Running code for process BLD_PLNCHK_20241222");
 	// Initialize defaults and flags
-	var closureStaff = "CDRA_UNASSIGNED";
-	var pfiStaff = "CDRA_UNASSIGNED";
+	var closureStaff = "PERMIT CENTER_UNASSIGNED";
+	var pfiStaff = "PERMIT CENTER_UNASSIGNED";
 	var doLimited = false;
 	var pcheckType = "Full";
 	var dueDateRecType = "";
@@ -143,8 +146,10 @@ if(wfProcess == "BLD_PLNCHK_20241222")
 		// preset TSI for required reviews
 		{
 
-			assignTask("Distribution","CDRA_UNASSIGNED",wfProcess);
+			assignThisTask("Distribution",wfProcess);	
 			editTaskDueDate("Distribution",dateAdd(null,1,"Y"),wfProcess);
+			editTaskSpecific("Distribution","Possession Start Date",dateAdd(null,0,"Y"));
+			updateTask("Distribution","Submittal Received","Possession Start Date logged by system","",wfProcess);					
 		}
 
 
@@ -209,7 +214,8 @@ if(wfProcess == "BLD_PLNCHK_20241222")
 		if(matches(AInfo["Fire Review - Partner Agency"],"Y","Yes") && !isTaskStatus("Fire Review - Partner Agency","Complete"))
 		{
 			activateTask("Fire Review - Partner Agency",wfProcess);
-			updateTask("Fire Review - Partner Agency","Completion Pending","","-(Preissuance Requirement)",wfProcess);			
+			updateTask("Fire Review - Partner Agency","Completion Pending","","-(Preissuance Requirement)",wfProcess);
+			assignPreissue("Fire Review - Partner Agency",wfProcess);		
 		}	
 		// for setting review task dates and staff assignment during autoRouteReviewsTD();
 		resubNum = AInfo["Resubmittal Number"];
@@ -222,7 +228,8 @@ if(wfProcess == "BLD_PLNCHK_20241222")
 			addNumDays = getDueInDays("SDL:DueDates","Reviews|" + dueDateRecType,1);	
 		}
 		setDueDate("MASTER",addNumDays,wfProcess);
-		assignConcurrent("MASTER",wfProcess,resubNum);		
+		assignConcurrent("MASTER",wfProcess,resubNum);
+		setConcurrentStatusAndPossDate("MASTER",wfProcess);		
 	}
 	
 	// Rules for Distribution/Not Required - Plan Check Only
@@ -230,15 +237,19 @@ if(wfProcess == "BLD_PLNCHK_20241222")
 	{
 		activateTask("Building Plan Check",wfProcess);
 		resubNum = AInfo["Resubmittal Number"];
+		newStatus = "Submittal Received";
 		if(resubNum <= 1)
 		{
 			addNumDays = getDueInDays("SDL:DueDates","Reviews|" + dueDateRecType,0);	
 		}
 		if(resubNum > 1)
 		{
-			addNumDays = getDueInDays("SDL:DueDates","Reviews|" + dueDateRecType,1);	
+			addNumDays = getDueInDays("SDL:DueDates","Reviews|" + dueDateRecType,1);
+			newStatus = "Resubmittal Received";
 		}
 		editTaskDueDate("Building Plan Check",dateAdd(null,addNumDays,"Y"),wfProcess);
+		editTaskSpecific("Building Plan Check","Possession Start Date",dateAdd(null,0,"Y"));
+		updateTask("Building Plan Check",newStatus,"Possession Start date logged. Updated by script","",wfProcess);		
 		assignConcurrent("MASTER",wfProcess,resubNum);
 		thisStaff = lookup("SDL:BLD Default Assignment","Building Plan Check");
 		if(resubNum <= 1)
@@ -263,7 +274,9 @@ if(wfProcess == "BLD_PLNCHK_20241222")
 		thisStaff = pfiStaff;
 		thisTask = "Process for Issuance";
 		cAssigned = getTaskAssignUser(thisTask);
-		editTaskDueDate(thisTask,dateAdd(null,2,"Y"),wfProcess);		
+		editTaskDueDate(thisTask,dateAdd(null,2,"Y"),wfProcess);
+		editTaskSpecific("Process for Issuance","Possession Start Date",dateAdd(null,0,"Y"));
+		updateTask("Process for Issuance","Final Processing","Possession Start date logged. Updated by script","",wfProcess);		
 		logDebug("Process for Issuance assigned to " + cAssigned);
 		if(!matches(cAssigned,false,"",null,undefined,"ACAPAYMENT"))
 		{
@@ -414,7 +427,7 @@ if(wfProcess == "BLD_PLNCHK_20241222")
 			}
 			if(allRevComplete)
 			{
-				thisStaff = "CDRA_UNASSIGNED";
+				thisStaff = lookup("SDL:BLD Default Assignment","Distribution Reconciliation");
 				thisTask = "Distribution Reconciliation";
 				editTaskDueDate(thisTask,dateAdd(null,1,"Y"));
 				
@@ -465,7 +478,8 @@ if(wfProcess == "BLD_PLNCHK_20241222")
 				{
 					distRecStatus = "Ready for Reconciliation - Corrections";
 				}
-				//updateTask("Distribution Reconciliation",distRecStatus,"Status updated by script.",""); // Remarked out due to duplication of WTUA digEplan script.
+				editTaskSpecific("Distribution Reconciliation","Possession Start Date",dateAdd(null,0,"Y"));
+				updateTask("Distribution Reconciliation",distRecStatus,"Possession Start Date logged by system.","");
 			}
 		}
 	}	
@@ -503,7 +517,7 @@ if(wfProcess == "BLD_PLNCHK_20241222")
 				showMessage = true;
 				comment("<font size = 4 color=ff000><b>No applicant email address found. " + wfStatus + " email notification cannot be sent.</b></font><br><br>A status of " + wfStatus + " for the " + wfTask + " task will send a " + wfStatus + " notification to the applicant.<br>The email notification cannot be sent without a valid applicant email address.<br> Please review applicant contact record for a valid email address.");
 			}
-
+			editTaskSpecific("Distribution","Possession Start Date",dateAdd(null,0,"Y"));
 			// Set and update resubmittal number
 			if(matches(AInfo["Resubmittal Number"],null,"",0)) 
 			{
@@ -518,7 +532,8 @@ if(wfProcess == "BLD_PLNCHK_20241222")
 		
 			//---------------------------------------------
 			createNotificationTPS2("NOTICE_BLD_CORRECTIONS REQUIRED","Y","Applicant","N","","N","N","N","Y","N","N","");
-			assignTask("Distribution","CDRA_UNASSIGNED",wfProcess);
+			thisTask = "Distribution";
+			assignThisTask(thisTask,wfProcess);
 			editTaskDueDate("Distribution",dateAdd(null,1,"Y"),wfProcess);
 			presetTSIpco("MASTER","Distribution","Approved","Cleared","ThirdStatus");
 			if(AInfo["Assess Fee"] != null) {editTaskSpecific("Distribution Reconciliation","Assess Fee",null);}
@@ -529,6 +544,8 @@ if(wfProcess == "BLD_PLNCHK_20241222")
 		{
 			if(isTaskStatus("Distribution","Distribute")) {updateTask("Distribution","Distributed","Updated by script on Distribution Reconciliation Complete","");}
 			editTaskDueDate("Process for Issuance",dateAdd(null,2,"Y"),wfProcess);
+			editTaskSpecific("Process for Issuance","Possession Start Date",dateAdd(null,0,"Y"));
+			updateTask("Process for Issuance","Final Processing","Reconciliation 'Complete'. Possession Start Date logged by system","",wfProcess);					
 			thisStaff = pfiStaff;
 			thisTask = "Process for Issuance";
 			cAssigned = getTaskAssignUser(thisTask);
@@ -548,7 +565,12 @@ if(wfProcess == "BLD_PLNCHK_20241222")
 			{
 				cTask = preTasksArraySD[thisPI];
 				logDebug("For setting date, current cTask = " + cTask);
-				if(isTaskActive(cTask)) { editTaskDueDate(cTask,dateAdd(null,1,"Y"),wfProcess); }
+				if(isTaskActive(cTask)) 
+				{ 
+					editTaskDueDate(cTask,dateAdd(null,1,"Y"),wfProcess); 
+					editTaskSpecific(cTask,"Possession Start Date",dateAdd(null,0,"Y"));
+					updateTask(cTask,"Awaiting Review","Possession Start Date logged by system","",wfProcess);					
+				}
 			}
 		}
 		
@@ -584,7 +606,9 @@ if(wfProcess == "BLD_PLNCHK_20241222")
 			if(isTaskActive("Process for Issuance"))
 			{
 				updateAppStatus("Final Processing","All preissuance tasks Complete or inactive. Updated by script");
-				editTaskDueDate("Process for Issuance",dateAdd(null,2,"Y"),wfProcess);				
+				editTaskDueDate("Process for Issuance",dateAdd(null,2,"Y"),wfProcess);
+				editTaskSpecific("Process for Issuance","Possession Start Date",dateAdd(null,0,"Y"));					
+				updateTask("Process for Issuance","Final Processing","All preissuance tasks Complete or inactive. Possession Start Date logged by system","",wfProcess);				
 			}			
 		}
 	}
@@ -920,6 +944,14 @@ if(wfProcess == "BLD_PLNCHK_20241222")
 			editAppSpecific("Scope of Work",getAppSpecific("Scope of Work",pCapId),cCapId);	
 			editAppSpecific("Plan Check Type",getAppSpecific("Plan Check Type",pCapId),cCapId);
 			copyContacts(pCapId,cCapId);
+			
+			// Auto assign and set due date for Submittal Review
+			capId = cCapId;
+			assignTask("Submittal Review","PERMIT CENTER_UNASSIGNED","BLD_PLNCHK_20241222");
+			editTaskDueDate("Submittal Review",dateAdd(null,2,"Y"),"BLD_PLNCHK_20241222");
+			editTaskSpecific("Submittal Review","Possession Start Date",dateAdd(null,0,"Y"),cCapId);
+			updateTask("Submittal Review","Received","Possession Start Date logged by system","","BLD_PLNCHK_20241222",cCapId);
+			capId = pCapId
 
 			// Create notification to applicant for new Revision record created
 			var vEmailTemplate = "ONLINE_PERMIT_AMENDMENT_SUBMITTED";
@@ -1012,6 +1044,14 @@ if(wfProcess == "BLD_PLNCHK_20241222")
 			editAppSpecific("Type of Work",getAppSpecific("Type of Work",pCapId),cCapId);
 			editAppSpecific("Scope of Work",getAppSpecific("Scope of Work",pCapId),cCapId);	
 			editAppSpecific("Plan Check Type",getAppSpecific("Plan Check Type",pCapId),cCapId);
+			
+			// Auto assign and set due date for Submittal Review
+			capId = cCapId;
+			assignTask("Submittal Review","PERMIT CENTER_UNASSIGNED","BLD_DEFERRED_20240710");
+			editTaskDueDate("Submittal Review",dateAdd(null,2,"Y"),"BLD_DEFERRED_20240710");
+			editTaskSpecific("Submittal Review","Possession Start Date",dateAdd(null,0,"Y"),cCapId);
+			updateTask("Submittal Review","Received","Possession Start Date logged by system","","BLD_DEFERRED_20240710",cCapId);
+			capId = pCapId			
 			
 			// Generate email notice to parent applicant for new Deferred Submittal application
 			var vEmailTemplate = "ONLINE_PERMIT_AMENDMENT_SUBMITTED";
