@@ -104,7 +104,7 @@ if(publicUser)
 		varUpdateWorkDesc = true;
 		varNewWorkDesc = workDescGet(capId) + "\n\n" + "CURRENT PANEL AMPERAGE: " + AInfo['ELECTRICAL- Current Panel Amperage'] + "\n\n" 
 		+ "PROPOSED PANEL AMPERAGE: " + AInfo['ELECTRICAL - Proposed Panel Amperage'] + "\n\n" + "CHANGE OUT / NEW: " 
-		+ AInfo['ELECTRICAL - Change Out or New'] + " - " + AInfo['ELECTRICAL - Work Being Performed'] + "\n" + "ELECTRIC UTILITY COMPANY: " + AInfo['ParcelAttribute.ELECTRIC'];
+		+ AInfo['ELECTRICAL - Change Out or New'] + " - " + AInfo['ELECTRICAL - Work Being Performed'] + "\n\n" + "ELECTRIC UTILITY COMPANY: " + AInfo['ParcelAttribute.ELECTRIC UTILITY'];
 	}
 
 	if (AInfo['Scope of Work ACA'] == "Mechanical") 
