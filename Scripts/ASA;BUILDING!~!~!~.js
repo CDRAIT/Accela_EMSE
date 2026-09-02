@@ -13,6 +13,7 @@
 |         
 |
 /=============================================================================================*/
+//test
 if(matches(currentUserID,"TDUNN","JMCKENZI", "EAFTAHI")) { showDebug = 1;}
 
 logDebug("Running ASA:Building for SP Fees and std condition");
