@@ -67,6 +67,6 @@ if (appTypeArray[1] == "Pre-Application" && !publicUser) {
         sendNotification("", "", "", emailTemp, emailParams, null);
         assignCap('ECS_TECH');
     }
-	aa.sendMail("noreply@placer.ca.gov", "eaftahi@placer.ca.gov", "", "PLN PREAPP ASA- IT REQ #2057", debug);
+	//aa.sendMail(defaultFrom, "eaftahi@placer.ca.gov", "", "PLN PREAPP ASA- IT REQ #2057", debug);
 }
 //End of IT Request # 2057
