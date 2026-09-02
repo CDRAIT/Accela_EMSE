@@ -60,16 +60,34 @@ if (publicUser) {
         sendEmail = true;
     }
 
-    // Adding new TECH fee
-    if (matches(appTypeArray[1], "Final Subdivision", "Grading Permit", "Improvement Plan Revision", "Parcel Map", "Record of Survey")) {
-        updateFee("TECH", "ACCOUNTING", "FINAL", 1, varAutoInvoiceFees);
-    }
-    
+
     if(sendEmail){
         sendNotification(emailSendFrom, toEmailStaff, emailStaffCC, notificationTemplate, params, report);
     }
+
+    
+    /**
+	 * Abe 09/02/2026: Replacing existing TECH FEE Logic with a new one
+	 * 
+    // Adding new TECH fee
+    if (matches(appTypeArray[1], "Final Subdivision", "Grading Permit", "Improvement Plan Revision", "Parcel Map", "Record of Survey")) {
+        updateFee("TECH", "ACCOUNTING", "FINAL", 1, varAutoInvoiceFees);
+    }    
 	if(appTypeArray[1] == "Improvement Plan" && matches(AInfo["Improvement Plan Type"],"Utility","BFAT")){
 		updateFee("TECH","ACCOUNTING","FINAL",1,varAutoInvoiceFees);
 	}
-    //aa.sendMail("noreply@placer.ca.gov", "eaftahi@placer.ca.gov", "", "PLACERCO CTRCA", debug);
+    */
+
+    
+    // Abe 09/02/2026: New TECH FEE Logic
+	//Adding TECH fee to all ESD's, un-invoiced
+
+    if (matches(appTypeArray[1], "Final Subdivision Map", "Grading Permit", "Improvement Plan Revision", "Improvement Plan", "Parcel Map", "Record of Survey", "Misc Fee" )) {
+		varAutoInvoiceFees = 'N';
+		updateFee("TECH V2", "ACCOUNTING", "FINAL", 1, varAutoInvoiceFees);
+	}
+
+
+
+    aa.sendMail(fromDefault, "eaftahi@placer.ca.gov", "", "NONPROD1 ESD CTRCA - TECH V2", debug);
 }

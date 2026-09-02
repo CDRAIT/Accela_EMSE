@@ -41,7 +41,10 @@ var maxFeeAdj = (maxFee * 1) - .1;
 logDebug("Current Tech fee maximum amount is " + maxFee);
 
 // Test for exempt record types
-if(!matches(appTypeArray[1],"Improvement Plan") || (appTypeArray[1] == "Improvement Plan" && matches(AInfo["Improvement Plan Type"],"Utility","BFAT")))
+// Abe 02/09/2026: Added ESD to Exempt list for TECH fee
+
+//if(!matches(appTypeArray[1],"Improvement Plan") || (appTypeArray[1] == "Improvement Plan" && matches(AInfo["Improvement Plan Type"],"Utility","BFAT")))
+if(!matches(appTypeArray[0],"ESD"))
 {
 	// Test for TECH exempt fees 
 	//=============================
@@ -160,7 +163,10 @@ if(!matches(appTypeArray[1],"Improvement Plan") || (appTypeArray[1] == "Improvem
 	}
 }else{
 	logDebug("Tech fee does not apply to " + appTypeArray[1]);
+	logDebug("Tech fee does not apply to " + appTypeArray[0]);
+
 	showMessage = true;
-	comment("Tech fee does not apply to " + appTypeArray[1])
+	comment("Tech fee does not apply to " + appTypeArray[1]);
+	comment("Tech fee does not apply to " + appTypeArray[0])
 }
 
