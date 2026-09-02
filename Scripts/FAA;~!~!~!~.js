@@ -18,8 +18,9 @@
 |         : TDunn 07/20/2022 updated maximum tech fee value to use a lookup.
 |         : TDunn 05/16/2024 fixed calculation error for TECH-ADJ amount on exempt fees.
 |         : TDunn 04/16/2026 added excluding PW Imp Plan record 
-|         : TDunn 05/19/2026 added Improvement Plan Type as part of exclution rule Imp Plan records
-|
+|         : TDunn 05/19/2026 added Improvement Plan Type as part of exclusion rule Imp Plan records
+|         : TDunn 06/02/2026 increased back dating for feeGetTotByDateRange from -730 to -1460
+|         : Abe   09/02/2026 Removed the ESD from TECH Fee Calcs for TEST in NP1
 /---------------------------------------------------------------------------------------------------------------------*/
 
 if(currentUserID == "TDUNN" || currentUserID == "EAFTAHI") {
@@ -100,7 +101,7 @@ if(!matches(appTypeArray[0],"ESD"))
 		techFeeAmt = techFeeAmt.toFixed(3);
 		var feesCharged = techFeeAmt/.035;
 		var fixedFeesChgd = feesCharged.toFixed(3);
-		var feeByDate = feeGetTotByDateRange(dateAdd(null,-730),dateAdd(null,0),"NEW","INVOICED");
+		var feeByDate = feeGetTotByDateRange(dateAdd(null,-2920),dateAdd(null,0),"NEW","INVOICED");
 		if(xmptAmount > 1) {
 			feeByDate = feeByDate - xmptAmount;
 			logDebug("New fee by date = " + feeByDate);
@@ -164,9 +165,7 @@ if(!matches(appTypeArray[0],"ESD"))
 }else{
 	logDebug("Tech fee does not apply to " + appTypeArray[1]);
 	logDebug("Tech fee does not apply to " + appTypeArray[0]);
-
 	showMessage = true;
 	comment("Tech fee does not apply to " + appTypeArray[1]);
-	comment("Tech fee does not apply to " + appTypeArray[0])
+	comment("Tech fee does not apply to " + appTypeArray[0]);
 }
-
