@@ -13,6 +13,7 @@
 |         : TDunn 01/11/2022 updated to logic for adding fees on NOT publicUser
 |         : TDunn 04/16/2026 Excluded Improvement Plan from Tech fee 
 |         : TDunn 05/19/2026 added Improvement Plan Type as part of exclution rule Imp Plan records
+|         : JM    09/03/2026: New TECH FEE Logic - Adding Abe's modifications - Abe added New Tech Fee logic on 09/02/2026
 |
 /=============================================================================================*/
 showDebug = false; showMessage = false;
