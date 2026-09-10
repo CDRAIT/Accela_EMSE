@@ -18,7 +18,7 @@
 /=============================================================================================*/
 showDebug = false; showMessage = false;
 
-if (matches(currentUserID, "TDUNN", "EAFTAHI") {
+if (matches(currentUserID, "TDUNN", "EAFTAHI")) {
 	showDebug = 1;
 }
 logDebug("Running ASA:Planning");
