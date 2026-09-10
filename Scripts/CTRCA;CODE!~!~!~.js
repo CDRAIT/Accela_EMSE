@@ -12,7 +12,7 @@
 | Notes   : Abe 08/16/2023 Created 3.0 version
 | Update  : Abe 08/16/2023 Added Staff Notification - Enforcement
 |         : Abe 08/22/2024 Added Staff Notification for Vehicle Abatement - IT Request# 2024
-|         : 
+|         : Abe 09/10/2026 IT Request# 3802 - updated  staff recipient emails
 |         
 /=============================================================================================*/
 if (publicUser) {
@@ -33,7 +33,7 @@ if (publicUser) {
     var emailStaffCC = "";
 
 
-    toEmailStaff = (getAppSpecific("Project Office") == "Tahoe") ? "codeCompTahoe@placer.ca.gov" : "codeComp@placer.ca.gov";
+    toEmailStaff = (getAppSpecific("Project Office") == "Tahoe") ? "codeEnforceTahoe@placer.ca.gov" : "codeEnforce@placer.ca.gov";
 
     if (appTypeArray[1] == "Enforcement") {
         complainantName = getAppSpecific("Complaintant");
@@ -89,7 +89,8 @@ if (publicUser) {
     //"$$addressLine$$", "$$parcelNumber$$", "$$ownerFullName$$" ,"$$ownerPhone$$" 
     getAPOParams4Notification(emailParams);
     sendNotification(emailSendFrom, toEmailStaff, emailStaffCC, notificationTemplate, emailParams, null);
-    //sendResult = aa.sendMail("noreply@placer.ca.gov","eaftahi@placer.ca.gov", "", "C_VA CTRCA Debug ", debug);
+
+    sendResult = aa.sendMail(defaultFrom,"eaftahi@placer.ca.gov", "", "Code_Enforce CTRCA debug - Email updates", debug);
 }
 
 
