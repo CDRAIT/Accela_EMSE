@@ -13,12 +13,11 @@
 | Update  : Abe 08/16/2023 Added Staff Notification - Enforcement
 |         : Abe 08/22/2024 Added Staff Notification for Vehicle Abatement - IT Request# 2024
 |         : Abe 06/24/2026 Added Code Enf section - IT Request# 1675
-|         : Abe 09/10/2026 IT Request# 3802 - updated  staff recipient emails
-|         
+|         : Abe 09/10/2026 Added IT Request# 3802 and modified to staff email addresses to CodeEnforce
 /=============================================================================================*/
-if (publicUser) {
+if (publicUser) {    
 
-    editAppSpecific("Application Received", "Online");
+    editAppSpecific("Application Received", "Online");    
 
     //Confirm this with Kayla later
     var notificationTemplate = "STAFF_NEW_ONLINE_CASE_SUBMITTED_CODE"; /* This is for Staff notice */
@@ -35,8 +34,8 @@ if (publicUser) {
     toEmail = (getAppSpecific("Project Office") == "Tahoe") ? "codeEnforceTahoe@placer.ca.gov" : "codeEnforce@placer.ca.gov";
 
     if (appTypeArray[1] == "Enforcement") {
-        /** No Acknowledgement Letter sent to ACA complainants for Enforcement */
-        /** No staff notification sent for new Enforcement cases*/
+        /** No Acknowledgement Letter sent to ACA complainants for Enforcement */ 
+        /** No staff notification sent for new Enforcement cases*/ 
         editAppSpecific("Complainant Communication Preference", "Email");
         complainantName = getAppSpecific("Complaintant");
         complainantEmail = getAppSpecific("Complaintant Email");
@@ -48,6 +47,7 @@ if (publicUser) {
          * 
          */
 
+        sendStaffNotification = true;        
     }
 
     if (appTypeArray[1] == "Vehicle Abatement") {
@@ -101,10 +101,8 @@ if (publicUser) {
     //"$$addressLine$$", "$$parcelNumber$$", "$$ownerFullName$$" ,"$$ownerPhone$$" 
     getAPOParams4Notification(emailParams);
 
-    if (sendStaffNotification)
-        var sendResult = sendNotification(sendFrom, toEmail, ccEmail, notificationTemplate, emailParams, null);
+    if(sendStaffNotification)
+        var sendResult= sendNotification(sendFrom, toEmail, ccEmail, notificationTemplate, emailParams, null);
 
-    sendResult = aa.sendMail(defaultFrom,"eaftahi@placer.ca.gov", "", " CTRCA CODE Debug ", debug);
+    //sendResult = aa.sendMail(defaultFrom,"eaftahi@placer.ca.gov", "", "CTRCA;Code Debug ", debug);
 }
-
-
