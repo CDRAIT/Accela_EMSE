@@ -31,7 +31,7 @@ if (publicUser) {
     var ccEmail = "";
     var sendStaffNotification = false;
 
-    toEmail = (getAppSpecific("Project Office") == "Tahoe") ? "codeCompTahoe@placer.ca.gov" : "codeComp@placer.ca.gov";
+    toEmail = (getAppSpecific("Project Office") == "Tahoe") ? "codeEnforceTahoe@placer.ca.gov" : "codeEnforce@placer.ca.gov";
 
     if (appTypeArray[1] == "Enforcement") {
         /** No Acknowledgement Letter sent to ACA complainants for Enforcement */ 
@@ -102,5 +102,6 @@ if (publicUser) {
 
     if(sendStaffNotification)
         var sendResult= sendNotification(sendFrom, toEmail, ccEmail, notificationTemplate, emailParams, null);
-        //sendResult = aa.sendMail(defaultFrom,"eaftahi@placer.ca.gov", "", "C_VA CTRCA Debug ", debug);
+
+    sendResult = aa.sendMail(defaultFrom,"eaftahi@placer.ca.gov", "", "CTRCA;Code Debug ", debug);
 }
