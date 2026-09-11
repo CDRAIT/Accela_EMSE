@@ -103,7 +103,8 @@ if (publicUser) {
 
     if (sendStaffNotification)
         var sendResult = sendNotification(sendFrom, toEmail, ccEmail, notificationTemplate, emailParams, null);
-    //sendResult = aa.sendMail(defaultFrom,"eaftahi@placer.ca.gov", "", "C_VA CTRCA Debug ", debug);
+
+    sendResult = aa.sendMail(defaultFrom,"eaftahi@placer.ca.gov", "", " CTRCA CODE Debug ", debug);
 }
 
 
