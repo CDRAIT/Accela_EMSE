@@ -30,7 +30,8 @@
 |         : TDunn 01/11/2026 deployed to nonprod1
 |         : TDunn 01/11/2026 added logic to stop inspection scheduling on Revisions and Deferred Submittals		  
 |         : TDunn 03/20/2026 ?
-|         : Abe   04/10/2026 Synced the Github version with database - the Github was behind! 
+|         : Abe   04/10/2026 Synced the Github version with database - the Github was behind!
+|         : Abe   09/4/2026  added IT Req# 3781  - Prevent Frame Inspection condition
 /------------------------------------------------------------------------------------------------------*/
 
 if (matches(currentUserID, "JMCKENZI", "EAFTAHI", "TDUNN")) {
@@ -208,12 +209,24 @@ if (appHasCondition("Building - Prevent Building Inspections", "Applied", null, 
     appHasCondition("Code Compliance - Prevent Building Inspections", "Applied", null, null) ||
     appHasCondition("Env. Health - Prevent Building Inspections", "Applied", null, null) ||
     appHasCondition("DPW - Prevent Building Inspections", "Applied", null, null) ||
-    appHasCondition("Fire - Prevent Building Inspections", "Applied", null, null) ||
+
+    //IT Req# 3781
+    (appHasCondition("Fire - Prevent Building Inspections", "Applied", null, null) && (!appHasCondition("Fire - Prevent Building Inspections", "Applied", "Prevent Frame Inspection", null)) )||
+
     appHasCondition("Other - Prevent Building Inspections", "Applied", null, null) ||
     appHasCondition("DPW - Prevent Building Inspections", "Applied", "DPW Prevent Building Inspections", null)) {
     vString += "<font size = 4 color=ff000><b>Inspections cannot be scheduled on this permit because not all inspection stop conditions have been met.</b></font><br><br>";
     vCancelFlag = true;
 }
+
+//IT Req# 3781
+
+if(inspType.substring(0,1) == "4" && appHasCondition("Fire - Prevent Building Inspections", "Applied", "Prevent Frame Inspection", null) ){
+    vString += "<font size = 4 color=ff000><b>400 Inspections cannot be scheduled on this permit because not all inspection stop conditions have been met.</b></font><br><br>";
+    vCancelFlag = true;
+}//End of IT Req# 3781
+    
+
 
 //Prevent final Inspection
 if (isFinalInspection) {
