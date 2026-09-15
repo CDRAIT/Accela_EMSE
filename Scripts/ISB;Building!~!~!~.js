@@ -222,7 +222,7 @@ if (appHasCondition("Building - Prevent Building Inspections", "Applied", null, 
 
 //IT Request# 3781 
 
-logDebug(inspType.substring(0, 1));
+//logDebug(inspType.substring(0, 1));
 if (inspType.substring(0, 1) == '4' && appHasCondition("Fire - Prevent Building Inspections", "Applied", "Prevent Frame Inspection", null)) {
     vString += "<font size = 4 color=ff000><b>400 Inspections cannot be scheduled on this permit because not all inspection stop conditions have been met.</b></font><br><br>";
     vCancelFlag = true;
