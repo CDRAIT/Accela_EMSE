@@ -33,11 +33,7 @@
 |         : Abe   04/10/2026 Synced the Github version with database - the Github was behind!
 |         : Abe   05/13/2026 added 515 ESS to the "Final Inspection" list - IT REQUEST# 3465
 |         : Abe   07/01/2026 Replaced all noreply@placer.ca.gov emails to defaultFrom (INCLUDES_CUSTOM_GLOBALS)
-<<<<<<< HEAD
-|
-=======
 |         : Abe   09/14/2026 added IT request# 3781 - Fire hold 400 series (Prevent Frame Inspection) 
->>>>>>> 2c5aa63 (Added IT Request#3781)
 |
 /------------------------------------------------------------------------------------------------------*/
 
@@ -217,22 +213,15 @@ if (appHasCondition("Building - Prevent Building Inspections", "Applied", null, 
     appHasCondition("Code Compliance - Prevent Building Inspections", "Applied", null, null) ||
     appHasCondition("Env. Health - Prevent Building Inspections", "Applied", null, null) ||
     appHasCondition("DPW - Prevent Building Inspections", "Applied", null, null) ||
-<<<<<<< HEAD
-    appHasCondition("Fire - Prevent Building Inspections", "Applied", null, null) ||
-=======
     (appHasCondition("Fire - Prevent Building Inspections", "Applied", null, null) && (!appHasCondition("Fire - Prevent Building Inspections", "Applied", "Prevent Frame Inspection", null)))||
->>>>>>> 2c5aa63 (Added IT Request#3781)
     appHasCondition("Other - Prevent Building Inspections", "Applied", null, null) ||
     appHasCondition("DPW - Prevent Building Inspections", "Applied", "DPW Prevent Building Inspections", null)) {
     vString += "<font size = 4 color=ff000><b>Inspections cannot be scheduled on this permit because not all inspection stop conditions have been met.</b></font><br><br>";
     vCancelFlag = true;
 }
 
-<<<<<<< HEAD
-=======
 //IT Request# 3781 
-
-logDebug(inspType.substring(0, 1));
+//logDebug(inspType.substring(0, 1));
 if (inspType.substring(0, 1) == '4' && appHasCondition("Fire - Prevent Building Inspections", "Applied", "Prevent Frame Inspection", null)) {
     vString += "<font size = 4 color=ff000><b>400 Inspections cannot be scheduled on this permit because not all inspection stop conditions have been met.</b></font><br><br>";
     vCancelFlag = true;
@@ -240,8 +229,6 @@ if (inspType.substring(0, 1) == '4' && appHasCondition("Fire - Prevent Building 
 
 //End of IT Request# 3781
 
-
->>>>>>> 2c5aa63 (Added IT Request#3781)
 //Prevent final Inspection
 if (isFinalInspection) {
     if (appHasCondition("Building - Prevent Final / Completion", "Applied", null, null) ||
