@@ -282,7 +282,8 @@ try
 			// }
 
 			//Start: Abe - IT Request # 2504 
-			if (AInfo["Project Type"] == "PV Solar and Storage") {
+				//MHelvick added Standalone Storage to criteria per KFulkers
+			if (AInfo["Project Type"] == "PV Solar and Storage" || AInfo["Project Type"] == "Standalone Storage") {
 				updateFee("0515", "B_RES", "FINAL", 1, varAutoInvoiceFees);
 			}
 			//End: Abe - IT Request # 2504 
