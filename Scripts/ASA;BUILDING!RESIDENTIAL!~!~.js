@@ -272,7 +272,13 @@ try
 		}
 		// Special fees for SolarApp
 		if (publicUser && appTypeArray[3] == "Solar App") {
-			if (matches(AInfo["Panel Upgrade"], "Y", "Yes") || AInfo["Project Type"] == "PV Solar and Storage") {
+			//MHelvick - GovPath commented this according to KFulkers Fee Review Request
+			//if (matches(AInfo["Panel Upgrade"], "Y", "Yes") || AInfo["Project Type"] == "PV Solar and Storage") {
+				//updateFee("0711", "B_RES", "FINAL", 1, varAutoInvoiceFees);
+			//}
+
+			//Start: MHelvick - GovPath Request Fee Review, 0711 required for all Project Types where MPU is Yes, Project Type doesn't matter
+			if (matches(AInfo["Panel Upgrade"], "Y", "Yes")) {
 				updateFee("0711", "B_RES", "FINAL", 1, varAutoInvoiceFees);
 			}
 
@@ -282,11 +288,18 @@ try
 			// }
 
 			//Start: Abe - IT Request # 2504 
-				//MHelvick added Standalone Storage to criteria per KFulkers
-			if (AInfo["Project Type"] == "PV Solar and Storage" || AInfo["Project Type"] == "Standalone Storage") {
+			//MHelvick - GovPath Request Fee Review, 0515 also required for Project Type Standalone Storage
+			if (AInfo["Project Type"] == "PV Solar and Storage" || AInfo["Project Type"] == "Standalone Storage" ) {
 				updateFee("0515", "B_RES", "FINAL", 1, varAutoInvoiceFees);
 			}
 			//End: Abe - IT Request # 2504 
+
+			//Start: MHelvick - GovPath Request Fee Review, 0731 added from lookup, but not required for Standalone Storage
+			if (AInfo["Project Type"] == "Standalone Storage") {
+				removeFee("0731", "FINAL");
+			}
+			//End: MHelvick - GovPath Request Fee Review
+
 			//updateFee("TECH","ACCOUNTING","FINAL",1,varAutoInvoiceFees);
 		}
 
