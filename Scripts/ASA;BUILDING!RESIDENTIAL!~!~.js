@@ -32,6 +32,7 @@
 |         : Abe     09/02/2025 IT Request # 2504 - Added Fee code 0515 to the SolarApp Fee Calculations
 |         : TDunn   09/23/2025 added try clause on IT requests 1978 and 2221
 |         : eaftahi 02/27/2026 Added IT Request# 2698
+|         : MHelvick 10/05/2026 updated SolarApp+ fee rules
 |
 /================================================================================================================================*/
 if (currentUserID == "TDUNN" || currentUserID == "EAFTAHI") {
