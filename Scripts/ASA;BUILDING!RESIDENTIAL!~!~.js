@@ -19,9 +19,9 @@
 |         : TDunn 11/06/2023 added SolarApp+ fee rules
 |         : TDunn 11/14/2023 added additional logic to include SolarApp+ as an 'exception' for adding and collecting fees online.
 |         : EAftahi 12/07/2023 IT Request # 1865 - added "Addressing" Ad Hoc task 
-|	      : EAftahi 11/18/2023 IT Request # 1590 - Tracking ADUs - changed the code based on new ASI fields		
+|         : EAftahi 11/18/2023 IT Request # 1590 - Tracking ADUs - changed the code based on new ASI fields		
 |         : EAftahi 03/07/2024 IT Request # 1978 - do not Auto Invoice 'Solar Roof Mount' fees
-|	      : EAftahi 04/29/2024 IT Request # 1998 - ADU Ad-Hoc Task - adds Ad-Hoc task for ADU/JADU permits(ADU Review & Addressing)
+|         : EAftahi 04/29/2024 IT Request # 1998 - ADU Ad-Hoc Task - adds Ad-Hoc task for ADU/JADU permits(ADU Review & Addressing)
 |         : TDunn   08/14/2024 during restore process kept production version and added new editDueDate rule for new workflow.
 |         : Abe     10/17/2024 IT Request # 2059 Auto Create Flag for SPMUD (Utility Geocode)
 |         : TDunn   03/22/2025 Disabled dolimited flag for limited scope records to eliminate add fees at ACA for testing.
@@ -31,8 +31,8 @@
 |         : TDunn   08/29/2025 deployed to GitHub
 |         : Abe     09/02/2025 IT Request # 2504 - Added Fee code 0515 to the SolarApp Fee Calculations
 |         : TDunn   09/23/2025 added try clause on IT requests 1978 and 2221
-|         : eaftahi 02/27/2026 Added IT Request# 2698
-|         : MHelvick 10/05/2026 updated SolarApp+ fee rules
+|         : eaftahi 04/07/2026 Added IT Request# 2698
+|         : MHelvick 10/05/2026 Updates to SolarApp Fee Rules
 |
 /================================================================================================================================*/
 if (currentUserID == "TDUNN" || currentUserID == "EAFTAHI") {
@@ -85,7 +85,7 @@ try
 	}
 	if (appTypeArray[2] == "Limited" && publicUser) {
 		varLookupTable = "OTC Scope of Work ACA";
-		// doLimited = true;	// Remarked this out for testing to remove adding fees at ACA submittal
+		doLimited = true;
 		spTypeFlag = false;
 		logDebug("Is limited = " + doLimited);
 	}
@@ -328,6 +328,6 @@ try
 	
 } catch(e)
 {
-	aa.sendMail("noreply@placer.ca.gov","tdunn@truepointsolutions.com", "", "Test: ASA:Building/Residential try error2 ", e.message);	
+	aa.sendMail("noreply@placer.ca.gov","mckenzie@govpath.tech", "", "Test: ASA:Building/Residential try error2 ", e.message);
 }
- aa.sendMail("noreply@placer.ca.gov","tdunn@truepointsolutions.com", "", "Test: ASA:Building/Residential: debug ", debug);
+aa.sendMail("noreply@placer.ca.gov","mckenzie@govpath.tech", "", "Test: ASA:Building/Residential: debug ", debug);
