@@ -295,9 +295,9 @@ try
 			}
 			//End: Abe - IT Request # 2504 
 
-			//Start: MHelvick - GovPath Request Fee Review, 0731 added from lookup, but not required for Standalone Storage
-			if (AInfo["Project Type"] == "Standalone Storage") {
-				removeFee("0731", "FINAL");
+			//Start: MHelvick - GovPath Request Fee Review, 0731 required for Project Types not Standalone Storage
+			if (!matches(AInfo["Project Type"],Standalone Storage")) {
+				updateFee("0731", "B_RES", "FINAL", 1, varAutoInvoiceFees);
 			}
 			//End: MHelvick - GovPath Request Fee Review
 
