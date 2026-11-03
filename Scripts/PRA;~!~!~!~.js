@@ -196,6 +196,18 @@ if(appTypeArray[1] == "Deferred Submittal")
 	}
 }
 
+// Begin rules for CalFire
+//======================================================
+if(appTypeArray[1] == "CalFire")
+{
+	if(isTaskStatus("Fire Review","Approved & Payment Requested"))
+	{
+		updateAppStatus("Approved","Updated by script on Payment Received via Citizen Portal");	
+		closeTask("Fire Review","Payment Received","Payment Received via Citizen Portal. Updated by script","","CALFIRE_20261103");
+		
+		createNotificationTPS3(praNoticeTemplate,"Y","Applicant","N","Contractor","N","N","N","Y",staffCode,"N",defaultEmail);
+	}
+}
 	
 /**
  * Abe >> IT Req# 1566: added AA/ACA initiated auto-advance 
