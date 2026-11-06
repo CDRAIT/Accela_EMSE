@@ -1,4 +1,5 @@
 //if(currentUserID == "MHELVICK"){
+/*
 if(wfTask == "Application Acceptance" && wfStatus == "Application Incomplete") {
 	//send email here
 	logDebug("<font color='green'>Send Incomplete Email</font>");
@@ -7,7 +8,7 @@ if(wfTask == "Application Acceptance" && wfStatus == "Application Incomplete") {
 		showMessage = true;
 		comment("<font size = 4 color=ff000><b>No applicant email address found. " + wfStatus + " email notification cannot be sent.</b></font><br><br>A status of " + wfStatus + " for the " + wfTask + " task will send a " + wfStatus + " notification to the applicant.<br>The email notification cannot be sent without a valid applicant email address.<br> Please review applicant contact record for a valid email address.");
 	}
-	var emailTemplate = "NOTICE_BLD_ADDITIONAL_INFORMATION_REQUIRED";
+	var emailTemplate = "WTUA_CALFIRE_INCOMPLETE";
 	var vFromEmail = "";
 	var vToEmail = "";
 	var vCcEmail = "";
@@ -52,17 +53,27 @@ if(wfTask == "Application Acceptance" && wfStatus == "Application Incomplete") {
 	updateTask("Application Acceptance","Pending Resubmittal","Application incomplete. Updated by script","Pending Resubmittal");
 	editTaskDueDate("Application Acceptance",dateAdd(null,1,"Y"),wfProcess);
 }
+*/
+
+if(wfTask == "Application Acceptance" && wfStatus == "Application Incomplete") {
+	//send email here
+	logDebug("<font color='green'>Send Incomplete Email</font>");
+	createNotificationTPS2("WTUA_CALFIRE_INCOMPLETE","Y","Applicant,Owner","N","","N","N","N","Y","N","N","");
+
+	updateTask("Application Acceptance","Pending Resubmittal","Application incomplete. Updated by script","Pending Resubmittal");
+	editTaskDueDate("Application Acceptance",dateAdd(null,1,"Y"),wfProcess);
+}
 
 if(wfTask == "Fire Review" && wfStatus == "Corrections Required") {
-//send email here
-logDebug("<font color='green'>Send Corrections Email</font>");
-createNotificationTPS2("NOTICE_BLD_CORRECTIONS REQUIRED","Y","Applicant,Owner","N","","N","N","N","Y","N","N","");
+	//send email here
+	logDebug("<font color='green'>Send Corrections Email</font>");
+	createNotificationTPS2("WTUA_CALFIRE_CORRECTIONS","Y","Applicant,Owner","N","","N","N","N","Y","N","N","");
 }
 
 if(wfTask == "Fire Review" && wfStatus == "Approved & Payment Requested") {
-//send email here
-logDebug("<font color='green'>Send Approval/Fees Email</font>");
-createNotificationTPS2("NNOTICE_BUILDING_FEES_DUE","Y","Applicant,Owner","N","","N","N","N","Y","N","N","");
+	//send email here
+	logDebug("<font color='green'>Send Approval/Fees Email</font>");
+	createNotificationTPS2("WTUA_CALFIRE_PAYMENT","Y","Applicant,Owner","N","","N","N","N","Y","N","N","");
 }
 
 //}
