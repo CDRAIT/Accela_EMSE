@@ -175,7 +175,25 @@ staffResult = aa.person.getUser(assignedStaff);
 	}
 }
 
-
+/*Get Current User ID information*/
+var userEmail = "";
+var userName = "";
+var userTitle = "";
+if(currentUserID != null) {
+	userObj = aa.person.getUser(currentUserID).getOutput();
+	if(userObj && userObj !=null) {
+		userName = userObj.getFirstName() + " " + userObj.getLastName();
+		if(!matches(userObj.getEmail(),undefined,"",null)) {
+			userEmail =  userObj.getEmail();
+		}
+		if(!matches(userObj.getTitle(),undefined,"",null)) {
+			userTitle =  userObj.getTitle();
+		}
+	}
+}
+addParameter(emailParameters,"$$userName$$",userName);
+addParameter(emailParameters,"$$userEmail$$",userEmail);
+addParameter(emailParameters,"$$userTitle$$",userTitle);
 
 logDebug("vFromEmail= " + vFromEmail + "; vToEmail= " + vToEmail + "; vCcEmail = " + vCcEmail + "; emailTemplate= " + emailTemplate + "; emailParameters= " + emailParameters);
 // aa.print("vFromEmail= " + vFromEmail + "; vToEmail= " + vToEmail + "; vCcEmail = " + vCcEmail + "; emailTemplate= " + emailTemplate + "; emailParameters= " + emailParameters);
