@@ -28,10 +28,16 @@
 |         : TDunn 03/25/2026 added updating child task due dates
 |         : TDunn 03/26/2026 added including old 'Plan Check Only' type in criteria for Master/Rev updates
 |         : TDunn 07/14/2026 added tracking in possession date
-|
+|         : MHelvick 11/6/26 added script for CalFire
 \-------------------------------------------------------------------------------------------------------*/
+if(matches(currentUserID,"TDUNN","JMCKENZI","EAFTAHI","MHELVICK")) { showDebug = 1;}
 
-
+sendPraEmails = false;
+fileDateCompare = new Date(fileDate);
+if(fileDateCompare < edrStartDate) { //edrStartDate variable is set in INCLUDES_CUSTOM_GLOBALS
+	sendPraEmails = true;
+	logDebug("<font color='blue'>Will Send PRA Staff Emails if applicable </font>");
+} else {logDebug("<font color='red'>Will Not Send PRA Emails</font>");}
 
 logDebug("Running Staff notification for payment received");
 var praNoticeTemplate = "PRA_STAFF_NOTIFICATION_ONLINE_PAYMENT_RECEIVED";
@@ -58,7 +64,7 @@ if(matches(appTypeArray[0],"Building","TRPA")) {
 	sendItFlag = true;
 }
 logDebug("App type = " + appTypeArray[0] + " send it flag is " + sendItFlag);
-if(((cHolderName != null && cHolderName != "") || currentUserID == "TDUNN") && sendItFlag) {
+if(((cHolderName != null && cHolderName != "") || currentUserID == "TDUNN") && sendItFlag && sendPraEmails) {
 	createNotificationTPS3(praNoticeTemplate,"N","Applicant","N","Contractor","N","N","N","Y",staffCode,"N",defaultEmail);
 }
 
@@ -205,7 +211,7 @@ if(appTypeArray[1] == "CalFire")
 		updateAppStatus("Approved","Updated by script on Payment Received via Citizen Portal");	
 		closeTask("Fire Review","Payment Received","Payment Received via Citizen Portal. Updated by script","","CALFIRE_20261103");
 		
-		createNotificationTPS3(praNoticeTemplate,"Y","Applicant","N","Contractor","N","N","N","Y",staffCode,"N",defaultEmail);
+		createNotificationTPS2("PRA_CALFIRE_APPROVAL","Y","Applicant,Owner","N","","N","N","N","Y","N","N","");
 	}
 }
 	
