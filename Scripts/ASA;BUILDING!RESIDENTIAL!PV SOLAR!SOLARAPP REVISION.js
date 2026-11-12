@@ -27,6 +27,7 @@ if(publicUser)
 	if(appTypeArray[3] == "SolarApp Revision")
 	{
 		//Assess fees
+		/* //Disabling Fees here, re-adding below with new logic
 		updateFee("0913","B_RES","FINAL",1,autoInvoiceFees);
 		if(AInfo["Adding an ESS with Revision"] == "Yes" || AInfo["Adding Main Panel Upgrade"] == "Yes")
 		{
@@ -44,6 +45,22 @@ if(publicUser)
 			updateFee("0515", "B_RES", "FINAL", 1, varAutoInvoiceFees);
 		}
 		//End of IT Req# 2504
+		*/
+		
+		//Add 0913 when ESS and MPU are No
+		if(AInfo["Adding an ESS with Revision"] == "No" && AInfo["Adding Main Panel Upgrade"] == "No"){
+			updateFee("0913","B_RES","FINAL",1,autoInvoiceFees);
+		}
+		//Add 0515 when ESS is Yes
+		if(AInfo["Adding an ESS with Revision"] == "Yes")
+		{
+			updateFee("0515","B_RES","FINAL",1,autoInvoiceFees);
+		}
+		//Add 0711 when MPU is Yes
+		if(AInfo["Adding Main Panel Upgrade"] == "Yes")
+		{
+			updateFee("0711","B_RES","FINAL",1,autoInvoiceFees);
+		}
 	}
 }
 
