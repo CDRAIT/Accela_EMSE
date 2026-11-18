@@ -48,6 +48,7 @@ if(publicUser)
 		*/
 		
 		//Add 0913 when ESS and MPU are No
+		//if(AInfo["Adding an ESS with Revision"] != "Yes" && AInfo["Adding Main Panel Upgrade"] != "Yes"){
 		if(AInfo["Adding an ESS with Revision"] == "No" && AInfo["Adding Main Panel Upgrade"] == "No"){
 			updateFee("0913","B_RES","FINAL",1,autoInvoiceFees);
 		}
