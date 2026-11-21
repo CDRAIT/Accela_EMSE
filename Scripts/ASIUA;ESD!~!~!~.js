@@ -13,6 +13,7 @@
 |         : Abe 10/22/2026 added IT Request# 3932 - ESD Fee Study
 |                          This contains Grading Permit Type change logic 
 |         : Abe 10/23/2026 Added StdChoice ASIUA:ESD/Improvement Plan/~/~ here and disabled it
+|         : Abe 11/20/2026 added last FEE STUDY updates and sent to NP1 and database(EMSE TOOL)
 |
 /=============================================================================================*/
 showDebug = false; showMessage = false;

@@ -21,6 +21,7 @@
 |         : Abe   10/23/2026 added ASA:ESD/Improvement Plan/~/~ StdChoice and disabled
 |         : Abe   10/23/2026 added ASA:ESD/Parcel Map/~/~ stdChoice and disabled
 |         : Abe   10/26/2026 commented fee automation associated with depricated Fee items
+|         : Abe   11/20/2026 added last FEE STUDY updates and sent to NP1 and database(EMSE TOOL)
 |
 |
 /=============================================================================================*/

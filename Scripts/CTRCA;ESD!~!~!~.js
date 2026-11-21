@@ -17,6 +17,7 @@
 |         : Abe     10/22/2026 Created sendSubmittalNotification2Staff_ESD() to carry submittal notification logic
 |         : Abe     10/22/2026 Added IT Req# 3932 : Fee study - ESD
 |         : Abe     10/23/2026 Converted CTRCA:ESD/~/~/~ stdChoice - Notification to Applicant
+|         : Abe     11/20/2026 added last FEE STUDY updates and sent to NP1 and database(EMSE TOOL)
 |
 /=============================================================================================*/
 
