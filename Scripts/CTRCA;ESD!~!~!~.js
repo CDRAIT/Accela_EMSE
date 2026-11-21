@@ -11,36 +11,28 @@
 |
 | Notes   : TDunn   01/11/2022 created production version 
 | Update  : EAFTAHI 08/31/2023 create staff notification for online Submission (GP and others)
-<<<<<<< Updated upstream
-|         
-=======
 |         : TDunn   04/16/2026 removed Improvement Plan from addition of Tech fee
 |         : TDunn   05/19/2026 added Improvement Plan Type as part of exclution rule Imp Plan records
 |         : Abe     10/22/2026 Synced script to PROD (Copied from PROD)   
 |         : Abe     10/22/2026 Created sendSubmittalNotification2Staff_ESD() to carry submittal notification logic
 |         : Abe     10/22/2026 Added IT Req# 3932 : Fee study - ESD
 |         : Abe     10/23/2026 Converted CTRCA:ESD/~/~/~ stdChoice - Notification to Applicant
->>>>>>> Stashed changes
+|         : Abe     11/20/2026 added last FEE STUDY updates and sent to NP1 and database(EMSE TOOL)
 |
 /=============================================================================================*/
 
-logDebug("Running CTRCA:ESD");
-logDebug("Test");
+//#region =================================================
+//        FEE CALCULATIONS ----
+//#region =================================================
+
 var varAutoInvoiceFees = "N"
 if (publicUser) {
-
-    /**
-     * 
-     * Abe 10/22/2026: Fee Logic Section
-     *               : Updated with Fee Study changes
-     *               : ACA-sides are ROS & GP
-     */
-
     if (matches(appTypeArray[1], "Grading Permit")) {
         //No default fee assign to GP
 
-        //Waiting for PLANNING Fee Study to confirm this
-        addFee("EXV", "P_PLN", "FINAL", 1, "N");
+        //NOTE: Exemption Verification Fee added to all Grading Permits from PLANNING Fee Schedule
+        //FIXME: Confirm the PLANNING fee schedule name
+        addFee("PL-EXV", "PLANNING", "FINAL", 1, varAutoInvoiceFees);
     }
 
     if (matches(appTypeArray[1], "Record of Survey")) {
@@ -48,29 +40,37 @@ if (publicUser) {
     }
 
     // Adding New TECH Fee (only two Rec Types on  ACA)
+    //NOTE: ESD TECH-FEE Exemptions, as of 11/20/2026: ESECURITY, EWINTERIZ
     if (matches(appTypeArray[1], "Grading Permit", "Record of Survey")) {
-        updateFee("TECH2", "ACCOUNTING", "FINAL", 1, varAutoInvoiceFees);
+        addFee("TECH-FEE", "ACCOUNTING", "FINAL", 1, varAutoInvoiceFees);
     }
+}  
+//#endregion FEE CALCULATIONS
     
 
+
+//#region =================================================
+//        NOTIFICATIONS ----
+//#region =================================================
+if (publicUser) {
     /**
      * 
      * Abe 10/22/2026: Separated Notification Codes
      *               : Notification to Staff (GP & ROS only)
-     * Abe 10/23/2026: Added Notification to Applicant to the function - Converted from CTRCA:ESD stdChoice
+     * Abe 10/23/2026: Added a function for sending Notification to Applicant - Converted from CTRCA:ESD stdChoice
      * 
      */
     sendSubmittalNotification2StaffAndApplicant_ESD();
-
-    
-    //Testing purpose
-    aa.sendMail(defaultFrom, "eaftahi@placer.ca.gov", "", "CTRCA;ESD log", debug);
 }
+//#endregion NOTIFICATIONS
+
+//Testing purpose
+aa.sendMail(defaultFrom, "eaftahi@placer.ca.gov", "", "CTRCA;ESD!NA NONPROD", debug);
 
 
-/******************************************************************************** 
- Local Functions used here only
-********************************************************************************/
+//#region =================================================
+//        LOCAL FUNCTIONS USED HERE ONLY ----
+//#region =================================================
 
 function sendSubmittalNotification2StaffAndApplicant_ESD() {
     var notificationTemplate = "STAFF_NEW_ONLINE_PERMIT_SUBMITTED_ESD";
@@ -126,20 +126,6 @@ function sendSubmittalNotification2StaffAndApplicant_ESD() {
         var sendResults = sendNotification(emailSendFrom, toEmailStaff, emailStaffCC, notificationTemplate, emailParams, reportFile);
 
     logDebug("Sending Notification Results: " + sendResults, "INFO");
-
-<<<<<<< Updated upstream
-    // Adding new TECH fee
-    if (matches(appTypeArray[1], "Final Subdivision", "Grading Permit", "Improvement Plan", "Improvement Plan Revision", "Parcel Map", "Record of Survey")) {
-        updateFee("TECH", "ACCOUNTING", "FINAL", 1, varAutoInvoiceFees);
-    }
-    
-    if(sendEmail){
-        sendNotification(emailSendFrom, toEmailStaff, emailStaffCC, notificationTemplate, params, report);
-    }
-    //aa.sendMail("noreply@placer.ca.gov", "eaftahi@placer.ca.gov", "", "PLACERCO CTRCA", debug);
-
 }
-=======
+//#endregion LOCAL FUNCTIONS
 
-}
->>>>>>> Stashed changes
