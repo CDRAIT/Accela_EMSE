@@ -8,39 +8,15 @@
 |
 | Requires: EMSE 3.0 and Standard Choice: "EMSE_EXECUTE_OPTIONS": "SCRIPT" to be Active.
 |
-<<<<<<< Updated upstream
-| Notes   : Abe     11/22/2024 created script - Converted from StdChoice, WTUA:Code/~/~/~ branch
-|           Abe     10/01/2025 Added IT Request# 1675 - New Code Compliance WF
-|           Abe     02/05/2026 Added Fisrt Revision outputs to the script
-|           Abe     04/23/2026 added 2nd to 4th revision 
-|           Abe     05/21/2026 added revision dated May 12, 2026 - removed all the codes regarding to appStatus manipulation
-|                              so that only record status (after Enforcement Action) will be "Enforcement" and "Fine Processing"
-|           Abe     06/09/2026 added revision dated June 9, 2026 - Kayla Email
-=======
 | Notes   : Abe >> 11/22/2024 created script - Converted from StdChoice, WTUA:Code/~/~/~ branch
 |         : Abe >> 06/24/2026 Added IT Request# 1675 - Code Enforcement New Workflow
 |         : Abe >> 10/22/2026 Added IT Request# 3921 - added Fee Invoice Rpt to "Fine Processing"
->>>>>>> Stashed changes
 |
 |
 /--------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 
 if (currentUserID == "EAFTAHI") { showDebug = 1; }
 
-<<<<<<< Updated upstream
-//Old WF
-if (matches(wfStatus, "Resolved", "Notes", "Appeal Hearing CBO", "Referred", "Unfounded", "No Violation")) {
-    removeParcelCondition(null, "Code", "Unlawful Landuse");
-    removeParcelCondition(null, "Code Compliance - Notification", "Unlawful Land Use");
-}
-
-var varAInfo = new Array();
-
-//To append wf process code.wftask. to TSI field label
-useTaskSpecificGroupName = true;
-loadTaskSpecific(varAInfo);
-if (wfProcess == "CODE_ENF") { //New Workflow
-=======
 logDebug("Running WTUA:Code/Enforcement/*/* ...");
 
 if (wfProcess == "C_ENF") { //Old Workflow
@@ -59,7 +35,6 @@ if (wfProcess == "CODE_ENF") { //New Workflow
     useTaskSpecificGroupName = true;
     loadTaskSpecific(varAInfo);
 
->>>>>>> Stashed changes
     var reportParams = aa.util.newHashMap();
     var emailParams = aa.util.newHashtable();
     var emailFrom = defaultFrom;
@@ -71,20 +46,12 @@ if (wfProcess == "CODE_ENF") { //New Workflow
     var emailSubject = "";    //$$emailSubject$$
     var reportModule = "Code";
     var reportFile = null;
-<<<<<<< Updated upstream
-=======
     var invoiceRptFile = null;
->>>>>>> Stashed changes
     var refAgenciesStdChoice = "SDL: CE_Ref_Agencies";
     //To control appStatus
     //commented - Revision 5/12/2026
     var isCitationActive = false;
     var isNuisanceActive = false;
-<<<<<<< Updated upstream
-    
-=======
-
->>>>>>> Stashed changes
     var isEnfActive = false;
     var isFineProcActive = false;
 
@@ -100,11 +67,6 @@ if (wfProcess == "CODE_ENF") { //New Workflow
     }
 
     if (isTaskActive("Enforcement Action") || isCitationActive || isNuisanceActive) { isEnfActive = true; }
-<<<<<<< Updated upstream
-       
-=======
-
->>>>>>> Stashed changes
     if (isTaskActive("Fine Processing") && !(isEnfActive)) { isFineProcActive = true; }
 
     addParameter(reportParams, "altID", capIDString);
@@ -118,20 +80,11 @@ if (wfProcess == "CODE_ENF") { //New Workflow
 
     // Assigns record to the current user
     if (matches(wfTask, "Complaint Received", "Investigation"))
-<<<<<<< Updated upstream
-        if (matches(wfStatus, "Unfounded", "Referred & Closed", "Duplicate", "Withdrawn", "No Violation"))
-        {
-            assignCap(currentUserID);             
-             closeCap(currentUserID);
-        }
-            
-=======
         if (matches(wfStatus, "Unfounded", "Referred & Closed", "Duplicate", "Withdrawn", "No Violation")) {
             assignCap(currentUserID);
             closeCap(currentUserID);
         }
 
->>>>>>> Stashed changes
 
     if (wfTask == "Complaint Received") {
         if (wfStatus == "Unfounded") {
@@ -207,11 +160,7 @@ if (wfProcess == "CODE_ENF") { //New Workflow
             editAppSpecific("NOV Expiration Date", dateAdd(wfDateMMDDYYYY, varAInfo[wfProcess + "." + wfTask + "." + "Days Num"]));
             //Create and send NOV Letter (6)
             reportName = "Complaint Notice of Violation";
-<<<<<<< Updated upstream
-            addParameter(emailParams, "$$emailSubject$$", "NOTICE OF VIOLATION");            
-=======
             addParameter(emailParams, "$$emailSubject$$", "NOTICE OF VIOLATION");
->>>>>>> Stashed changes
             sendNotice2Recipients("Notice_of_Violation");
         }
 
@@ -221,11 +170,6 @@ if (wfProcess == "CODE_ENF") { //New Workflow
             activateTask("Notice of Nuisance");
             closeTask("Enforcement Action", "Citation & Notice of Nuisance", "Closed by Script", "Forked by Script");
         }
-<<<<<<< Updated upstream
-        
-=======
-
->>>>>>> Stashed changes
         if (wfStatus == "Complied Voluntarily") {
             if (isEnfActive) updateAppStatus("Enforcement Action", "Updated by WTUA Script");
             else if (isFineProcActive) updateAppStatus("Fine Processing", "Updated by WTUA Script");
@@ -338,28 +282,17 @@ if (wfProcess == "CODE_ENF") { //New Workflow
             sendNotice2Recipients("Citation_Letter");
 
             editAppSpecific("Citation Issuance Date", wfDateMMDDYYYY);
-<<<<<<< Updated upstream
-        }        
-
-        if (wfStatus == "Complied") {
-            if (isEnfActive) updateAppStatus("Enforcement Action", "Updated by WTUA Script");            
-=======
         }
 
         if (wfStatus == "Complied") {
             if (isEnfActive) updateAppStatus("Enforcement Action", "Updated by WTUA Script");
->>>>>>> Stashed changes
         }
     }
 
     if (wfTask == "Appeal") {
         if (wfStatus == "No Appeal") {
             //Create the fork manually
-<<<<<<< Updated upstream
-            activateTask("Citation");            
-=======
             activateTask("Citation");
->>>>>>> Stashed changes
         }
     }
 
@@ -402,11 +335,6 @@ if (wfProcess == "CODE_ENF") { //New Workflow
             }
         }
     }
-<<<<<<< Updated upstream
-    
-=======
-
->>>>>>> Stashed changes
     if (wfTask == "Fine Processing") {
         if (wfStatus == "Request for Payment") {
             //Create Invoice Cover Letter (16)
@@ -426,11 +354,7 @@ if (wfProcess == "CODE_ENF") { //New Workflow
 
             //Eamil Fines Due to Staff (17) - batchjob
             editAppSpecific("Subsequent Payment Request Date", wfDateMMDDYYYY);
-<<<<<<< Updated upstream
-        }        
-=======
         }
->>>>>>> Stashed changes
 
         if (!(isEnfActive)) {
 
@@ -470,11 +394,7 @@ if (wfProcess == "CODE_ENF") { //New Workflow
         if (!isBlank(emailTo))
             if (emailTo.indexOf('@') != -1)
                 var sendResult = sendNotification(emailFrom, emailTo, emailCc, emailTemplate, emailParams, null);
-<<<<<<< Updated upstream
-    }    
-=======
     }
->>>>>>> Stashed changes
 }
 
 /********************************* 
@@ -510,8 +430,6 @@ function sendNotice2Recipients(fileName) {
         for (each in checkedRecipients) {
             addParameter(reportParams, "conatctType", checkedRecipients[each]);
             reportFile = generateReportTPS_CustomFileName(reportName, reportParams, reportModule, fileName + "_Case# " + capIDString + "_" + checkedRecipients[each] + ".pdf");
-<<<<<<< Updated upstream
-=======
 
             //start: IT Request# 3921
             if(wfTask=="Fine Processing" && matches(wfStatus, "Request for Payment","Subsequent Payment Request")){
@@ -520,7 +438,6 @@ function sendNotice2Recipients(fileName) {
             }
             //End: IT Request# 3921    
 
->>>>>>> Stashed changes
             //logDebug("reportFile: " + reportFile);
             if (checkedRecipients[each] == "Owner") {
                 emailTo = emailParams.get("$$ownerEmail$$");
