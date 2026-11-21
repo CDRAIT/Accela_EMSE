@@ -109,3 +109,5 @@
 |   09/18/2025 RMoore >> removed functions, main function copytoxics, copies toxics table from record to another
 |   02/05/2025 Abe   >> added exploreObject function to print objects' info 
 /---------------------------------------------------------------------------------------------------------------------------------------------------------*/
+
+eval(getScriptText("INCLUDES_LOGGING", null, true));
