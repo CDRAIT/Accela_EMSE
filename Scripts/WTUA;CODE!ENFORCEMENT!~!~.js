@@ -3,14 +3,14 @@
 | Event   : WorkflowTaskUpdateAfter
 |
 | Client  : Placer County, CA
-| Usage   : Workflow Task Update After for all Vehicle Abatement records.
+| Usage   : Workflow Task Update After for all Code Enforcement records.
 | 
 |
 | Requires: EMSE 3.0 and Standard Choice: "EMSE_EXECUTE_OPTIONS": "SCRIPT" to be Active.
 |
 | Notes   : Abe >> 11/22/2024 created script - Converted from StdChoice, WTUA:Code/~/~/~ branch
 |         : Abe >> 06/24/2026 Added IT Request# 1675 - Code Enforcement New Workflow
-|          
+|         : Abe >> 10/22/2026 Added IT Request# 3921 - added Fee Invoice Rpt to "Fine Processing"
 |
 |
 /--------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
@@ -46,12 +46,12 @@ if (wfProcess == "CODE_ENF") { //New Workflow
     var emailSubject = "";    //$$emailSubject$$
     var reportModule = "Code";
     var reportFile = null;
+    var invoiceRptFile = null;
     var refAgenciesStdChoice = "SDL: CE_Ref_Agencies";
     //To control appStatus
     //commented - Revision 5/12/2026
     var isCitationActive = false;
     var isNuisanceActive = false;
-
     var isEnfActive = false;
     var isFineProcActive = false;
 
@@ -67,7 +67,6 @@ if (wfProcess == "CODE_ENF") { //New Workflow
     }
 
     if (isTaskActive("Enforcement Action") || isCitationActive || isNuisanceActive) { isEnfActive = true; }
-
     if (isTaskActive("Fine Processing") && !(isEnfActive)) { isFineProcActive = true; }
 
     addParameter(reportParams, "altID", capIDString);
@@ -171,7 +170,6 @@ if (wfProcess == "CODE_ENF") { //New Workflow
             activateTask("Notice of Nuisance");
             closeTask("Enforcement Action", "Citation & Notice of Nuisance", "Closed by Script", "Forked by Script");
         }
-
         if (wfStatus == "Complied Voluntarily") {
             if (isEnfActive) updateAppStatus("Enforcement Action", "Updated by WTUA Script");
             else if (isFineProcActive) updateAppStatus("Fine Processing", "Updated by WTUA Script");
@@ -337,7 +335,6 @@ if (wfProcess == "CODE_ENF") { //New Workflow
             }
         }
     }
-
     if (wfTask == "Fine Processing") {
         if (wfStatus == "Request for Payment") {
             //Create Invoice Cover Letter (16)
@@ -433,6 +430,14 @@ function sendNotice2Recipients(fileName) {
         for (each in checkedRecipients) {
             addParameter(reportParams, "conatctType", checkedRecipients[each]);
             reportFile = generateReportTPS_CustomFileName(reportName, reportParams, reportModule, fileName + "_Case# " + capIDString + "_" + checkedRecipients[each] + ".pdf");
+
+            //start: IT Request# 3921
+            if(wfTask=="Fine Processing" && matches(wfStatus, "Request for Payment","Subsequent Payment Request")){
+                invoiceRptFile = generateReportTPS_CustomFileName("Fee Invoice", reportParams, reportModule, "Fee_Invoice_case#"+ capIDString +".pdf");
+
+            }
+            //End: IT Request# 3921    
+
             //logDebug("reportFile: " + reportFile);
             if (checkedRecipients[each] == "Owner") {
                 emailTo = emailParams.get("$$ownerEmail$$");
