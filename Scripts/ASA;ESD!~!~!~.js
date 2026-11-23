@@ -22,7 +22,8 @@
 |         : Abe   10/23/2026 added ASA:ESD/Parcel Map/~/~ stdChoice and disabled
 |         : Abe   10/26/2026 commented fee automation associated with depricated Fee items
 |         : Abe   11/20/2026 added last FEE STUDY updates and sent to NP1 and database(EMSE TOOL)
-|
+|         : Abe   11/23/2026 //FIXME: Will convert ASA;ESD!~!~!~ stdChoice to EMSE Script soon. It includes followings:
+|                                   : "ES_COPY_GEO_TO_ASI", "ES_GEO_MESSAGE", "updateRefParcelToCap(), "ES_CONTACTUPDATEAFTER"
 |
 /=============================================================================================*/
 showDebug = false; showMessage = false;
@@ -110,7 +111,8 @@ if (!publicUser) {
 		if (varGradingType == "Pond") addFee("EGPPOND", "ESD", "FINAL", 1, varAutoInvoiceFees);
 
 		//FIXME:  Fee schedule of "Exemption Verification Fee" 
-		updateFee("PL-EXV", "PLANNING", "FINAL", 1, varAutoInvoiceFees);
+		logDebug("Will be adding PL-EXV fee here to all GP - currently commented ...");
+		//updateFee("PL-EXV", "PLANNING", "FINAL", 1, varAutoInvoiceFees);
 
 		//Abe 10/23/2026: added assignCap from ASA:ESD stdChoice
 		if (matches(vProjectOffice, "Auburn", ""))
@@ -146,17 +148,7 @@ if (!publicUser) {
 		updateFee("EPLNCHK", "ESD", "FINAL", 1, varAutoInvoiceFees);
 		updateFee("EINSPECT", "ESD", "FINAL", 1, varAutoInvoiceFees);
 
-		/*** 
-		 * 
-		 * Abe - 10/26/2026 >> Commented automation associated with depricated Fee codes
-		 * 
-		 * 		 
-		addFee("DMMICROFLM", "ESD", "FINAL", 1, varAutoInvoiceFees);		
-		if (matches(vImpPlanType, "FF", "PN"))
-			addFee("DPPCSEWER", "ESD", "FINAL", 1, varAutoInvoiceFees); 
-		 *
-		 *
-		*/
+
 	}
 
 	//NOTE:Adding TECH-FEE
@@ -168,6 +160,19 @@ if (!publicUser) {
 		addFee("TECH-FEE", "ACCOUNTING", "FINAL", 1, varAutoInvoiceFees);
 	}
 }
+
+
+/*** 
+ * 
+ * Abe - 10/26/2026 >> Commented automation associated with depricated Fee codes
+ * 
+ * 		 
+addFee("DMMICROFLM", "ESD", "FINAL", 1, varAutoInvoiceFees);		
+if (matches(vImpPlanType, "FF", "PN"))
+	addFee("DPPCSEWER", "ESD", "FINAL", 1, varAutoInvoiceFees); 
+	*
+	*
+*/
 
 
 /** 
