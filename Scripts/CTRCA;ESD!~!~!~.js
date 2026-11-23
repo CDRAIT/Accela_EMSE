@@ -32,7 +32,8 @@ if (publicUser) {
 
         //NOTE: Exemption Verification Fee added to all Grading Permits from PLANNING Fee Schedule
         //FIXME: Confirm the PLANNING fee schedule name
-        addFee("PL-EXV", "PLANNING", "FINAL", 1, varAutoInvoiceFees);
+        logDebug("Will be adding PL-EXV fee here to all GP - currently commented ...");
+        //addFee("PL-EXV", "PLANNING", "FINAL", 1, varAutoInvoiceFees);
     }
 
     if (matches(appTypeArray[1], "Record of Survey")) {
