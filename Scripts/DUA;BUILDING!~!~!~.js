@@ -317,6 +317,36 @@ if((publicUser || publicUserEDR == true) && capIDString.indexOf("TMP") == -1)
 
 	//--- End block for BLD_PLNCHK_20241222	--------------------------/
 
+	// New block for wf process CALFIRE_20261103
+	//-------------------------------------------------------------	
+	if(matches(capStatus,"Corrections Required","Application Incomplete","Responses Received"))
+	{
+		logDebug("Inside first if for matches capStatus");
+		if(isTaskActive("Application Acceptance","CALFIRE_20261103"))
+		{
+			logDebug("Inside matches active task");
+			if(isTaskStatus("Application Acceptance","Application Incomplete","CALFIRE_20261103"))
+			{
+				logDebug("Inside matches task status");
+				editTaskDueDate("Application Acceptance",dateAdd(null,1,"Y"),"CALFIRE_20261103");
+				updateTask("Application Acceptance","Received","Document uploaded following an Application Incomplete status. Updated by script","");
+				updateAppStatus("Received","Document uploaded following an Application Incomplete status. Updated by script");				
+			}
+		}
+		if(isTaskActive("Fire Review","CALFIRE_20261103"))
+		{
+			if(isTaskStatus("Fire Review","Corrections Required","CALFIRE_20261103"))
+			{
+				logDebug("Inside matches task status");
+				editTaskDueDate("Fire Review",dateAdd(null,1,"Y"),"CALFIRE_20261103");
+				updateTask("Fire Review","Resubmittal Review","Document uploaded following a Corrections Required/Responses Received status. Updated by script","");
+				updateAppStatus("Resubmittal Review","Document uploaded following a Corrections Required/Responses Received status. Updated by script");							
+			}
+		}
+	}
+	//--- End block for CALFIRE -------------------------
+	
+
 	if(sendDUAEmails && capStatus == "Received") {
 		if(AInfo["Project Office"]== "Auburn") {
 			addParameter(emailParameters,"$$officeParam$$","Auburn");
