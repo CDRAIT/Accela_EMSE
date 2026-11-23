@@ -27,7 +27,7 @@ var varAutoInvoiceFees = 'N';
 if (!publicUser) {
     //NOTE: Update associated fees after post-submittal "ASI:GRADING PERMIT TYPE" updates by staff
     if (matches(appTypeArray[1], "Grading Permit")) {   
-        var varGradingType = getAppSpecific("Grading Permit Type");
+        var varGradingType = getAppSpecific("GP Type");
         if (varGradingType == "Standard") {
             updateFee("EGP", "ESD", "FINAL", 1, varAutoInvoiceFees);
             if (feeExists("EGPENGPLANS", 'NEW')) removeFee("EGPENGPLANS", "FINAL");

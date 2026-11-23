@@ -42,6 +42,7 @@ if (publicUser) {
 
     // Adding New TECH Fee (only two Rec Types on  ACA)
     //NOTE: ESD TECH-FEE Exemptions, as of 11/20/2026: ESECURITY, EWINTERIZ
+    logDebug("Adding TECH-FEE ...");
     if (matches(appTypeArray[1], "Grading Permit", "Record of Survey")) {
         addFee("TECH-FEE", "ACCOUNTING", "FINAL", 1, varAutoInvoiceFees);
     }

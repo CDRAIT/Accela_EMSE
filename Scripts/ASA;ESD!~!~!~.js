@@ -153,6 +153,7 @@ if (!publicUser) {
 
 	//NOTE:Adding TECH-FEE
 	//NOTE: ESD TECH-FEE Exemptions, as of 11/20/2026: ESECURITY, EWINTERIZ	
+	logDebug("Adding TECH-FEE ...");
 	if (matches(appTypeArray[1], "Final Subdivision Map", "Grading Permit", "Improvement Plan Revision", "Parcel Map", "Record of Survey")) {
 		addFee("TECH-FEE", "ACCOUNTING", "FINAL", 1, varAutoInvoiceFees);
 	}
