@@ -37,6 +37,7 @@ if (publicUser) {
     }
 
     if (matches(appTypeArray[1], "Record of Survey")) {
+        logDebug("Adding/updating EROS fee ...");
         addFee("EROS", "ESD", "FINAL", 1, varAutoInvoiceFees);
     }
 

@@ -123,10 +123,12 @@ if (!publicUser) {
 	}
 
 	if (appTypeArray[1] == "Record of Survey") {
+		logDebug("Adding/updating EROS fee ...");
 		updateFee("EROS", "ESD", "FINAL", 1, varAutoInvoiceFees);
 	}
 
 	if (appTypeArray[1] == "Parcel Map") {
+		logDebug("Adding/updating EPARCELMAP fee ...");
 		updateFee("EPARCELMAP", "ESD", "FINAL", 1, varAutoInvoiceFees);
 
 		//Abe 10/23/2026: added from ASA:ESD/Parcel Map
@@ -134,6 +136,7 @@ if (!publicUser) {
 	}
 
 	if (appTypeArray[1] == "Final Subdivision Map") {
+		logDebug("Adding/updating EFINALMAP fee ...");
 		updateFee("EFINALMAP", "ESD", "FINAL", 1, varAutoInvoiceFees);
 	}
 
@@ -144,8 +147,12 @@ if (!publicUser) {
 			updateShortNotes(varImpPlanType);
 		}
 
+		logDebug("ESD Improvement Plan: adding/updating following fees ...");
+		logDebug("Adding/updating EWINTERIZ fee ...");
 		updateFee("EWINTERIZ", "ESD", "FINAL", 1, varAutoInvoiceFees);
+		logDebug("Adding/updating EPLNCHK fee ...");
 		updateFee("EPLNCHK", "ESD", "FINAL", 1, varAutoInvoiceFees);
+		logDebug("Adding/updating EINSPECT fee ...");
 		updateFee("EINSPECT", "ESD", "FINAL", 1, varAutoInvoiceFees);
 
 

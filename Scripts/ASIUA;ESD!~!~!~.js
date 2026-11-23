@@ -29,16 +29,19 @@ if (!publicUser) {
     if (matches(appTypeArray[1], "Grading Permit")) {   
         var varGradingType = getAppSpecific("GP Type");
         if (varGradingType == "Standard") {
+            logDebug("Grading Permit Type: Standard, adding/updating EGP fee ...");
             updateFee("EGP", "ESD", "FINAL", 1, varAutoInvoiceFees);
             if (feeExists("EGPENGPLANS", 'NEW')) removeFee("EGPENGPLANS", "FINAL");
             if (feeExists("EGPPOND", 'NEW')) removeFee("EGPPOND", "FINAL");
         }
         if (varGradingType == "Engineered") {
+            logDebug("Grading Permit Type: Engineered, adding/updating EGPENGPLANS fee ...");
             updateFee("EGPENGPLANS", "ESD", "FINAL", 1, varAutoInvoiceFees);
             if(feeExists("EGP","NEW")) removeFee("EGP", "FINAL");
             if (feeExists("EGPPOND", 'NEW')) removeFee("EGPPOND", "FINAL");
         }
         if (varGradingType == "Pond"){
+            logDebug("Grading Permit Type: Pond, adding/updating EGPPOND fee ...");
             updateFee("EGPPOND", "ESD", "FINAL", 1, varAutoInvoiceFees);
             if(feeExists("EGP","NEW")) removeFee("EGP", "FINAL");
             if (feeExists("EGPENGPLANS", 'NEW')) removeFee("EGPENGPLANS", "FINAL");
